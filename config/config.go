@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists an app's config.
-func List(c *deis.Client, app string) (api.Config, error) {
+func List(c *drycc.Client, app string) (api.Config, error) {
 	u := fmt.Sprintf("/v2/apps/%s/config/", app)
 
 	res, reqErr := c.Request("GET", u, nil)
@@ -35,10 +35,10 @@ func List(c *deis.Client, app string) (api.Config, error) {
 //    - If the variable is set to nil, it will be unset.
 //    - If the variable was ignored in the api.Config, it will remain unchanged.
 //
-// Calling Set() with an empty api.Config will return a deis.ErrConflict.
-// Trying to unset a key that does not exist returns a deis.ErrUnprocessable.
-// Trying to set a tag that is not a label in the kubernetes cluster will return a deis.ErrTagNotFound.
-func Set(c *deis.Client, app string, config api.Config) (api.Config, error) {
+// Calling Set() with an empty api.Config will return a drycc.ErrConflict.
+// Trying to unset a key that does not exist returns a drycc.ErrUnprocessable.
+// Trying to set a tag that is not a label in the kubernetes cluster will return a drycc.ErrTagNotFound.
+func Set(c *drycc.Client, app string, config api.Config) (api.Config, error) {
 	body, err := json.Marshal(config)
 
 	if err != nil {

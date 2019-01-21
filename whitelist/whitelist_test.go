@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const whitelistFixture string = `
@@ -22,7 +22,7 @@ const whitelistCreateExpected string = `{"addresses":["1.2.3.4","0.0.0.0/0"]}`
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/whitelist/" && req.Method == "GET" {
 		res.Write([]byte(whitelistFixture))
@@ -83,12 +83,12 @@ func TestWhitelistList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := List(deis, "example-go")
+	actual, err := List(drycc, "example-go")
 
 	if err != nil {
 		t.Fatal(err)
@@ -110,12 +110,12 @@ func TestWhitelistAdd(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := Add(deis, "example-go", []string{"1.2.3.4", "0.0.0.0/0"})
+	actual, err := Add(drycc, "example-go", []string{"1.2.3.4", "0.0.0.0/0"})
 
 	if err != nil {
 		t.Fatal(err)
@@ -133,12 +133,12 @@ func TestWhitelistRemove(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "example-go", []string{"1.2.3.4"}); err != nil {
+	if err = Delete(drycc, "example-go", []string{"1.2.3.4"}); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -150,18 +150,18 @@ func TestAppSettingsInvalidJson(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = List(deis, "invalidjson-test")
+	_, err = List(drycc, "invalidjson-test")
 	expected := "json: cannot unmarshal string into Go value of type api.Whitelist"
 	if err == nil || !reflect.DeepEqual(expected, err.Error()) {
 		t.Errorf("Expected %v, Got %v", expected, err)
 	}
 
-	_, err = Add(deis, "invalidjson-test", []string{"1.2.3.4"})
+	_, err = Add(drycc, "invalidjson-test", []string{"1.2.3.4"})
 	if err == nil || !reflect.DeepEqual(expected, err.Error()) {
 		t.Errorf("Expected %v, Got %v", expected, err)
 	}

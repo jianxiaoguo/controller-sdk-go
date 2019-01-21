@@ -5,11 +5,11 @@ def sh = { cmd ->
 }
 
 // Disabling until we have a more sustainable Windows Jenkins Agent plan
-// See https://github.com/teamhephy/jenkins-jobs/issues/351
+// See https://github.com/drycc/jenkins-jobs/issues/351
 // node('windows') {
 // 	def gopath = pwd() + "\\gopath"
 // 	env.GOPATH = gopath
-// 	def workdir = gopath + "\\src\\github.com\\teamhephy\\controller-sdk-go"
+// 	def workdir = gopath + "\\src\\github.com\\drycc\\controller-sdk-go"
 //
 // 	def pscmd = { String cmd ->
 // 		"powershell -NoProfile -ExecutionPolicy Bypass -Command \"${cmd}\""
@@ -49,13 +49,13 @@ node('linux') {
 	}
 }
 
-def test_image = "quay.io/deisci/controller-sdk-go-dev:${git_commit.take(7)}"
+def test_image = "quay.io/drycc/controller-sdk-go-dev:${git_commit.take(7)}"
 
 node('linux') {
 		stage 'Build and push test container'
 			checkout scm
-			def quayUsername = "deisci+jenkins"
-			def quayEmail = "deis+jenkins@deis.com"
+			def quayUsername = "drycc+jenkins"
+			def quayEmail = "drycc+jenkins@drycc.com"
 			withCredentials([[$class: 'StringBinding',
 												credentialsId: 'c67dc0a1-c8c4-4568-a73d-53ad8530ceeb',
 									 			variable: 'QUAY_PASSWORD']]) {
@@ -95,7 +95,7 @@ node('linux') {
 stage 'Build and Upload CLI built with SDK'
 
 def gcs_bucket = "gs://workflow-cli-pr"
-def wcli_image = 'quay.io/deisci/workflow-cli-dev:latest'
+def wcli_image = 'quay.io/drycc/workflow-cli-dev:latest'
 
 
 def upload_artifacts = { String dist_dir ->
@@ -127,7 +127,7 @@ def mktmp = {
 }
 
 node('linux') {
-	def author = "teamhephy"
+	def author = "drycc"
 	def flags = ""
 
 	if (git_branch != "master") {
@@ -139,14 +139,14 @@ node('linux') {
 	def tmp_dir = mktmp()
 	def dist_dir = "-e DIST_DIR=/upload -v ${tmp_dir}:/upload"
 
-	def pattern = "github\\.com\\/teamhephy\\/controller-sdk-go\\n\\s+version:\\s+[a-f0-9]+"
-	def replacement = "github\\.com\\/teamhephy\\/controller-sdk-go\\n"
+	def pattern = "github\\.com\\/drycc\\/controller-sdk-go\\n\\s+version:\\s+[a-f0-9]+"
+	def replacement = "github\\.com\\/drycc\\/controller-sdk-go\\n"
 	replacement += "  repo: https:\\/\\/github\\.com\\/${author}\\/controller-sdk-go\\.git\\n"
 	replacement += "  vcs: git\\n"
 	replacement += "  version: ${git_commit}"
 
 	def build_script = "sh -c 'perl -i -0pe \"s/${pattern}/${replacement}/\" glide.yaml "
-	build_script += "&& rm -rf glide.lock vendor/github.com/teamhephy/controller-sdk-go "
+	build_script += "&& rm -rf glide.lock vendor/github.com/drycc/controller-sdk-go "
 	build_script += "&& glide install "
 	build_script += "&& make build-revision'"
 	sh "docker pull ${wcli_image}"
@@ -188,7 +188,7 @@ Commit: ${env.CHANGE_TITLE}<br/>
 <p><a href="${env.BUILD_URL}input/">Click here</a> to restart e2e.</p>
 </div>
 </html>
-""", from: 'jenkins@ci.deis.io', subject: 'Controller-sdk-go E2E Test Failure', to: env.SLACKEMAIL, mimeType: 'text/html'
+""", from: 'jenkins@ci.drycc.cc', subject: 'Controller-sdk-go E2E Test Failure', to: env.SLACKEMAIL, mimeType: 'text/html'
 			}
 			input "Retry the e2e tests?"
 		}

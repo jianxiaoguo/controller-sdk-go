@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
+	drycc "github.com/drycc/controller-sdk-go"
 )
 
 const registerExpected string = `{"username":"test","password":"opensesame","email":"test@example.com"}`
@@ -27,7 +27,7 @@ type fakeHTTPServer struct {
 }
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/auth/register/" && req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
@@ -165,12 +165,12 @@ func TestRegister(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Register(deis, "test", "opensesame", "test@example.com"); err != nil {
+	if err = Register(drycc, "test", "opensesame", "test@example.com"); err != nil {
 		t.Error(err)
 	}
 }
@@ -182,12 +182,12 @@ func TestLogin(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := Login(deis, "test", "opensesame")
+	actual, err := Login(drycc, "test", "opensesame")
 
 	if err != nil {
 		t.Error(err)
@@ -207,12 +207,12 @@ func TestPasswd(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := Passwd(deis, "test", "old", "new"); err != nil {
+	if err := Passwd(drycc, "test", "old", "new"); err != nil {
 		t.Error(err)
 	}
 }
@@ -224,16 +224,16 @@ func TestDelete(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err := Delete(deis, "foo"); err != nil {
+	if err := Delete(drycc, "foo"); err != nil {
 		t.Error(err)
 	}
 
-	if err := Delete(deis, ""); err != nil {
+	if err := Delete(drycc, ""); err != nil {
 		t.Error(err)
 	}
 }
@@ -245,7 +245,7 @@ func TestDeleteUserApp(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	d, err := deis.New(false, server.URL, "abc")
+	d, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -253,8 +253,8 @@ func TestDeleteUserApp(t *testing.T) {
 	err = Delete(d, "admin")
 	// should be a 409 Conflict
 
-	if err != deis.ErrCancellationFailed {
-		t.Errorf("got '%s' but expected '%s'", err, deis.ErrConflict)
+	if err != drycc.ErrCancellationFailed {
+		t.Errorf("got '%s' but expected '%s'", err, drycc.ErrConflict)
 	}
 }
 
@@ -265,12 +265,12 @@ func TestRegenerate(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	token, err := Regenerate(deis, "", true)
+	token, err := Regenerate(drycc, "", true)
 
 	if err != nil {
 		t.Error(err)
@@ -280,7 +280,7 @@ func TestRegenerate(t *testing.T) {
 		t.Errorf("Expected token be empty, Got %s", token)
 	}
 
-	token, err = Regenerate(deis, "test", false)
+	token, err = Regenerate(drycc, "test", false)
 
 	if err != nil {
 		t.Error(err)
@@ -291,7 +291,7 @@ func TestRegenerate(t *testing.T) {
 		t.Errorf("Expected %s, Got %s", expected, token)
 	}
 
-	token, err = Regenerate(deis, "", false)
+	token, err = Regenerate(drycc, "", false)
 
 	if err != nil {
 		t.Error(err)

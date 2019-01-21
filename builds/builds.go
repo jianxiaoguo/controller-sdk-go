@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists an app's builds.
-func List(c *deis.Client, appID string, results int) ([]api.Build, int, error) {
+func List(c *drycc.Client, appID string, results int) ([]api.Build, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/builds/", appID)
 	body, count, reqErr := c.LimitedRequest(u, results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Build{}, -1, reqErr
 	}
 
@@ -31,12 +31,12 @@ func List(c *deis.Client, appID string, results int) ([]api.Build, int, error) {
 // If you want to define more process types, you can pass a Procfile map,
 // where the key is the process name and the value is the command for that process.
 // To pull from a private docker registry, a custom username and password must be set in the app's
-// configuration object. This can be done with `deis registry:set` or by using this SDK.
+// configuration object. This can be done with `drycc registry:set` or by using this SDK.
 //
 // This example adds custom registry credentials to an app:
 //    import (
-//    	"github.com/teamhephy/controller-sdk-go/api"
-//    	"github.com/teamhephy/controller-sdk-go/config"
+//    	"github.com/drycc/controller-sdk-go/api"
+//    	"github.com/drycc/controller-sdk-go/config"
 //    )
 //
 //    // Create username/password map
@@ -53,7 +53,7 @@ func List(c *deis.Client, appID string, results int) ([]api.Build, int, error) {
 //    if err != nil {
 //        log.Fatal(err)
 //    }
-func New(c *deis.Client, appID string, image string,
+func New(c *drycc.Client, appID string, image string,
 	procfile map[string]string) (api.Build, error) {
 
 	u := fmt.Sprintf("/v2/apps/%s/builds/", appID)
@@ -67,7 +67,7 @@ func New(c *deis.Client, appID string, image string,
 	}
 
 	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Build{}, reqErr
 	}
 	defer res.Body.Close()

@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // Info displays an app's tls config.
-func Info(c *deis.Client, app string) (api.TLS, error) {
+func Info(c *drycc.Client, app string) (api.TLS, error) {
 	u := fmt.Sprintf("/v2/apps/%s/tls/", app)
 
 	res, reqErr := c.Request("GET", u, nil)
@@ -28,7 +28,7 @@ func Info(c *deis.Client, app string) (api.TLS, error) {
 }
 
 // Enable enables the router to enforce https-only requests to the application.
-func Enable(c *deis.Client, app string) (api.TLS, error) {
+func Enable(c *drycc.Client, app string) (api.TLS, error) {
 	t := api.NewTLS()
 	b := true
 	t.HTTPSEnforced = &b
@@ -55,7 +55,7 @@ func Enable(c *deis.Client, app string) (api.TLS, error) {
 }
 
 // Disable disables the router from enforcing https-only requests to the application.
-func Disable(c *deis.Client, app string) (api.TLS, error) {
+func Disable(c *drycc.Client, app string) (api.TLS, error) {
 	body, err := json.Marshal(api.NewTLS())
 
 	if err != nil {

@@ -7,14 +7,14 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	"github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // UserFromKey retrives a user from their SSH key fingerprint.
-func UserFromKey(c *deis.Client, fingerprint string) (api.UserApps, error) {
+func UserFromKey(c *drycc.Client, fingerprint string) (api.UserApps, error) {
 	res, reqErr := c.Request("GET", fmt.Sprintf("/v2/hooks/key/%s", fingerprint), nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.UserApps{}, reqErr
 	}
 
@@ -29,7 +29,7 @@ func UserFromKey(c *deis.Client, fingerprint string) (api.UserApps, error) {
 }
 
 // GetAppConfig retrives an app's configuration from the controller.
-func GetAppConfig(c *deis.Client, username, app string) (api.Config, error) {
+func GetAppConfig(c *drycc.Client, username, app string) (api.Config, error) {
 	req := api.ConfigHookRequest{User: username, App: app}
 	b, err := json.Marshal(req)
 	if err != nil {
@@ -37,7 +37,7 @@ func GetAppConfig(c *deis.Client, username, app string) (api.Config, error) {
 	}
 
 	res, reqErr := c.Request("POST", "/v2/hooks/config/", b)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Config{}, reqErr
 	}
 	defer res.Body.Close()
@@ -53,7 +53,7 @@ func GetAppConfig(c *deis.Client, username, app string) (api.Config, error) {
 // CreateBuild creates a new release of an application. It returns the version of the new release.
 // gitSha should be the first 8 characters of the git commit sha. Image is either the docker image
 // location for the dockerfile app the absolute url to the tar file for a buldpack app.
-func CreateBuild(c *deis.Client, username, app, image, gitSha string, procfile api.ProcessType,
+func CreateBuild(c *drycc.Client, username, app, image, gitSha string, procfile api.ProcessType,
 	usingDockerifle bool) (int, error) {
 	req := api.BuildHookRequest{
 		Sha:      gitSha,
@@ -73,7 +73,7 @@ func CreateBuild(c *deis.Client, username, app, image, gitSha string, procfile a
 	}
 
 	res, reqErr := c.Request("POST", "/v2/hooks/build/", b)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return -1, reqErr
 	}
 	defer res.Body.Close()

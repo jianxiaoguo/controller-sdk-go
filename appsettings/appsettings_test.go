@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const appSettingsFixture string = `
@@ -20,7 +20,7 @@ const appSettingsFixture string = `
     "routable": true,
     "whitelist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
-    "label": {"git_repo": "https://github.com/teamhephy/controller-sdk-go", "team" : "deis"},
+    "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
@@ -35,22 +35,22 @@ const appSettingsUnsetFixture string = `
     "routable": true,
     "whitelist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
-    "label": {"git_repo": "https://github.com/teamhephy/controller-sdk-go", "team" : "deis"},
+    "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
 
-const appSettingsSetExpected string = `{"maintenance":true,"routable":true,"whitelist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/teamhephy/controller-sdk-go","team":"deis"}}`
-const appSettingsUnsetExpected string = `{"maintenance":true,"routable":true,"whitelist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/teamhephy/controller-sdk-go","team":"deis"}}`
+const appSettingsSetExpected string = `{"maintenance":true,"routable":true,"whitelist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+const appSettingsUnsetExpected string = `{"maintenance":true,"routable":true,"whitelist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
 
 var trueVar = true
 
 type fakeHTTPServer struct{}
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/settings/" && req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
@@ -122,7 +122,7 @@ func TestAppSettingsSet(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -141,8 +141,8 @@ func TestAppSettingsSet(t *testing.T) {
 			},
 		},
 		Label: map[string]interface{}{
-			"git_repo": "https://github.com/teamhephy/controller-sdk-go",
-			"team":     "deis",
+			"git_repo": "https://github.com/drycc/controller-sdk-go",
+			"team":     "drycc",
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",
@@ -161,12 +161,12 @@ func TestAppSettingsSet(t *testing.T) {
 			},
 		},
 		Label: map[string]interface{}{
-			"git_repo": "https://github.com/teamhephy/controller-sdk-go",
-			"team":     "deis",
+			"git_repo": "https://github.com/drycc/controller-sdk-go",
+			"team":     "drycc",
 		},
 	}
 
-	actual, err := Set(deis, "example-go", appSettingsVars)
+	actual, err := Set(drycc, "example-go", appSettingsVars)
 
 	if err != nil {
 		t.Error(err)
@@ -184,7 +184,7 @@ func TestAppSettingsUnset(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -203,8 +203,8 @@ func TestAppSettingsUnset(t *testing.T) {
 			},
 		},
 		Label: map[string]interface{}{
-			"git_repo": "https://github.com/teamhephy/controller-sdk-go",
-			"team":     "deis",
+			"git_repo": "https://github.com/drycc/controller-sdk-go",
+			"team":     "drycc",
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",
@@ -223,12 +223,12 @@ func TestAppSettingsUnset(t *testing.T) {
 			},
 		},
 		Label: map[string]interface{}{
-			"git_repo": "https://github.com/teamhephy/controller-sdk-go",
-			"team":     "deis",
+			"git_repo": "https://github.com/drycc/controller-sdk-go",
+			"team":     "drycc",
 		},
 	}
 
-	actual, err := Set(deis, "unset-test", appSettingsVars)
+	actual, err := Set(drycc, "unset-test", appSettingsVars)
 
 	if err != nil {
 		t.Error(err)
@@ -246,7 +246,7 @@ func TestAppSettingsList(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -265,15 +265,15 @@ func TestAppSettingsList(t *testing.T) {
 			},
 		},
 		Label: map[string]interface{}{
-			"git_repo": "https://github.com/teamhephy/controller-sdk-go",
-			"team":     "deis",
+			"git_repo": "https://github.com/drycc/controller-sdk-go",
+			"team":     "drycc",
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
-	actual, err := List(deis, "example-go")
+	actual, err := List(drycc, "example-go")
 
 	if err != nil {
 		t.Error(err)
@@ -291,12 +291,12 @@ func TestAppSettingsInvalidJson(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = List(deis, "invalidjson-test")
+	_, err = List(drycc, "invalidjson-test")
 	expected := "json: cannot unmarshal string into Go value of type api.AppSettings"
 	if err == nil || !reflect.DeepEqual(expected, err.Error()) {
 		t.Errorf("Expected %v, Got %v", expected, err)
@@ -305,7 +305,7 @@ func TestAppSettingsInvalidJson(t *testing.T) {
 	appSettingsVars := api.AppSettings{
 		Maintenance: &trueVar,
 	}
-	_, err = Set(deis, "invalidjson-test", appSettingsVars)
+	_, err = Set(drycc, "invalidjson-test", appSettingsVars)
 	if err == nil || !reflect.DeepEqual(expected, err.Error()) {
 		t.Errorf("Expected %v, Got %v", expected, err)
 	}

@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const configFixture string = `
@@ -59,7 +59,7 @@ const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"memory":
 type fakeHTTPServer struct{}
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/config/" && req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
@@ -120,7 +120,7 @@ func TestConfigSet(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,7 +168,7 @@ func TestConfigSet(t *testing.T) {
 		},
 	}
 
-	actual, err := Set(deis, "example-go", configVars)
+	actual, err := Set(drycc, "example-go", configVars)
 
 	if err != nil {
 		t.Error(err)
@@ -186,7 +186,7 @@ func TestConfigUnset(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -223,7 +223,7 @@ func TestConfigUnset(t *testing.T) {
 		},
 	}
 
-	actual, err := Set(deis, "unset-test", configVars)
+	actual, err := Set(drycc, "unset-test", configVars)
 
 	if err != nil {
 		t.Error(err)
@@ -241,7 +241,7 @@ func TestConfigList(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -270,7 +270,7 @@ func TestConfigList(t *testing.T) {
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
-	actual, err := List(deis, "example-go")
+	actual, err := List(drycc, "example-go")
 
 	if err != nil {
 		t.Error(err)

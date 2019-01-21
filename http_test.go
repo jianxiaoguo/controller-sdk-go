@@ -1,4 +1,4 @@
-package deis
+package drycc
 
 import (
 	"fmt"
@@ -30,8 +30,8 @@ const limitedFixture string = `
 `
 
 func (f fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", f.Version)
-	res.Header().Add("DEIS_PLATFORM_VERSION", f.PlatformVersion)
+	res.Header().Add("DRYCC_API_VERSION", f.Version)
+	res.Header().Add("DRYCC_PLATFORM_VERSION", f.PlatformVersion)
 
 	eA := "test"
 
@@ -69,8 +69,8 @@ func (f fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		}
 
 		bT := "testing"
-		if req.Header.Get("X-Deis-Builder-Auth") != bT {
-			fmt.Printf("Hook Token Wrong: Expected %s, Got %s\n", bT, req.Header.Get("X-Deis-Builder-Auth"))
+		if req.Header.Get("X-Drycc-Builder-Auth") != bT {
+			fmt.Printf("Hook Token Wrong: Expected %s, Got %s\n", bT, req.Header.Get("X-Drycc-Builder-Auth"))
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 			return
@@ -116,13 +116,13 @@ func TestCheckConnection(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := New(false, server.URL, "")
+	drycc, err := New(false, server.URL, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
+	drycc.UserAgent = "test"
 
-	if err = deis.CheckConnection(); err != nil {
+	if err = drycc.CheckConnection(); err != nil {
 		t.Error(err)
 	}
 }
@@ -134,18 +134,18 @@ func TestAPIMistmatch(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := New(false, server.URL, "")
+	drycc, err := New(false, server.URL, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
+	drycc.UserAgent = "test"
 
-	if err = deis.CheckConnection(); err != ErrAPIMismatch {
+	if err = drycc.CheckConnection(); err != ErrAPIMismatch {
 		t.Error("Expected ErrAPIMismatch error")
 	}
 
-	if deis.ControllerAPIVersion != handler.Version {
-		t.Errorf("Expected %s, Got %s", handler.Version, deis.ControllerAPIVersion)
+	if drycc.ControllerAPIVersion != handler.Version {
+		t.Errorf("Expected %s, Got %s", handler.Version, drycc.ControllerAPIVersion)
 	}
 }
 
@@ -156,14 +156,14 @@ func TestBasicRequest(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := New(false, server.URL, "abc")
+	drycc, err := New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
-	deis.HooksToken = "testing"
+	drycc.UserAgent = "test"
+	drycc.HooksToken = "testing"
 
-	res, err := deis.Request("POST", "/request/", []byte("test"))
+	res, err := drycc.Request("POST", "/request/", []byte("test"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,17 +175,17 @@ func TestBasicRequest(t *testing.T) {
 		t.Errorf("Expected %s, Got %s", expected, string(body))
 	}
 
-	if deis.ControllerAPIVersion != handler.Version {
-		t.Errorf("Expected %s, Got %s", handler.Version, deis.ControllerAPIVersion)
+	if drycc.ControllerAPIVersion != handler.Version {
+		t.Errorf("Expected %s, Got %s", handler.Version, drycc.ControllerAPIVersion)
 	}
 
-	if deis.ControllerVersion != handler.PlatformVersion {
-		t.Errorf("Expected %s, Got %s", handler.PlatformVersion, deis.ControllerVersion)
+	if drycc.ControllerVersion != handler.PlatformVersion {
+		t.Errorf("Expected %s, Got %s", handler.PlatformVersion, drycc.ControllerVersion)
 	}
 
 	// Make sure the request doesn't modify the URL
-	if deis.ControllerURL.String() != server.URL {
-		t.Errorf("Expected %s, Got %s", server.URL, deis.ControllerURL.String())
+	if drycc.ControllerURL.String() != server.URL {
+		t.Errorf("Expected %s, Got %s", server.URL, drycc.ControllerURL.String())
 	}
 }
 
@@ -196,16 +196,16 @@ func TestLimitedRequest(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := New(false, server.URL, "abc")
+	drycc, err := New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
+	drycc.UserAgent = "test"
 
 	expected := `[{"test":"foo"},{"test":"bar"}]`
 	expectedC := 4
 
-	actual, count, err := deis.LimitedRequest("/limited/", 2)
+	actual, count, err := drycc.LimitedRequest("/limited/", 2)
 
 	if err != nil {
 		t.Fatal(err)
@@ -219,13 +219,13 @@ func TestLimitedRequest(t *testing.T) {
 		t.Errorf("Expected %s, Got %s", expected, actual)
 	}
 
-	if deis.ControllerAPIVersion != handler.Version {
-		t.Errorf("Expected %s, Got %s", handler.Version, deis.ControllerAPIVersion)
+	if drycc.ControllerAPIVersion != handler.Version {
+		t.Errorf("Expected %s, Got %s", handler.Version, drycc.ControllerAPIVersion)
 	}
 
 	// Make sure the request doesn't modify the URL
-	if deis.ControllerURL.String() != server.URL {
-		t.Errorf("Expected %s, Got %s", server.URL, deis.ControllerURL.String())
+	if drycc.ControllerURL.String() != server.URL {
+		t.Errorf("Expected %s, Got %s", server.URL, drycc.ControllerURL.String())
 	}
 }
 
@@ -237,24 +237,24 @@ func TestHealthcheck(t *testing.T) {
 	defer server.Close()
 
 	// Test with a trailing slash
-	deis, err := New(false, server.URL+"/", "")
+	drycc, err := New(false, server.URL+"/", "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
+	drycc.UserAgent = "test"
 
-	if err = deis.Healthcheck(); err != nil {
+	if err = drycc.Healthcheck(); err != nil {
 		t.Error(err)
 	}
 
 	// Test without a trailing slash
-	deis, err = New(false, server.URL, "")
+	drycc, err = New(false, server.URL, "")
 	if err != nil {
 		t.Fatal(err)
 	}
-	deis.UserAgent = "test"
+	drycc.UserAgent = "test"
 
-	if err = deis.Healthcheck(); err != nil {
+	if err = drycc.Healthcheck(); err != nil {
 		t.Error(err)
 	}
 }

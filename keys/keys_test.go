@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const keysFixture string = `
@@ -44,7 +44,7 @@ const keyCreateExpected string = `{"id":"test@example.com","public":"ssh-rsa abc
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/keys/" && req.Method == "GET" {
 		res.Write([]byte(keysListFixture))
@@ -101,12 +101,12 @@ func TestKeysList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(deis, 100)
+	actual, _, err := List(drycc, 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -133,12 +133,12 @@ func TestKeyCreate(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := New(deis, "test@example.com", "ssh-rsa abc test@example.com")
+	actual, err := New(drycc, "test@example.com", "ssh-rsa abc test@example.com")
 
 	if err != nil {
 		t.Fatal(err)
@@ -156,12 +156,12 @@ func TestKeysDestroy(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "test@example.com"); err != nil {
+	if err = Delete(drycc, "test@example.com"); err != nil {
 		t.Fatal(err)
 	}
 }

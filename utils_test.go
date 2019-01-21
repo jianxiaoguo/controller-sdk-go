@@ -1,4 +1,4 @@
-package deis
+package drycc
 
 import "testing"
 

@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists a user's ssh keys.
-func List(c *deis.Client, results int) (api.Keys, int, error) {
+func List(c *drycc.Client, results int) (api.Keys, int, error) {
 	body, count, reqErr := c.LimitedRequest("/v2/keys/", results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Key{}, -1, reqErr
 	}
 
@@ -27,8 +27,8 @@ func List(c *deis.Client, results int) (api.Keys, int, error) {
 
 // New adds a new ssh key for the user. This is used for authenting with the git
 // remote for the builder. This key must be unique to the current user, or the error
-// deis.ErrDuplicateKey will be returned.
-func New(c *deis.Client, id string, pubKey string) (api.Key, error) {
+// drycc.ErrDuplicateKey will be returned.
+func New(c *drycc.Client, id string, pubKey string) (api.Key, error) {
 	req := api.KeyCreateRequest{ID: id, Public: pubKey}
 	body, err := json.Marshal(req)
 	if err != nil {
@@ -36,7 +36,7 @@ func New(c *deis.Client, id string, pubKey string) (api.Key, error) {
 	}
 
 	res, reqErr := c.Request("POST", "/v2/keys/", body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Key{}, reqErr
 	}
 	defer res.Body.Close()
@@ -51,7 +51,7 @@ func New(c *deis.Client, id string, pubKey string) (api.Key, error) {
 
 // Delete removes a user's ssh key. The key ID will be the key comment, usually the email or user@hostname
 // of the user. The exact keyID can be retrieved with List()
-func Delete(c *deis.Client, keyID string) error {
+func Delete(c *drycc.Client, keyID string) error {
 	u := fmt.Sprintf("/v2/keys/%s", keyID)
 
 	res, err := c.Request("DELETE", u, nil)

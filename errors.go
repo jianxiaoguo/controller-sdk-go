@@ -1,4 +1,4 @@
-package deis
+package drycc
 
 import (
 	"encoding/json"
@@ -53,15 +53,15 @@ var (
 	// ErrInvalidAppName is returned when the user specifies an invalid app name.
 	ErrInvalidAppName = errors.New(invalidAppNameMsg)
 	// ErrConflict is returned when the API returns a 409.
-	ErrConflict = errors.New("This action could not be completed due to a conflict.")
+	ErrConflict = errors.New("this action could not be completed due to a conflict")
 	// ErrForbidden is returned when the API returns a 403.
-	ErrForbidden = errors.New("You do not have permission to perform this action.")
+	ErrForbidden = errors.New("you do not have permission to perform this action")
 	// ErrMissingKey is returned when a key is not sent with the request.
-	ErrMissingKey = errors.New("A key is required")
+	ErrMissingKey = errors.New("a key is required")
 	// ErrDuplicateKey is returned when adding a key that already exists.
 	ErrDuplicateKey = errors.New(duplicateKeyMsg)
 	// ErrInvalidName is returned when a name is invalid or missing.
-	ErrInvalidName = errors.New(fmt.Sprintf("Name %s", strings.ToLower(invalidNameMsg)))
+	ErrInvalidName = fmt.Errorf("name %s", strings.ToLower(invalidNameMsg))
 	// ErrInvalidCertificate is returned when a certififate is missing or invalid
 	ErrInvalidCertificate = errors.New(invalidCertMsg)
 	// ErrPodNotFound is returned when a pod type is not Found
@@ -83,7 +83,7 @@ var (
 	// ErrDuplicateApp is returned when create an app with an ID that already exists
 	ErrDuplicateApp = errors.New(duplicateIDMsg)
 	// ErrCancellationFailed is returned when cancelling a user fails.
-	ErrCancellationFailed = errors.New("Failed to delete user because the user still has applications assigned. Delete or transfer ownership.")
+	ErrCancellationFailed = errors.New("failed to delete user because the user still has applications assigned. Delete or transfer ownership")
 )
 
 // ErrUnprocessable is returned when the controller throws a 422.

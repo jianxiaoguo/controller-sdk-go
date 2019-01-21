@@ -5,16 +5,16 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List domains registered with an app.
-func List(c *deis.Client, appID string, results int) (api.Domains, int, error) {
+func List(c *drycc.Client, appID string, results int) (api.Domains, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/domains/", appID)
 	body, count, reqErr := c.LimitedRequest(u, results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Domain{}, -1, reqErr
 	}
 
@@ -27,7 +27,7 @@ func List(c *deis.Client, appID string, results int) (api.Domains, int, error) {
 }
 
 // New adds a domain to an app.
-func New(c *deis.Client, appID string, domain string) (api.Domain, error) {
+func New(c *drycc.Client, appID string, domain string) (api.Domain, error) {
 	u := fmt.Sprintf("/v2/apps/%s/domains/", appID)
 
 	req := api.DomainCreateRequest{Domain: domain}
@@ -39,7 +39,7 @@ func New(c *deis.Client, appID string, domain string) (api.Domain, error) {
 	}
 
 	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Domain{}, reqErr
 	}
 	defer res.Body.Close()
@@ -53,7 +53,7 @@ func New(c *deis.Client, appID string, domain string) (api.Domain, error) {
 }
 
 // Delete removes a domain from an app.
-func Delete(c *deis.Client, appID string, domain string) error {
+func Delete(c *drycc.Client, appID string, domain string) error {
 	u := fmt.Sprintf("/v2/apps/%s/domains/%s", appID, domain)
 	res, err := c.Request("DELETE", u, nil)
 	if err == nil {

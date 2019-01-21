@@ -24,7 +24,7 @@ TCP Socket Probe: N/A`)
 	h.HTTPGet = &HTTPGetProbe{
 		Path:        "/",
 		Port:        80,
-		HTTPHeaders: []*KVPair{{Name: "X-DEIS-IS", Value: "AWESOME"}},
+		HTTPHeaders: []*KVPair{{Name: "X-DRYCC-IS", Value: "AWESOME"}},
 	}
 
 	expected = strings.TrimSpace(`Initial Delay (seconds): 0
@@ -33,7 +33,7 @@ Period (seconds): 0
 Success Threshold: 0
 Failure Threshold: 0
 Exec Probe: N/A
-HTTP GET Probe: Path="/" Port=80 HTTPHeaders=[X-DEIS-IS=AWESOME]
+HTTP GET Probe: Path="/" Port=80 HTTPHeaders=[X-DRYCC-IS=AWESOME]
 TCP Socket Probe: N/A`)
 
 	if strings.TrimSpace(h.String()) != expected {
@@ -52,7 +52,7 @@ Period (seconds): 0
 Success Threshold: 0
 Failure Threshold: 0
 Exec Probe: Command=[echo hi]
-HTTP GET Probe: Path="/" Port=80 HTTPHeaders=[X-DEIS-IS=AWESOME]
+HTTP GET Probe: Path="/" Port=80 HTTPHeaders=[X-DRYCC-IS=AWESOME]
 TCP Socket Probe: Port=80`)
 
 	if strings.TrimSpace(h.String()) != expected {

@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const buildsFixture string = `
@@ -21,7 +21,7 @@ const buildsFixture string = `
         {
             "app": "example-go",
             "created": "2014-01-01T00:00:00UTC",
-            "dockerfile": "FROM deis/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
+            "dockerfile": "FROM drycc/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
             "image": "example-go",
             "owner": "test",
             "procfile": {
@@ -39,7 +39,7 @@ const buildFixture string = `
     "app": "example-go",
     "created": "2014-01-01T00:00:00UTC",
     "dockerfile": "",
-    "image": "deis/example-go:latest",
+    "image": "drycc/example-go:latest",
     "owner": "test",
     "procfile": {
         "web": "example-go"
@@ -49,12 +49,12 @@ const buildFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }`
 
-const buildExpected string = `{"image":"deis/example-go","procfile":{"web":"example-go"}}`
+const buildExpected string = `{"image":"drycc/example-go","procfile":{"web":"example-go"}}`
 
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/builds/" && req.Method == "GET" {
 		res.Write([]byte(buildsFixture))
@@ -94,7 +94,7 @@ func TestBuildsList(t *testing.T) {
 		{
 			App:        "example-go",
 			Created:    "2014-01-01T00:00:00UTC",
-			Dockerfile: "FROM deis/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
+			Dockerfile: "FROM drycc/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
 			Image:      "example-go",
 			Owner:      "test",
 			Procfile: map[string]string{
@@ -110,12 +110,12 @@ func TestBuildsList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(deis, "example-go", 100)
+	actual, _, err := List(drycc, "example-go", 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -132,7 +132,7 @@ func TestBuildCreate(t *testing.T) {
 	expected := api.Build{
 		App:     "example-go",
 		Created: "2014-01-01T00:00:00UTC",
-		Image:   "deis/example-go:latest",
+		Image:   "drycc/example-go:latest",
 		Owner:   "test",
 		Procfile: map[string]string{
 			"web": "example-go",
@@ -145,7 +145,7 @@ func TestBuildCreate(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -154,7 +154,7 @@ func TestBuildCreate(t *testing.T) {
 		"web": "example-go",
 	}
 
-	actual, err := New(deis, "example-go", "deis/example-go", procfile)
+	actual, err := New(drycc, "example-go", "drycc/example-go", procfile)
 
 	if err != nil {
 		t.Fatal(err)

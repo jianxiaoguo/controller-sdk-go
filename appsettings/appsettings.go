@@ -5,12 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists an app's settings.
-func List(c *deis.Client, app string) (api.AppSettings, error) {
+func List(c *drycc.Client, app string) (api.AppSettings, error) {
 	u := fmt.Sprintf("/v2/apps/%s/settings/", app)
 
 	res, reqErr := c.Request("GET", u, nil)
@@ -35,8 +35,8 @@ func List(c *deis.Client, app string) (api.AppSettings, error) {
 //    - If the variable is set to nil, it will be unset.
 //    - If the variable was ignored in the api.AppSettings, it will remain unchanged.
 //
-// Calling Set() with an empty api.AppSettings will return a deis.ErrConflict.
-func Set(c *deis.Client, app string, appSettings api.AppSettings) (api.AppSettings, error) {
+// Calling Set() with an empty api.AppSettings will return a drycc.ErrConflict.
+func Set(c *drycc.Client, app string, appSettings api.AppSettings) (api.AppSettings, error) {
 	body, err := json.Marshal(appSettings)
 
 	if err != nil {

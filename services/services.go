@@ -6,16 +6,16 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List services registered with an app.
-func List(c *deis.Client, appID string) (api.Services, error) {
+func List(c *drycc.Client, appID string) (api.Services, error) {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 	res, reqErr := c.Request("GET", u, nil)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Service{}, reqErr
 	}
 
@@ -51,7 +51,7 @@ func List(c *deis.Client, appID string) (api.Services, error) {
 // pathPattern - one or several regexp patterns separated by comma, all request matching given regexp
 // are routed to the procfileType workers. E.g. `/webhooks/notify,~ ^/users/[0-9]+/.*/webhooks/notify,/webhooks/rest`
 // procfileType and pathPattern are mandatory and should have valid values.
-func New(c *deis.Client, appID string, procfileType string, pathPattern string) (api.Service, error) {
+func New(c *drycc.Client, appID string, procfileType string, pathPattern string) (api.Service, error) {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
 	req := api.ServiceCreateUpdateRequest{ProcfileType: procfileType, PathPattern: pathPattern}
@@ -63,7 +63,7 @@ func New(c *deis.Client, appID string, procfileType string, pathPattern string) 
 	}
 
 	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Service{}, reqErr
 	}
 	defer res.Body.Close()
@@ -74,7 +74,7 @@ func New(c *deis.Client, appID string, procfileType string, pathPattern string) 
 
 // Delete service from app
 // If given service for the app doesn't exists then error returned
-func Delete(c *deis.Client, appID string, procfileType string) error {
+func Delete(c *drycc.Client, appID string, procfileType string) error {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
 	req := api.ServiceDeleteRequest{ProcfileType: procfileType}

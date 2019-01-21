@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const servicesFixture string = `
@@ -37,7 +37,7 @@ const serviceCreateExpected string = `{"procfile_type":"web","path_pattern":"/ab
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/services/" && req.Method == "GET" {
 		res.Write([]byte(servicesFixture))
@@ -94,12 +94,12 @@ func TestServicesList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := List(deis, "example-go")
+	actual, err := List(drycc, "example-go")
 
 	if err != nil {
 		t.Fatal(err)
@@ -122,12 +122,12 @@ func TestServicesAdd(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := New(deis, "example-go", "web", "/abc/xyz")
+	actual, err := New(drycc, "example-go", "web", "/abc/xyz")
 
 	if err != nil {
 		t.Fatal(err)
@@ -145,12 +145,12 @@ func TestServicesRemove(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "example-go", "web"); err != nil {
+	if err = Delete(drycc, "example-go", "web"); err != nil {
 		t.Fatal(err)
 	}
 }

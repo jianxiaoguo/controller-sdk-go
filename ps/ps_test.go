@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
-	"github.com/teamhephy/controller-sdk-go/pkg/time"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
+	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const processesFixture string = `
@@ -67,7 +67,7 @@ const scaleExpected string = `{"web":2}`
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/pods/" && req.Method == "GET" {
 		res.Write([]byte(processesFixture))
@@ -139,12 +139,12 @@ func TestProcessesList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(deis, "example-go", 100)
+	actual, _, err := List(drycc, "example-go", 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -225,13 +225,13 @@ func TestAppsRestart(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	for _, test := range tests {
-		actual, err := Restart(deis, "example-go", test.Type, test.Name)
+		actual, err := Restart(drycc, "example-go", test.Type, test.Name)
 
 		if err != nil {
 			t.Error(err)
@@ -250,12 +250,12 @@ func TestScale(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Scale(deis, "example-go", map[string]int{"web": 2}); err != nil {
+	if err = Scale(drycc, "example-go", map[string]int{"web": 2}); err != nil {
 		t.Fatal(err)
 	}
 }

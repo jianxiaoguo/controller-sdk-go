@@ -5,15 +5,15 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List IP's whitelisted for an app.
-func List(c *deis.Client, appID string) (api.Whitelist, error) {
+func List(c *drycc.Client, appID string) (api.Whitelist, error) {
 	u := fmt.Sprintf("/v2/apps/%s/whitelist/", appID)
 	res, reqErr := c.Request("GET", u, nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Whitelist{}, reqErr
 	}
 	defer res.Body.Close()
@@ -27,7 +27,7 @@ func List(c *deis.Client, appID string) (api.Whitelist, error) {
 }
 
 // Add adds addresses to an app's whitelist.
-func Add(c *deis.Client, appID string, addresses []string) (api.Whitelist, error) {
+func Add(c *drycc.Client, appID string, addresses []string) (api.Whitelist, error) {
 	u := fmt.Sprintf("/v2/apps/%s/whitelist/", appID)
 
 	req := api.Whitelist{Addresses: addresses}
@@ -36,7 +36,7 @@ func Add(c *deis.Client, appID string, addresses []string) (api.Whitelist, error
 		return api.Whitelist{}, err
 	}
 	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Whitelist{}, reqErr
 	}
 	defer res.Body.Close()
@@ -50,7 +50,7 @@ func Add(c *deis.Client, appID string, addresses []string) (api.Whitelist, error
 }
 
 // Delete removes addresses from an app's whitelist.
-func Delete(c *deis.Client, appID string, addresses []string) error {
+func Delete(c *drycc.Client, appID string, addresses []string) error {
 	u := fmt.Sprintf("/v2/apps/%s/whitelist/", appID)
 
 	req := api.Whitelist{Addresses: addresses}
@@ -60,7 +60,7 @@ func Delete(c *deis.Client, appID string, addresses []string) error {
 	}
 
 	_, reqErr := c.Request("DELETE", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return reqErr
 	}
 	return nil

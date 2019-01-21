@@ -5,17 +5,17 @@ import (
 	"encoding/json"
 	"fmt"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists an app's releases.
-func List(c *deis.Client, appID string, results int) ([]api.Release, int, error) {
+func List(c *drycc.Client, appID string, results int) ([]api.Release, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/releases/", appID)
 
 	body, count, reqErr := c.LimitedRequest(u, results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Release{}, -1, reqErr
 	}
 
@@ -28,11 +28,11 @@ func List(c *deis.Client, appID string, results int) ([]api.Release, int, error)
 }
 
 // Get retrieves a release of an app.
-func Get(c *deis.Client, appID string, version int) (api.Release, error) {
+func Get(c *drycc.Client, appID string, version int) (api.Release, error) {
 	u := fmt.Sprintf("/v2/apps/%s/releases/v%d/", appID, version)
 
 	res, reqErr := c.Request("GET", u, nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Release{}, reqErr
 	}
 	defer res.Body.Close()
@@ -47,7 +47,7 @@ func Get(c *deis.Client, appID string, version int) (api.Release, error) {
 
 // Rollback rolls back an app to a previous release. If version is -1, this rolls back to
 // the previous release. Otherwise, roll back to the specified version.
-func Rollback(c *deis.Client, appID string, version int) (int, error) {
+func Rollback(c *drycc.Client, appID string, version int) (int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/releases/rollback/", appID)
 
 	req := api.ReleaseRollback{Version: version}
@@ -63,7 +63,7 @@ func Rollback(c *deis.Client, appID string, version int) (int, error) {
 	}
 
 	res, reqErr := c.Request("POST", u, reqBody)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return -1, reqErr
 	}
 	defer res.Body.Close()

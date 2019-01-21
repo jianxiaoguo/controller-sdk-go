@@ -4,15 +4,15 @@ package users
 import (
 	"encoding/json"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists users registered with the controller.
-func List(c *deis.Client, results int) (api.Users, int, error) {
+func List(c *drycc.Client, results int) (api.Users, int, error) {
 	body, count, reqErr := c.LimitedRequest("/v2/users/", results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.User{}, -1, reqErr
 	}
 

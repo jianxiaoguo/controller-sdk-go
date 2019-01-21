@@ -1,4 +1,4 @@
-package deis
+package drycc
 
 import (
 	"bytes"
@@ -48,7 +48,7 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 	}
 
 	if c.HooksToken != "" {
-		req.Header.Add("X-Deis-Builder-Auth", c.HooksToken)
+		req.Header.Add("X-Drycc-Builder-Auth", c.HooksToken)
 	}
 
 	addUserAgent(&req.Header, c.UserAgent)
@@ -63,7 +63,7 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 		return nil, err
 	}
 
-	apiVersion := res.Header.Get("DEIS_API_VERSION")
+	apiVersion := res.Header.Get("DRYCC_API_VERSION")
 
 	// Update controller api and platform version
 	c.ControllerAPIVersion = apiVersion
@@ -105,9 +105,9 @@ func (c *Client) LimitedRequest(path string, results int) (string, int, error) {
 
 // CheckConnection checks that the user is connected to a network and the URL points to a valid controller.
 func (c *Client) CheckConnection() error {
-	errorMessage := `%s does not appear to be a valid Deis controller.
+	errorMessage := `%s does not appear to be a valid Drycc controller.
 Make sure that the Controller URI is correct, the server is running and
-your deis version is correct.`
+your drycc version is correct.`
 
 	// Make a request to /v2/ and expect a 401 response
 	req, err := http.NewRequest("GET", c.ControllerURL.String()+"/v2/", bytes.NewBuffer(nil))
@@ -129,7 +129,7 @@ your deis version is correct.`
 	}
 
 	// Update controller api version
-	apiVersion := res.Header.Get("DEIS_API_VERSION")
+	apiVersion := res.Header.Get("DRYCC_API_VERSION")
 	c.ControllerAPIVersion = apiVersion
 	setControllerVersion(c, res.Header)
 
@@ -163,7 +163,7 @@ func (c *Client) Healthcheck() error {
 	res.Body.Close()
 
 	// Update controller api version
-	apiVersion := res.Header.Get("DEIS_API_VERSION")
+	apiVersion := res.Header.Get("DRYCC_API_VERSION")
 	c.ControllerAPIVersion = apiVersion
 	setControllerVersion(c, res.Header)
 
@@ -175,5 +175,5 @@ func addUserAgent(headers *http.Header, userAgent string) {
 }
 
 func setControllerVersion(c *Client, headers http.Header) {
-	c.ControllerVersion = headers.Get("DEIS_PLATFORM_VERSION")
+	c.ControllerVersion = headers.Get("DRYCC_PLATFORM_VERSION")
 }

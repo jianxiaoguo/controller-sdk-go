@@ -4,14 +4,14 @@ package auth
 import (
 	"encoding/json"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // Register a new user with the controller.
 // If controller registration is set to administrators only, a valid administrative
 // user token is required in the client.
-func Register(c *deis.Client, username, password, email string) error {
+func Register(c *drycc.Client, username, password, email string) error {
 	user := api.AuthRegisterRequest{Username: username, Password: password, Email: email}
 	body, err := json.Marshal(user)
 
@@ -27,7 +27,7 @@ func Register(c *deis.Client, username, password, email string) error {
 }
 
 // Login to the controller and get a token
-func Login(c *deis.Client, username, password string) (string, error) {
+func Login(c *drycc.Client, username, password string) (string, error) {
 	user := api.AuthLoginRequest{Username: username, Password: password}
 	reqBody, err := json.Marshal(user)
 
@@ -36,7 +36,7 @@ func Login(c *deis.Client, username, password string) (string, error) {
 	}
 
 	res, reqErr := c.Request("POST", "/v2/auth/login/", reqBody)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return "", reqErr
 	}
 	defer res.Body.Close()
@@ -50,7 +50,7 @@ func Login(c *deis.Client, username, password string) (string, error) {
 }
 
 // Delete deletes a user.
-func Delete(c *deis.Client, username string) error {
+func Delete(c *drycc.Client, username string) error {
 	var body []byte
 	var err error
 
@@ -81,7 +81,7 @@ func Delete(c *deis.Client, username string) error {
 // and return a new token. If not targeting yourself, regenerate requires administrative privileges.
 //
 // If all is true, this will regenerate every user's token. This requires administrative privileges.
-func Regenerate(c *deis.Client, username string, all bool) (string, error) {
+func Regenerate(c *drycc.Client, username string, all bool) (string, error) {
 	var reqBody []byte
 	var err error
 
@@ -96,7 +96,7 @@ func Regenerate(c *deis.Client, username string, all bool) (string, error) {
 	}
 
 	res, reqErr := c.Request("POST", "/v2/auth/tokens/", reqBody)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return "", reqErr
 	}
 	defer res.Body.Close()
@@ -119,7 +119,7 @@ func Regenerate(c *deis.Client, username string, all bool) (string, error) {
 //
 // If username is set, change the password of another user and do not require
 // their password. This requires administrative privileges.
-func Passwd(c *deis.Client, username, password, newPassword string) error {
+func Passwd(c *drycc.Client, username, password, newPassword string) error {
 	req := api.AuthPasswdRequest{Password: password, NewPassword: newPassword}
 
 	if username != "" {
@@ -140,7 +140,7 @@ func Passwd(c *deis.Client, username, password, newPassword string) error {
 }
 
 // Whoami retrives the user object for the authenticated user.
-func Whoami(c *deis.Client) (api.User, error) {
+func Whoami(c *drycc.Client) (api.User, error) {
 	res, err := c.Request("GET", "/v2/auth/whoami/", nil)
 	if err != nil {
 		return api.User{}, err

@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	"github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const keyFixture string = `
@@ -62,7 +62,7 @@ const (
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == fmt.Sprintf("/v2/hooks/key/%s", testingClientFingerprint) && req.Method == "GET" {
 		res.Write([]byte(keyFixture))
@@ -128,12 +128,12 @@ func TestUserFromKey(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := UserFromKey(deis, testingClientFingerprint)
+	actual, err := UserFromKey(drycc, testingClientFingerprint)
 
 	if err != nil {
 		t.Fatal(err)
@@ -151,7 +151,7 @@ func TestConfigHook(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -180,7 +180,7 @@ func TestConfigHook(t *testing.T) {
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
-	actual, err := GetAppConfig(deis, "test", "example-go")
+	actual, err := GetAppConfig(drycc, "test", "example-go")
 
 	if err != nil {
 		t.Error(err)
@@ -198,14 +198,14 @@ func TestBuildHook(t *testing.T) {
 	server := httptest.NewServer(&handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	expected := 2
 
-	actual, err := CreateBuild(deis, "test", "example-go", "test:abc123", "abc123", map[string]string{"web": "./run"}, true)
+	actual, err := CreateBuild(drycc, "test", "example-go", "test:abc123", "abc123", map[string]string{"web": "./run"}, true)
 
 	if err != nil {
 		t.Error(err)

@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
+	drycc "github.com/drycc/controller-sdk-go"
 )
 
 const adminFixture string = `
@@ -42,7 +42,7 @@ const appCreateExpected = `{"username":"foo"}`
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/admin/perms/" && req.Method == "GET" {
 		res.Write([]byte(adminFixture))
@@ -125,12 +125,12 @@ func TestList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := List(deis, "example-go")
+	actual, err := List(drycc, "example-go")
 
 	if err != nil {
 		t.Fatal(err)
@@ -153,12 +153,12 @@ func TestListAdmins(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := ListAdmins(deis, 100)
+	actual, _, err := ListAdmins(drycc, 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -176,12 +176,12 @@ func TestNew(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = New(deis, "example-go", "foo"); err != nil {
+	if err = New(drycc, "example-go", "foo"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -193,12 +193,12 @@ func TestNewAdmin(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = NewAdmin(deis, "test"); err != nil {
+	if err = NewAdmin(drycc, "test"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -210,12 +210,12 @@ func TestDelete(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "example-go", "foo"); err != nil {
+	if err = Delete(drycc, "example-go", "foo"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -227,12 +227,12 @@ func TestDeleteAdmin(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = DeleteAdmin(deis, "test"); err != nil {
+	if err = DeleteAdmin(drycc, "test"); err != nil {
 		t.Fatal(err)
 	}
 }

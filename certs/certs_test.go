@@ -8,9 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
-	"github.com/teamhephy/controller-sdk-go/pkg/time"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
+	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const certsFixture string = `
@@ -45,7 +45,7 @@ const certExpected string = `{"certificate":"test","key":"foo","name":"test-exam
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/certs/" && req.Method == "GET" {
 		res.Write([]byte(certsFixture))
@@ -122,12 +122,12 @@ func TestCertsList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(deis, 100)
+	actual, _, err := List(drycc, 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -161,12 +161,12 @@ func TestCert(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := New(deis, "test", "foo", "test-example-com")
+	actual, err := New(drycc, "test", "foo", "test-example-com")
 
 	if err != nil {
 		t.Fatal(err)
@@ -200,12 +200,12 @@ func TestCertInfo(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := Get(deis, "test-example-com")
+	actual, err := Get(drycc, "test-example-com")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -222,16 +222,16 @@ func TestCertDeletion(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "test-example-com"); err != nil {
+	if err = Delete(drycc, "test-example-com"); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := Delete(deis, "non-existent-cert"); err == nil {
+	if err := Delete(drycc, "non-existent-cert"); err == nil {
 		t.Fatal("An Error should have resulted from the attempt to delete a non-existent-cert")
 	}
 }
@@ -243,21 +243,21 @@ func TestCertAttach(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Attach(deis, "test-example-com", "foo.com"); err != nil {
+	if err = Attach(drycc, "test-example-com", "foo.com"); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := Attach(deis, "non-existent-cert", "foo.com"); err == nil {
+	if err := Attach(drycc, "non-existent-cert", "foo.com"); err == nil {
 		t.Fatal("An Error should have resulted from the attempt to attach a non-existent cert to a valid domain")
 	}
 
 	// TODO: #475
-	// if err := Attach(&deis, "test-example-com", "non-existent.domain.com"); err == nil {
+	// if err := Attach(&drycc, "test-example-com", "non-existent.domain.com"); err == nil {
 	// 	t.Fatal("An Error should have resulted from the attempt to attach a valid cert to a non-existent domain")
 	// }
 }
@@ -269,20 +269,20 @@ func TestCertDetach(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Detach(deis, "test-example-com", "foo.com"); err != nil {
+	if err = Detach(drycc, "test-example-com", "foo.com"); err != nil {
 		t.Fatal(err)
 	}
 
-	if err := Detach(deis, "non-existent-cert", "foo.com"); err == nil {
+	if err := Detach(drycc, "non-existent-cert", "foo.com"); err == nil {
 		t.Fatal("An Error should have resulted from the attempt to detach a non-existent cert from a valid domain")
 	}
 
-	if err := Detach(deis, "test-example-com", "non-existent.domain.com"); err == nil {
+	if err := Detach(drycc, "test-example-com", "non-existent.domain.com"); err == nil {
 		t.Fatal("An Error should have resulted from the attempt to detach a valid cert from a non-existent domain")
 	}
 }

@@ -1,4 +1,4 @@
-// Package deis offers a SDK for interacting with the Hephy controller API.
+// Package drycc offers a SDK for interacting with the Drycc controller API.
 //
 // This package works by creating a client, which contains session information,
 // such as the controller url and user token. The client is then passed to api methods,
@@ -9,12 +9,12 @@
 // This example creates a client and then lists the apps that the user has access to:
 //
 //    import (
-//        deis "github.com/teamhephy/controller-sdk-go"
-//        "github.com/teamhephy/controller-sdk-go/apps"
+//        drycc "github.com/drycc/controller-sdk-go"
+//        "github.com/drycc/controller-sdk-go/apps"
 //    )
 //
 //    //                      Verify SSL, Controller URL, API Token
-//    client, err := deis.New(true, "deis.test.io", "abc123")
+//    client, err := drycc.New(true, "drycc.test.io", "abc123")
 //    if err != nil {
 //        log.Fatal(err)
 //    }
@@ -29,12 +29,12 @@
 // username and password.
 //
 //    import (
-//        deis "github.com/teamhephy/controller-sdk-go"
-//        "github.com/teamhephy/controller-sdk-go/apps"
+//        drycc "github.com/drycc/controller-sdk-go"
+//        "github.com/drycc/controller-sdk-go/apps"
 //    )
 //
 //    // Create a client with a blank token to pass to login.
-//    client, err := deis.New(true, "deis.test.io", "")
+//    client, err := drycc.New(true, "drycc.test.io", "")
 //    if err != nil {
 //        log.Fatal(err)
 //    }
@@ -48,7 +48,7 @@
 // Learning More
 //
 // See the godoc for the SDK's subpackages to learn more about specific SDK actions.
-package deis
+package drycc
 
 import (
 	"errors"
@@ -59,7 +59,7 @@ import (
 	"github.com/goware/urlx"
 )
 
-// Client oversees the interaction between the deis and controller
+// Client oversees the interaction between the drycc and controller
 type Client struct {
 	// HTTPClient is the transport that is used to communicate with the API.
 	HTTPClient *http.Client
@@ -77,7 +77,7 @@ type Client struct {
 	// API Version used by the controller, set after a http request.
 	ControllerAPIVersion string
 
-	// Version of the deis controller in use, set after a http request.
+	// Version of the drycc controller in use, set after a http request.
 	ControllerVersion string
 
 	// Token is used to authenticate the request against the API.
@@ -92,7 +92,7 @@ type Client struct {
 // APIVersion is the api version compatible with the SDK.
 //
 // In general, using an SDK that is a minor version out of date with the target controller
-// is probably safe, as the deis controller api follows semantic versioning and is backward
+// is probably safe, as the drycc controller api follows semantic versioning and is backward
 // compatible. However, using a SDK that is newer or a major version different than the
 // controller is unsafe.
 //
@@ -100,11 +100,11 @@ type Client struct {
 const APIVersion = "2.3"
 
 var (
-	// ErrAPIMismatch occurs when the sdk is using a different api version than the deis.
-	ErrAPIMismatch = errors.New("API Version Mismatch between server and deis")
+	// ErrAPIMismatch occurs when the sdk is using a different api version than the drycc.
+	ErrAPIMismatch = errors.New("API Version Mismatch between server and drycc")
 
 	// DefaultUserAgent is used as the default user agent when making requests.
-	DefaultUserAgent = fmt.Sprintf("Deis Go SDK V%s", APIVersion)
+	DefaultUserAgent = fmt.Sprintf("Drycc Go SDK V%s", APIVersion)
 )
 
 // IsErrAPIMismatch returns true if err is an ErrAPIMismatch, false otherwise
@@ -113,7 +113,7 @@ func IsErrAPIMismatch(err error) bool {
 }
 
 // New creates a new client to communicate with the api.
-// The controllerURL is the url of the controller component, by default deis.<cluster url>.com
+// The controllerURL is the url of the controller component, by default drycc.<cluster url>.com
 // verifySSL determines whether or not to verify SSL connections.
 // This should be true unless you know the controller is using untrusted SSL keys.
 func New(verifySSL bool, controllerURL string, token string) (*Client, error) {

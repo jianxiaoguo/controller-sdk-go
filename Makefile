@@ -1,9 +1,9 @@
 # the filepath to this repository, relative to $GOPATH/src
-repo_path = github.com/teamhephy/controller-sdk-go
+repo_path = github.com/drycc/controller-sdk-go
 
 REVISION ?= $(shell git rev-parse --short HEAD)
 REGISTRY ?= quay.io/
-IMAGE_PREFIX ?= deisci
+IMAGE_PREFIX ?= drycc
 IMAGE := ${REGISTRY}${IMAGE_PREFIX}/controller-sdk-go-dev:${REVISION}
 
 test-style: build-test-image

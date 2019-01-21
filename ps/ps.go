@@ -6,15 +6,15 @@ import (
 	"fmt"
 	"sort"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // List lists an app's processes.
-func List(c *deis.Client, appID string, results int) (api.PodsList, int, error) {
+func List(c *drycc.Client, appID string, results int) (api.PodsList, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/pods/", appID)
 	body, count, reqErr := c.LimitedRequest(u, results)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Pods{}, -1, reqErr
 	}
 
@@ -28,7 +28,7 @@ func List(c *deis.Client, appID string, results int) (api.PodsList, int, error) 
 
 // Scale increases or decreases an app's processes. The processes are specified in the target argument,
 // a key-value map, where the key is the process name and the value is the number of replicas
-func Scale(c *deis.Client, appID string, targets map[string]int) error {
+func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 	u := fmt.Sprintf("/v2/apps/%s/scale/", appID)
 
 	body, err := json.Marshal(targets)
@@ -47,7 +47,7 @@ func Scale(c *deis.Client, appID string, targets map[string]int) error {
 // Restart restarts an app's processes. To restart all app processes, pass empty strings for
 // procType and name. To restart an specific process, pass an procType by leave name empty.
 // To restart a specific instance, pass a procType and a name.
-func Restart(c *deis.Client, appID string, procType string, name string) (api.PodsList, error) {
+func Restart(c *drycc.Client, appID string, procType string, name string) (api.PodsList, error) {
 	u := fmt.Sprintf("/v2/apps/%s/pods/", appID)
 
 	if procType == "" {
@@ -61,7 +61,7 @@ func Restart(c *deis.Client, appID string, procType string, name string) (api.Po
 	}
 
 	res, reqErr := c.Request("POST", u, nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Pods{}, reqErr
 	}
 	defer res.Body.Close()

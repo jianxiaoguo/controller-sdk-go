@@ -1,4 +1,4 @@
-// Package apps provides methods for managing deis apps.
+// Package apps provides methods for managing drycc apps.
 package apps
 
 import (
@@ -8,23 +8,23 @@ import (
 	"io/ioutil"
 	"strconv"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 // ErrNoLogs is returned when logs are missing from an app.
 var ErrNoLogs = errors.New(
 	`There are currently no log messages. Please check the following things:
-1) Logger and fluentd pods are running: kubectl --namespace=deis get pods.
-2) The application is writing logs to the logger component by checking that an entry in the ring buffer was created: kubectl --namespace=deis logs <logger pod>
-3) Making sure that the container logs were mounted properly into the fluentd pod: kubectl --namespace=deis exec <fluentd pod> ls /var/log/containers
-3a) If the above command returns saying /var/log/containers cannot be found then please see the following github issue for a workaround: https://github.com/deis/logger/issues/50`)
+1) Logger and fluentd pods are running: kubectl --namespace=drycc get pods.
+2) The application is writing logs to the logger component by checking that an entry in the ring buffer was created: kubectl --namespace=drycc logs <logger pod>
+3) Making sure that the container logs were mounted properly into the fluentd pod: kubectl --namespace=drycc exec <fluentd pod> ls /var/log/containers
+3a) If the above command returns saying /var/log/containers cannot be found then please see the following github issue for a workaround: https://github.com/drycc/logger/issues/50`)
 
-// List lists apps on a Deis controller.
-func List(c *deis.Client, results int) (api.Apps, int, error) {
+// List lists apps on a Drycc controller.
+func List(c *drycc.Client, results int) (api.Apps, int, error) {
 	body, count, reqErr := c.LimitedRequest("/v2/apps/", results)
 
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.App{}, -1, reqErr
 	}
 
@@ -39,8 +39,8 @@ func List(c *deis.Client, results int) (api.Apps, int, error) {
 // New creates a new app with the given appID. Passing an empty string will result in
 // a randomized app name.
 //
-// If the app name already exists, the error deis.ErrDuplicateApp will be returned.
-func New(c *deis.Client, appID string) (api.App, error) {
+// If the app name already exists, the error drycc.ErrDuplicateApp will be returned.
+func New(c *drycc.Client, appID string) (api.App, error) {
 	body := []byte{}
 
 	if appID != "" {
@@ -54,7 +54,7 @@ func New(c *deis.Client, appID string) (api.App, error) {
 	}
 
 	res, reqErr := c.Request("POST", "/v2/apps/", body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.App{}, reqErr
 	}
 	defer res.Body.Close()
@@ -68,11 +68,11 @@ func New(c *deis.Client, appID string) (api.App, error) {
 }
 
 // Get app details from a controller.
-func Get(c *deis.Client, appID string) (api.App, error) {
+func Get(c *drycc.Client, appID string) (api.App, error) {
 	u := fmt.Sprintf("/v2/apps/%s/", appID)
 
 	res, reqErr := c.Request("GET", u, nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.App{}, reqErr
 	}
 	defer res.Body.Close()
@@ -88,7 +88,7 @@ func Get(c *deis.Client, appID string) (api.App, error) {
 
 // Logs retrieves logs from an app. The number of log lines fetched can be set by the lines
 // argument. Setting lines = -1 will retrive all app logs.
-func Logs(c *deis.Client, appID string, lines int) (string, error) {
+func Logs(c *drycc.Client, appID string, lines int) (string, error) {
 	u := fmt.Sprintf("/v2/apps/%s/logs", appID)
 
 	if lines > 0 {
@@ -96,7 +96,7 @@ func Logs(c *deis.Client, appID string, lines int) (string, error) {
 	}
 
 	res, reqErr := c.Request("GET", u, nil)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return "", ErrNoLogs
 	}
 	defer res.Body.Close()
@@ -112,7 +112,7 @@ func Logs(c *deis.Client, appID string, lines int) (string, error) {
 
 // Run a one-time command in your app. This will start a kubernetes job with the
 // same container image and environment as the rest of the app.
-func Run(c *deis.Client, appID string, command string) (api.AppRunResponse, error) {
+func Run(c *drycc.Client, appID string, command string) (api.AppRunResponse, error) {
 	req := api.AppRunRequest{Command: command}
 	body, err := json.Marshal(req)
 
@@ -123,7 +123,7 @@ func Run(c *deis.Client, appID string, command string) (api.AppRunResponse, erro
 	u := fmt.Sprintf("/v2/apps/%s/run", appID)
 
 	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil && !deis.IsErrAPIMismatch(reqErr) {
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.AppRunResponse{}, reqErr
 	}
 
@@ -137,7 +137,7 @@ func Run(c *deis.Client, appID string, command string) (api.AppRunResponse, erro
 }
 
 // Delete an app.
-func Delete(c *deis.Client, appID string) error {
+func Delete(c *drycc.Client, appID string) error {
 	u := fmt.Sprintf("/v2/apps/%s/", appID)
 
 	res, err := c.Request("DELETE", u, nil)
@@ -148,7 +148,7 @@ func Delete(c *deis.Client, appID string) error {
 }
 
 // Transfer an app to another user.
-func Transfer(c *deis.Client, appID string, username string) error {
+func Transfer(c *drycc.Client, appID string, username string) error {
 	u := fmt.Sprintf("/v2/apps/%s/", appID)
 
 	req := api.AppUpdateRequest{Owner: username}

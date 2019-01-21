@@ -9,7 +9,7 @@ func TestUserString(t *testing.T) {
 	user := User{
 		ID:          1,
 		Username:    "bacongobbler",
-		Email:       "matthewf@deis.com",
+		Email:       "matthewf@drycc.com",
 		FirstName:   "Matthew",
 		LastName:    "Fisher",
 		LastLogin:   "Yesterday",
@@ -21,7 +21,7 @@ func TestUserString(t *testing.T) {
 
 	expected := `ID: 1
 Username: bacongobbler
-Email: matthewf@deis.com
+Email: matthewf@drycc.com
 First Name: Matthew
 Last Name: Fisher
 Last Login: Yesterday

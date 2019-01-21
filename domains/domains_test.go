@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const domainsFixture string = `
@@ -42,7 +42,7 @@ const domainCreateExpected string = `{"domain":"example.example.com"}`
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/domains/" && req.Method == "GET" {
 		res.Write([]byte(domainsFixture))
@@ -98,12 +98,12 @@ func TestDomainsList(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(deis, "example-go", 100)
+	actual, _, err := List(drycc, "example-go", 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -129,12 +129,12 @@ func TestDomainsAdd(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	actual, err := New(deis, "example-go", "example.example.com")
+	actual, err := New(drycc, "example-go", "example.example.com")
 
 	if err != nil {
 		t.Fatal(err)
@@ -152,12 +152,12 @@ func TestDomainsRemove(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	deis, err := deis.New(false, server.URL, "abc")
+	drycc, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	if err = Delete(deis, "example-go", "test.com"); err != nil {
+	if err = Delete(drycc, "example-go", "test.com"); err != nil {
 		t.Fatal(err)
 	}
 }

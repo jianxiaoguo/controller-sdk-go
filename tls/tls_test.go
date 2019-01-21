@@ -8,8 +8,8 @@ import (
 	"reflect"
 	"testing"
 
-	deis "github.com/teamhephy/controller-sdk-go"
-	"github.com/teamhephy/controller-sdk-go/api"
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const (
@@ -36,7 +36,7 @@ const (
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "GET" {
 		res.Write([]byte(tlsDisabledFixture))
@@ -79,7 +79,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 type badJSONFakeHTTPServer struct{}
 
 func (badJSONFakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	res.Header().Add("DEIS_API_VERSION", deis.APIVersion)
+	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "GET" {
 		res.Write([]byte(tlsDisabledFixture))
@@ -135,7 +135,7 @@ func TestTLSInfo(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	dClient, err := deis.New(false, server.URL, "abc")
+	dClient, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -155,7 +155,7 @@ func TestTLSInfo(t *testing.T) {
 	badServer := httptest.NewServer(badHandler)
 	defer badServer.Close()
 
-	dClient, err = deis.New(false, badServer.URL, "abc")
+	dClient, err = drycc.New(false, badServer.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -182,7 +182,7 @@ func TestTLSEnable(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	dClient, err := deis.New(false, server.URL, "abc")
+	dClient, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +202,7 @@ func TestTLSEnable(t *testing.T) {
 	badServer := httptest.NewServer(badHandler)
 	defer badServer.Close()
 
-	dClient, err = deis.New(false, badServer.URL, "abc")
+	dClient, err = drycc.New(false, badServer.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -229,7 +229,7 @@ func TestTLSDisable(t *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	dClient, err := deis.New(false, server.URL, "abc")
+	dClient, err := drycc.New(false, server.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -249,7 +249,7 @@ func TestTLSDisable(t *testing.T) {
 	badServer := httptest.NewServer(badHandler)
 	defer badServer.Close()
 
-	dClient, err = deis.New(false, badServer.URL, "abc")
+	dClient, err = drycc.New(false, badServer.URL, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
