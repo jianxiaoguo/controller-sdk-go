@@ -1,20 +1,3 @@
-
-|![](https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Anchor_pictogram_yellow.svg/156px-Anchor_pictogram_yellow.svg.png) | Drycc Workflow is the open source fork of Drycc Workflow.<br />Please [go here](https://www.drycc.com/) for more detail. |
-|---:|---|
-| 08/27/2018 | Team Drycc [blog][] comes online |
-| 08/20/2018 | Drycc [#community slack][] goes dark |
-| 08/10/2018 | Drycc Workflow [v2.19.4][] fourth patch release |
-| 08/08/2018 | [Drycc website][] goes dark, then redirects to Azure Kubernetes Service |
-| 08/01/2018 | Drycc Workflow [v2.19.3][] third patch release |
-| 07/17/2018 | Drycc Workflow [v2.19.2][] second patch release |
-| 07/12/2018 | Drycc Workflow [v2.19.1][] first patch release |
-| 06/29/2018 | Drycc Workflow [v2.19.0][] first release in the open source fork of Drycc |
-| 06/16/2018 | Drycc Workflow [v2.19][] series is announced |
-| 03/01/2018 | End of Drycc Workflow maintenance: critical patches no longer merged |
-| 12/11/2017 | Team Drycc [slack community][] invites first volunteers |
-| 09/07/2017 | Drycc Workflow [v2.18][] final release before entering maintenance mode |
-| 09/06/2017 | Team Drycc [slack community][] comes online |
-
 # Controller Go SDK
 [![Build Status](https://ci.drycc.cc/buildStatus/icon?job=Drycc/controller-sdk-go/master)](https://ci.drycc.cc/job/Drycc/job/controller-sdk-go/job/master/)
 [![codecov](https://codecov.io/gh/drycc/controller-sdk-go/branch/master/graph/badge.svg)](https://codecov.io/gh/drycc/controller-sdk-go)
