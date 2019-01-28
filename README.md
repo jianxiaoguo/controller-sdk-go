@@ -1,8 +1,8 @@
 # Controller Go SDK
-[![Build Status](https://ci.drycc.cc/buildStatus/icon?job=Drycc/controller-sdk-go/master)](https://ci.drycc.cc/job/Drycc/job/controller-sdk-go/job/master/)
+[![Build Status](https://travis-ci.org/drycc/controller-sdk-go.svg?branch=master)](https://travis-ci.org/drycc/controller-sdk-go/)
 [![codecov](https://codecov.io/gh/drycc/controller-sdk-go/branch/master/graph/badge.svg)](https://codecov.io/gh/drycc/controller-sdk-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/drycc/controller-sdk-go)](https://goreportcard.com/report/github.com/drycc/controller-sdk-go)
-[![codebeat badge](https://codebeat.co/badges/2fdee091-714d-4860-ab19-dba7587a3158)](https://codebeat.co/projects/github-com-drycc-controller-sdk-go)
+[![codebeat badge](https://codebeat.co/badges/3ae3560d-eebf-4b36-bbf3-780d2b2e26fd)](https://codebeat.co/projects/github-com-drycc-controller-sdk-go-master)
 [![GoDoc](https://godoc.org/github.com/drycc/controller-sdk-go?status.svg)](https://godoc.org/github.com/drycc/controller-sdk-go)
 
 This is the Go SDK for interacting with the [Drycc Controller](https://github.com/drycc/controller).

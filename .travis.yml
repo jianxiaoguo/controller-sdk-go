@@ -1,8 +1,13 @@
 sudo: required
 language: go
 services:
-- docker
-script: make test
+  - docker
+script:
+  - make bootstrap
+  - make test
 notifications:
   slack:
-    secure: E7FiUhFZXtYGOtH3xGk2n3OuwHPP0VCv3NHzvWut8G+vKtzyFIfZTC2K8J8rLM3sZ83m51BilEwNPW7ADMVqbER8z+ns1ZnJzoMMz/Dr1OecYdp5eol+Da7biwgEOBKTHBz20HYh5rHY4d//y0vRF1u1JCTtgHXhPOSnf9SvKWe8QpPEcy+7lx0d3+sIrCyUTjVfgfBIsVLBbKy8rVPAw3xAhRzKm4fcZ8pwiQE0R5GSxAZ1JdeiaMoMqiYLMInyTg+0ohc9LFoMEavBP9/icYrFGQfVWpEstyJ3XKKQA+RIeytM2Fe2d3BFQ1l+upLo30lxOfUYRreX4HCZD1HfiLJz+0uyJbh8+ztYZA77e0tVTt9ZBsT5/RpQZRTdwzPvqYUig6VxH/t+hwQvFTvncHrRLKY6WH9q3be1uc95XwUC1SpUWXq2g+OxQj38SzOiI5sDgag3+eezD1+DRIEsXYqKLIDn5377P+s69wTCC23HjqzJFchLU0HX96zm7CDjEapICHXXA5jDe8Ub8832gq+FhKDv+OSGFyeOeF0EamSc9FL+OrKmswz1lcIwR/sWSsO+aij5qBPtvU6LyUcuMdPYtwA2qslhPAWxSPkrRalWFbNsFEwtP6WvM8ziR1ZpMRLOowE1t2ZvWrUBXZhgPsf9OXkI9SKVGun19J9wB6k=
+    rooms:
+      - drycc:xKmLlmJR4hfRAgVIOwdpAoC9#drycc
+after_success:
+  - bash <(curl -s https://codecov.io/bash)

@@ -1,21 +1,25 @@
 # the filepath to this repository, relative to $GOPATH/src
-repo_path = github.com/drycc/controller-sdk-go
+REPO_PATH = github.com/drycc/controller-sdk-go
 
-REVISION ?= $(shell git rev-parse --short HEAD)
-REGISTRY ?= quay.io/
-IMAGE_PREFIX ?= drycc
-IMAGE := ${REGISTRY}${IMAGE_PREFIX}/controller-sdk-go-dev:${REVISION}
+DEV_ENV_IMAGE := quay.io/drycc/go-dev:v0.22.0
+DEV_ENV_WORK_DIR := /go/src/${REPO_PATH}
 
-test-style: build-test-image
-	docker run --rm ${IMAGE} lint
+# Enable vendor/ directory support.
+export GO15VENDOREXPERIMENT=1
 
-test-unit: build-test-image
-	docker run --rm ${IMAGE} test
+PKG_DIRS := ./...
 
-test: build-test-image test-style test-unit
+DEV_ENV_CMD := docker run --rm -v ${CURDIR}:${DEV_ENV_WORK_DIR} -w ${DEV_ENV_WORK_DIR} ${DEV_ENV_IMAGE}
 
-build-test-image:
-	docker build -t ${IMAGE} .
+bootstrap:
+	${DEV_ENV_CMD} dep ensure
 
-push-test-image:
-	docker push ${IMAGE}
+build:
+	${DEV_ENV_CMD} go build ${PKG_DIRS}
+
+test-cover:
+	${DEV_ENV_CMD} test-cover.sh
+test-style:
+	${DEV_ENV_CMD} lint
+test: build test-style test-cover
+	${DEV_ENV_CMD} go test ${PKG_DIRS}
