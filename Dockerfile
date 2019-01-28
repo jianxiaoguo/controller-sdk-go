@@ -4,12 +4,11 @@ FROM drycc/go-dev:v0.22.0
 ADD https://codecov.io/bash /usr/local/bin/codecov
 RUN chmod +x /usr/local/bin/codecov
 
-COPY glide.yaml /go/src/github.com/drycc/controller-sdk-go/
-COPY glide.lock /go/src/github.com/drycc/controller-sdk-go/
+ADD . /go/src/github.com/drycc/controller-sdk-go/
 
 WORKDIR /go/src/github.com/drycc/controller-sdk-go
 
-RUN glide install --strip-vendor
+RUN dep ensure
 
 COPY ./_scripts /usr/local/bin
 
