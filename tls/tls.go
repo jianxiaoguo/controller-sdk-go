@@ -27,11 +27,11 @@ func Info(c *drycc.Client, app string) (api.TLS, error) {
 	return tls, reqErr
 }
 
-// Enable enables the router to enforce https-only requests to the application.
-func Enable(c *drycc.Client, app string) (api.TLS, error) {
+// changeTLS enables the router to enforce https-only requests to the application.
+func changeTLS(c *drycc.Client, app string, httpsEnforced, certsAutoEnabled *bool) (api.TLS, error) {
 	t := api.NewTLS()
-	b := true
-	t.HTTPSEnforced = &b
+	t.HTTPSEnforced = httpsEnforced
+	t.CertsAutoEnabled = certsAutoEnabled
 	body, err := json.Marshal(t)
 
 	if err != nil {
@@ -54,26 +54,26 @@ func Enable(c *drycc.Client, app string) (api.TLS, error) {
 	return newTLS, reqErr
 }
 
-// Disable disables the router from enforcing https-only requests to the application.
-func Disable(c *drycc.Client, app string) (api.TLS, error) {
-	body, err := json.Marshal(api.NewTLS())
+// EnableHTTPSEnforced enables the router to enforce https-only requests to the application.
+func EnableHTTPSEnforced(c *drycc.Client, app string) (api.TLS, error) {
+	b := true
+	return changeTLS(c, app, &b, nil)
+}
 
-	if err != nil {
-		return api.TLS{}, err
-	}
+// DisableHTTPSEnforced disables the router from enforcing https-only requests to the application.
+func DisableHTTPSEnforced(c *drycc.Client, app string) (api.TLS, error) {
+	b := false
+	return changeTLS(c, app, &b, nil)
+}
 
-	u := fmt.Sprintf("/v2/apps/%s/tls/", app)
+// EnableCertsAutoEnabled enables ACME to automatically generate certificates.
+func EnableCertsAutoEnabled(c *drycc.Client, app string) (api.TLS, error) {
+	b := true
+	return changeTLS(c, app, nil, &b)
+}
 
-	res, reqErr := c.Request("POST", u, body)
-	if reqErr != nil {
-		return api.TLS{}, reqErr
-	}
-	defer res.Body.Close()
-
-	newTLS := api.TLS{}
-	if err = json.NewDecoder(res.Body).Decode(&newTLS); err != nil {
-		return api.TLS{}, err
-	}
-
-	return newTLS, reqErr
+// DisableCertsAutoEnabled disables ACME to automatically generate certificates.
+func DisableCertsAutoEnabled(c *drycc.Client, app string) (api.TLS, error) {
+	b := false
+	return changeTLS(c, app, nil, &b)
 }

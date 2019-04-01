@@ -19,18 +19,20 @@ type TLS struct {
 	UUID string `json:"uuid,omitempty"`
 	//HTTPSEnforced determines if the router should enable or disable https-only requests.
 	HTTPSEnforced *bool `json:"https_enforced,omitempty"`
+	//Use ACME to automatically generate certificates if CertsAuto enable
+	CertsAutoEnabled *bool `json:"certs_auto_enabled,omitempty"`
 }
 
 // NewTLS creates a new TLS object with fields properly zeroed
 func NewTLS() *TLS {
 	return &TLS{
-		HTTPSEnforced: new(bool),
+		HTTPSEnforced:    new(bool),
+		CertsAutoEnabled: new(bool),
 	}
 }
 
 func (t TLS) String() string {
-	if t.HTTPSEnforced != nil {
-		return fmt.Sprintf("HTTPS Enforced: %t", *t.HTTPSEnforced)
-	}
-	return "HTTPS Enforced: not set"
+	tpl := `HTTPSEnforced: %d
+CertsAutoEnabled: %s`
+	return fmt.Sprintf(tpl, *(t.HTTPSEnforced) == true, *(t.CertsAutoEnabled) == true)
 }
