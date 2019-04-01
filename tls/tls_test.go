@@ -19,7 +19,8 @@ const (
 	"owner": "test",
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
-	"https_enforced": false
+	"https_enforced": false,
+	"certs_auto_enabled": false
 }`
 	tlsEnabledFixture string = `{
 	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
@@ -27,7 +28,8 @@ const (
 	"owner": "test",
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
-	"https_enforced": true
+	"https_enforced": true,
+	"certs_auto_enabled": null
 }`
 	tlsEnableExpected  string = `{"https_enforced":true}`
 	tlsDisableExpected string = `{"https_enforced":false}`
@@ -123,12 +125,13 @@ func TestTLSInfo(t *testing.T) {
 	t.Parallel()
 
 	expected := api.TLS{
-		Created:       "2016-08-22T17:40:16Z",
-		Updated:       "2016-08-22T17:40:16Z",
-		App:           "foo",
-		Owner:         "test",
-		UUID:          "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
-		HTTPSEnforced: new(bool),
+		Created:          "2016-08-22T17:40:16Z",
+		Updated:          "2016-08-22T17:40:16Z",
+		App:              "foo",
+		Owner:            "test",
+		UUID:             "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
+		HTTPSEnforced:    new(bool),
+		CertsAutoEnabled: new(bool),
 	}
 
 	handler := fakeHTTPServer{}
@@ -187,7 +190,7 @@ func TestTLSEnable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Enable(dClient, "foo")
+	actual, err := EnableHTTPSEnforced(dClient, "foo")
 
 	if err != nil {
 		t.Fatal(err)
@@ -207,7 +210,7 @@ func TestTLSEnable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err = Enable(dClient, "foo"); err != nil {
+	if _, err = EnableHTTPSEnforced(dClient, "foo"); err != nil {
 		t.Errorf("Expected Enable() with poorly JSON response to fail")
 	}
 }
@@ -234,7 +237,7 @@ func TestTLSDisable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Disable(dClient, "foo")
+	actual, err := DisableHTTPSEnforced(dClient, "foo")
 
 	if err != nil {
 		t.Fatal(err)
@@ -254,7 +257,7 @@ func TestTLSDisable(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if _, err = Disable(dClient, "foo"); err != nil {
+	if _, err = DisableHTTPSEnforced(dClient, "foo"); err != nil {
 		t.Errorf("Expected Disable() with poorly JSON response to fail")
 	}
 }

@@ -8,7 +8,7 @@ import (
 func TestTLSString(t *testing.T) {
 	tls := &TLS{}
 
-	expected := "HTTPS Enforced: not set"
+	expected := "HTTPS Enforced: not set\nCerts Auto: not set"
 
 	if strings.TrimSpace(tls.String()) != expected {
 		t.Errorf("Expected:\n\n%s\n\nGot:\n\n%s", expected, tls.String())
@@ -16,7 +16,7 @@ func TestTLSString(t *testing.T) {
 
 	tls = NewTLS()
 
-	expected = "HTTPS Enforced: false"
+	expected = "HTTPS Enforced: false\nCerts Auto: false"
 
 	if strings.TrimSpace(tls.String()) != expected {
 		t.Errorf("Expected:\n\n%s\n\nGot:\n\n%s", expected, tls.String())
@@ -25,7 +25,7 @@ func TestTLSString(t *testing.T) {
 	b := true
 	tls.HTTPSEnforced = &b
 
-	expected = "HTTPS Enforced: true"
+	expected = "HTTPS Enforced: true\nCerts Auto: false"
 
 	if strings.TrimSpace(tls.String()) != expected {
 		t.Errorf("Expected:\n\n%s\n\nGot:\n\n%s", expected, tls.String())

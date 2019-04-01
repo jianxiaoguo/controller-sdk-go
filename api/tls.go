@@ -32,7 +32,15 @@ func NewTLS() *TLS {
 }
 
 func (t TLS) String() string {
-	tpl := `HTTPSEnforced: %d
-CertsAutoEnabled: %s`
-	return fmt.Sprintf(tpl, *(t.HTTPSEnforced) == true, *(t.CertsAutoEnabled) == true)
+	tpl := `HTTPS Enforced: %s
+Certs Auto: %s`
+	httpsEnforced := "not set"
+	if t.HTTPSEnforced != nil {
+		httpsEnforced = fmt.Sprintf("%t", *(t.HTTPSEnforced))
+	}
+	certsAutoEnabled := "not set"
+	if t.CertsAutoEnabled != nil {
+		certsAutoEnabled = fmt.Sprintf("%t", *(t.CertsAutoEnabled))
+	}
+	return fmt.Sprintf(tpl, httpsEnforced, certsAutoEnabled)
 }
