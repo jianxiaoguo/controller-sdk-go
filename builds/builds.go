@@ -54,11 +54,11 @@ func List(c *drycc.Client, appID string, results int) ([]api.Build, int, error) 
 //        log.Fatal(err)
 //    }
 func New(c *drycc.Client, appID string, image string,
-	procfile map[string]string) (api.Build, error) {
+	stack string, procfile map[string]string) (api.Build, error) {
 
 	u := fmt.Sprintf("/v2/apps/%s/builds/", appID)
 
-	req := api.CreateBuildRequest{Image: image, Procfile: procfile}
+	req := api.CreateBuildRequest{Image: image, Stack: stack, Procfile: procfile}
 
 	body, err := json.Marshal(req)
 

@@ -6,6 +6,7 @@ type Build struct {
 	Created    string            `json:"created"`
 	Dockerfile string            `json:"dockerfile,omitempty"`
 	Image      string            `json:"image,omitempty"`
+	Stack      string            `json:"stack,omitempty"`
 	Owner      string            `json:"owner"`
 	Procfile   map[string]string `json:"procfile"`
 	Sha        string            `json:"sha,omitempty"`
@@ -16,6 +17,7 @@ type Build struct {
 // CreateBuildRequest is the structure of POST /v2/apps/<app id>/builds/.
 type CreateBuildRequest struct {
 	Image    string            `json:"image"`
+	Stack    string            `json:"stack,omitempty"`
 	Procfile map[string]string `json:"procfile,omitempty"`
 }
 
@@ -25,6 +27,7 @@ type BuildHookRequest struct {
 	User       string      `json:"receive_user"`
 	App        string      `json:"receive_repo"`
 	Image      string      `json:"image"`
+	Stack      string      `json:"stack"`
 	Procfile   ProcessType `json:"procfile"`
 	Dockerfile string      `json:"dockerfile"`
 }

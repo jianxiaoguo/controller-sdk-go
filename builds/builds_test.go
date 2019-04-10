@@ -23,6 +23,7 @@ const buildsFixture string = `
             "created": "2014-01-01T00:00:00UTC",
             "dockerfile": "FROM drycc/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
             "image": "example-go",
+            "stack": "container",
             "owner": "test",
             "procfile": {
                 "web": "example-go"
@@ -40,6 +41,7 @@ const buildFixture string = `
     "created": "2014-01-01T00:00:00UTC",
     "dockerfile": "",
     "image": "drycc/example-go:latest",
+    "stack": "heroku-18",
     "owner": "test",
     "procfile": {
         "web": "example-go"
@@ -49,7 +51,7 @@ const buildFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }`
 
-const buildExpected string = `{"image":"drycc/example-go","procfile":{"web":"example-go"}}`
+const buildExpected string = `{"image":"drycc/example-go","stack":"heroku-18","procfile":{"web":"example-go"}}`
 
 type fakeHTTPServer struct{}
 
@@ -96,6 +98,7 @@ func TestBuildsList(t *testing.T) {
 			Created:    "2014-01-01T00:00:00UTC",
 			Dockerfile: "FROM drycc/slugrunner RUN mkdir -p /app WORKDIR /app ENTRYPOINT [\"/runner/init\"] ADD slug.tgz /app ENV GIT_SHA 060da68f654e75fac06dbedd1995d5f8ad9084db",
 			Image:      "example-go",
+			Stack:      "container",
 			Owner:      "test",
 			Procfile: map[string]string{
 				"web": "example-go",
@@ -133,6 +136,7 @@ func TestBuildCreate(t *testing.T) {
 		App:     "example-go",
 		Created: "2014-01-01T00:00:00UTC",
 		Image:   "drycc/example-go:latest",
+		Stack:   "heroku-18",
 		Owner:   "test",
 		Procfile: map[string]string{
 			"web": "example-go",
@@ -154,7 +158,7 @@ func TestBuildCreate(t *testing.T) {
 		"web": "example-go",
 	}
 
-	actual, err := New(drycc, "example-go", "drycc/example-go", procfile)
+	actual, err := New(drycc, "example-go", "drycc/example-go", "heroku-18", procfile)
 
 	if err != nil {
 		t.Fatal(err)
