@@ -87,7 +87,7 @@ func Get(c *drycc.Client, appID string) (api.App, error) {
 }
 
 // Logs retrieves logs from an app. The number of log lines fetched can be set by the lines
-// argument. Setting lines = -1 will retrive all app logs.
+// argument. Setting lines = -1 will retrieve all app logs.
 func Logs(c *drycc.Client, appID string, lines int) (string, error) {
 	u := fmt.Sprintf("/v2/apps/%s/logs", appID)
 

@@ -1,7 +1,7 @@
 # the filepath to this repository, relative to $GOPATH/src
 REPO_PATH = github.com/drycc/controller-sdk-go
 
-DEV_ENV_IMAGE := golang:1.14
+DEV_ENV_IMAGE := drycc/go-dev
 DEV_ENV_WORK_DIR := /go/src/${REPO_PATH}
 
 # Enable vendor/ directory support.
@@ -17,5 +17,8 @@ bootstrap:
 build:
 	${DEV_ENV_CMD} go build ${PKG_DIRS}
 
-test: build
+test: build test-style
 	${DEV_ENV_CMD} go test ${PKG_DIRS}
+
+test-style:
+	${DEV_ENV_CMD} lint --deadline
