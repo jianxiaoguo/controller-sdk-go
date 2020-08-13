@@ -18,8 +18,6 @@ type AppSettings struct {
 	// UUID is a unique string reflecting the application settings in its current state.
 	// It changes every time the application settings is changed and cannot be updated.
 	UUID string `json:"uuid,omitempty"`
-	// Maintenance determines if the application is taken down for maintenance or not.
-	Maintenance *bool `json:"maintenance,omitempty"`
 	// Routable determines if the application should be exposed by the router.
 	Routable  *bool                 `json:"routable,omitempty"`
 	Whitelist []string              `json:"whitelist,omitempty"`
