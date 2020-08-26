@@ -252,7 +252,7 @@ func TestAppsRun(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Run(drycc, "example-go", "echo hi")
+	actual, err := Run(drycc, "example-go", "echo hi", nil)
 
 	if err != nil {
 		t.Fatal(err)
