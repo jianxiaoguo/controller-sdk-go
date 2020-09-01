@@ -167,12 +167,12 @@ func TestVolumesCreate(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Volume{
-		UUID: "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner: "test",
-		App:   "example-go",
-		Name:  "myvolume",
-		Size:  "500M",
-		Path:  map[string]interface{}{},
+		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Owner:   "test",
+		App:     "example-go",
+		Name:    "myvolume",
+		Size:    "500M",
+		Path:    map[string]interface{}{},
 		Created: "2020-08-26T00:00:00UTC",
 		Updated: "2020-08-26T00:00:00UTC",
 	}

@@ -112,8 +112,11 @@ func Logs(c *drycc.Client, appID string, lines int) (string, error) {
 
 // Run a one-time command in your app. This will start a kubernetes job with the
 // same container image and environment as the rest of the app.
-func Run(c *drycc.Client, appID string, command string) (api.AppRunResponse, error) {
-	req := api.AppRunRequest{Command: command}
+func Run(c *drycc.Client, appID string, command string, volumes map[string]interface{}) (api.AppRunResponse, error) {
+	req := api.AppRunRequest{
+		Command: command,
+		Volumes: volumes,
+	}
 	body, err := json.Marshal(req)
 
 	if err != nil {
