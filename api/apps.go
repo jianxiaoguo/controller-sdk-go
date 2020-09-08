@@ -28,7 +28,7 @@ type AppUpdateRequest struct {
 
 // AppRunRequest is the definition of POST /v2/apps/<app id>/run.
 type AppRunRequest struct {
-	Command string `json:"command"`
+	Command string                 `json:"command"`
 	Volumes map[string]interface{} `json:"volumes,omitempty"`
 }
 
