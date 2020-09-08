@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-const domainCreateExpected string = `{"name":"myvolume","size":"500M"}`
+const volumeCreateExpected string = `{"name":"myvolume","size":"500M"}`
 
 const volumeCreateFixture string = `
 {
@@ -93,8 +93,8 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.Write(nil)
 		}
 
-		if string(body) != domainCreateExpected {
-			fmt.Printf("Expected '%s', Got '%s'\n", domainCreateExpected, body)
+		if string(body) != volumeCreateExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", volumeCreateExpected, body)
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 			return
