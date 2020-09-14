@@ -8,16 +8,16 @@ type Binding struct {
 // Resource is the structure of an app's resource.
 type Resource struct {
 	// Owner is the app owner.
-	Owner string `json:"owner,omitempty,-"`
+	Owner string `json:"owner,omitempty"`
 	// App is the app the tls settings apply to and cannot be updated.
-	App string `json:"app,omitempty,-"`
+	App string `json:"app,omitempty"`
 	// Created is the time that the resource was created and cannot be updated.
-	Created string `json:"created,omitempty,-"`
+	Created string `json:"created,omitempty"`
 	// Updated is the last time the TLS settings was changed and cannot be updated.
-	Updated string `json:"updated,omitempty,-"`
+	Updated string `json:"updated,omitempty"`
 	// UUID is a unique string reflecting the resource in its current state.
 	// It changes every time the resource is changed and cannot be updated.
-	UUID string `json:"uuid,omitempty,-"`
+	UUID string `json:"uuid,omitempty"`
 	// Resource's name
 	Name string `json:"name,omitempty"`
 	// Resource's Plan
