@@ -93,14 +93,10 @@ func Binding(c *drycc.Client, appID string, name string, resource api.Binding) (
 	}
 	u := fmt.Sprintf("/v2/apps/%s/resources/%s/binding/", appID, name)
 	res, reqErr := c.Request("PATCH", u, body)
-
 	if reqErr != nil {
 		return api.Resource{}, reqErr
 	}
 	defer res.Body.Close()
-
-	//return api.Resource{}, reqErr
-
 	newResource := api.Resource{}
 	if err = json.NewDecoder(res.Body).Decode(&newResource); err != nil {
 		return api.Resource{}, err
