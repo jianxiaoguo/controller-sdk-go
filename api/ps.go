@@ -10,11 +10,12 @@ type ProcessType map[string]string
 
 // Pods defines the structure of a process.
 type Pods struct {
-	Release string    `json:"release"`
-	Type    string    `json:"type"`
-	Name    string    `json:"name"`
-	State   string    `json:"state"`
-	Started time.Time `json:"started"`
+	Release  string    `json:"release,omitempty"`
+	Type     string    `json:"type,omitempty"`
+	Name     string    `json:"name,omitempty"`
+	State    string    `json:"state,omitempty"`
+	Started  time.Time `json:"started,omitempty"`
+	Replicas int       `json:"replicas,omitempty"`
 }
 
 // PodsList defines a collection of app pods.
@@ -28,10 +29,17 @@ func (p PodsList) Less(i, j int) bool { return p[i].Name < p[j].Name }
 type PodType struct {
 	Type     string
 	PodsList PodsList
+	Replicas int
+	Status   string
 }
 
 // PodTypes holds groups of pods organized by type.
 type PodTypes []PodType
+
+// Start is the definition of POST /v2/apps/<app_id>/stop or POST /v2/apps/<app_id>/start.
+type Types struct {
+	Types []string `json:"types,omitempty"`
+}
 
 func (p PodTypes) Len() int           { return len(p) }
 func (p PodTypes) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
