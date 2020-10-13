@@ -43,6 +43,14 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte(usersFixture))
 		return
 	}
+	if req.URL.Path == "/v2/users/test/enable/" && req.Method == "PATCH" {
+		res.WriteHeader(http.StatusNoContent)
+		return
+	}
+	if req.URL.Path == "/v2/users/test/disable/" && req.Method == "PATCH" {
+		res.WriteHeader(http.StatusNoContent)
+		return
+	}
 
 	fmt.Printf("Unrecongized URL %s\n", req.URL)
 	res.WriteHeader(http.StatusNotFound)
@@ -84,5 +92,37 @@ func TestUsersList(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Expected %v, Got %v", expected, actual)
+	}
+}
+
+func TestUsersEnable(t *testing.T) {
+	t.Parallel()
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Enable(drycc, "test")
+	if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUsersDisable(t *testing.T) {
+	t.Parallel()
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = Enable(drycc, "test")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
