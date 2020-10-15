@@ -24,7 +24,8 @@ const processesFixture string = `
             "type": "web",
             "name": "example-go-v2-web-45678",
             "state": "up",
-            "started": "2016-02-13T00:47:52"
+            "started": "2016-02-13T00:47:52",
+            "replicas": 1
         }
     ]
 }`
@@ -35,7 +36,8 @@ const restartAllFixture string = `[
         "type": "web",
         "name": "example-go-v2-web-45678",
         "state": "up",
-        "started": "2016-02-13T00:47:52"
+        "started": "2016-02-13T00:47:52",
+        "replicas": 1
     }
 ]
 `
@@ -46,7 +48,8 @@ const restartWorkerFixture string = `[
         "type": "worker",
         "name": "example-go-v2-worker-45678",
         "state": "up",
-        "started": "2016-02-13T00:47:52"
+        "started": "2016-02-13T00:47:52",
+        "replicas": 1
     }
 ]
 `
@@ -57,12 +60,17 @@ const restartWebTwoFixture string = `[
         "type": "web",
         "name": "example-go-v2-web-45678",
         "state": "up",
-        "started": "2016-02-13T00:47:52"
+        "started": "2016-02-13T00:47:52",
+        "replicas": 1
     }
 ]
 `
 
 const scaleExpected string = `{"web":2}`
+
+const stopExpected string = `{"types":["web"]}`
+
+const startExpected string = `{"types":["web"]}`
 
 type fakeHTTPServer struct{}
 
@@ -115,6 +123,48 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if req.URL.Path == "/v2/apps/example-go/stop/" && req.Method == "POST" {
+		body, err := ioutil.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != stopExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", stopExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusNoContent)
+		res.Write(nil)
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/start/" && req.Method == "POST" {
+		body, err := ioutil.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != startExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", startExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusNoContent)
+		res.Write(nil)
+		return
+	}
+
 	fmt.Printf("Unrecognized URL %s\n", req.URL)
 	res.WriteHeader(http.StatusNotFound)
 	res.Write(nil)
@@ -127,11 +177,12 @@ func TestProcessesList(t *testing.T) {
 	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
 	expected := api.PodsList{
 		{
-			Release: "v2",
-			Type:    "web",
-			Name:    "example-go-v2-web-45678",
-			State:   "up",
-			Started: started,
+			Release:  "v2",
+			Type:     "web",
+			Name:     "example-go-v2-web-45678",
+			State:    "up",
+			Started:  started,
+			Replicas: 1,
 		},
 	}
 
@@ -172,11 +223,12 @@ func TestAppsRestart(t *testing.T) {
 			Type: "",
 			Expected: []api.Pods{
 				{
-					Release: "v2",
-					Type:    "web",
-					Name:    "example-go-v2-web-45678",
-					State:   "up",
-					Started: started,
+					Release:  "v2",
+					Type:     "web",
+					Name:     "example-go-v2-web-45678",
+					State:    "up",
+					Started:  started,
+					Replicas: 1,
 				},
 			},
 		},
@@ -185,11 +237,12 @@ func TestAppsRestart(t *testing.T) {
 			Type: "worker",
 			Expected: []api.Pods{
 				{
-					Release: "v2",
-					Type:    "worker",
-					Name:    "example-go-v2-worker-45678",
-					State:   "up",
-					Started: started,
+					Release:  "v2",
+					Type:     "worker",
+					Name:     "example-go-v2-worker-45678",
+					State:    "up",
+					Started:  started,
+					Replicas: 1,
 				},
 			},
 		},
@@ -198,11 +251,12 @@ func TestAppsRestart(t *testing.T) {
 			Type: "worker",
 			Expected: []api.Pods{
 				{
-					Release: "v2",
-					Type:    "worker",
-					Name:    "example-go-v2-worker-45678",
-					State:   "up",
-					Started: started,
+					Release:  "v2",
+					Type:     "worker",
+					Name:     "example-go-v2-worker-45678",
+					State:    "up",
+					Started:  started,
+					Replicas: 1,
 				},
 			},
 		},
@@ -211,11 +265,12 @@ func TestAppsRestart(t *testing.T) {
 			Type: "web",
 			Expected: []api.Pods{
 				{
-					Release: "v2",
-					Type:    "web",
-					Name:    "example-go-v2-web-45678",
-					State:   "up",
-					Started: started,
+					Release:  "v2",
+					Type:     "web",
+					Name:     "example-go-v2-web-45678",
+					State:    "up",
+					Started:  started,
+					Replicas: 1,
 				},
 			},
 		},
@@ -260,6 +315,40 @@ func TestScale(t *testing.T) {
 	}
 }
 
+func TestStop(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = Stop(drycc, "example-go", map[string][]string{"types": {"web"}}); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestStart(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = Start(drycc, "example-go", map[string][]string{"types": {"web"}}); err != nil {
+		t.Fatal(err)
+	}
+}
+
 func TestByType(t *testing.T) {
 	t.Parallel()
 
@@ -270,39 +359,52 @@ func TestByType(t *testing.T) {
 		{
 			Type: "abc",
 			PodsList: api.PodsList{
-				{Type: "abc", Name: "1", Started: started},
-				{Type: "abc", Name: "2", Started: started},
-				{Type: "abc", Name: "3", Started: started},
+				{Type: "abc", Name: "1", Started: started, Replicas: 3},
+				{Type: "abc", Name: "2", Started: started, Replicas: 3},
+				{Type: "abc", Name: "3", Started: started, Replicas: 3},
 			},
+			Replicas: 3,
+			Status:   "started",
+		},
+		{
+			Type:     "job",
+			PodsList: api.PodsList{},
+			Replicas: 3,
+			Status:   "stopped",
 		},
 		{
 			Type: "web",
 			PodsList: api.PodsList{
-				{Type: "web", Name: "test1", Started: started},
-				{Type: "web", Name: "test2", Started: started},
-				{Type: "web", Name: "test3", Started: started},
+				{Type: "web", Name: "test1", Started: started, Replicas: 3},
+				{Type: "web", Name: "test2", Started: started, Replicas: 3},
+				{Type: "web", Name: "test3", Started: started, Replicas: 3},
 			},
+			Replicas: 3,
+			Status:   "started",
 		},
 		{
 			Type: "worker",
 			PodsList: api.PodsList{
-				{Type: "worker", Name: "a", Started: started},
-				{Type: "worker", Name: "b", Started: started},
-				{Type: "worker", Name: "c", Started: started},
+				{Type: "worker", Name: "a", Started: started, Replicas: 3},
+				{Type: "worker", Name: "b", Started: started, Replicas: 3},
+				{Type: "worker", Name: "c", Started: started, Replicas: 3},
 			},
+			Replicas: 3,
+			Status:   "started",
 		},
 	}
 
 	input := api.PodsList{
-		{Type: "worker", Name: "c", Started: started},
-		{Type: "abc", Name: "2", Started: started},
-		{Type: "worker", Name: "b", Started: started},
-		{Type: "web", Name: "test1", Started: started},
-		{Type: "web", Name: "test3", Started: started},
-		{Type: "abc", Name: "1", Started: started},
-		{Type: "worker", Name: "a", Started: started},
-		{Type: "abc", Name: "3", Started: started},
-		{Type: "web", Name: "test2", Started: started},
+		{Type: "worker", Name: "c", Started: started, Replicas: 3},
+		{Type: "abc", Name: "2", Started: started, Replicas: 3},
+		{Type: "worker", Name: "b", Started: started, Replicas: 3},
+		{Type: "web", Name: "test1", Started: started, Replicas: 3},
+		{Type: "web", Name: "test3", Started: started, Replicas: 3},
+		{Type: "abc", Name: "1", Started: started, Replicas: 3},
+		{Type: "worker", Name: "a", Started: started, Replicas: 3},
+		{Type: "abc", Name: "3", Started: started, Replicas: 3},
+		{Type: "web", Name: "test2", Started: started, Replicas: 3},
+		{Type: "job", Replicas: 3},
 	}
 
 	actual := ByType(input)
