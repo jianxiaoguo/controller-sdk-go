@@ -127,11 +127,13 @@ func ByType(processes api.PodsList) api.PodTypes {
 
 		// Is processtype for process doesn't exist, create a new one
 		if !exists {
-			p := api.PodsList{}
-			status := "stopped"
-			if process.Name != "" {
-				p = api.PodsList{process}
-				status = "started"
+			p := api.PodsList{process}
+			status := "started"
+			if process.State == "stopped" && process.Replicas != 0 {
+				status = "stopped"
+			}
+			if process.Name == "" {
+				p = api.PodsList{}
 			}
 			pts = append(pts, api.PodType{
 				Type:     process.Type,
