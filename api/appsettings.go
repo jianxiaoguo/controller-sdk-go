@@ -20,7 +20,7 @@ type AppSettings struct {
 	UUID string `json:"uuid,omitempty"`
 	// Routable determines if the application should be exposed by the router.
 	Routable  *bool                 `json:"routable,omitempty"`
-	Whitelist []string              `json:"whitelist,omitempty"`
+	Allowlist []string              `json:"allowlist,omitempty"`
 	Autoscale map[string]*Autoscale `json:"autoscale,omitempty"`
 	Label     Labels                `json:"label,omitempty"`
 }
@@ -31,8 +31,8 @@ func NewRoutable() *bool {
 	return &b
 }
 
-// Whitelist is the structure of POST /v2/app/<app id>/whitelist/.
-type Whitelist struct {
+// Allowlist is the structure of POST /v2/app/<app id>/allowlist/.
+type Allowlist struct {
 	Addresses []string `json:"addresses"`
 }
 
