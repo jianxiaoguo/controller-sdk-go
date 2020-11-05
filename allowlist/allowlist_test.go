@@ -1,4 +1,4 @@
-package whitelist
+package allowlist
 
 import (
 	"fmt"
@@ -12,24 +12,24 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-const whitelistFixture string = `
+const allowlistFixture string = `
 {
     "addresses": ["1.2.3.4", "0.0.0.0/0"]
 }`
 
-const whitelistCreateExpected string = `{"addresses":["1.2.3.4","0.0.0.0/0"]}`
+const allowlistCreateExpected string = `{"addresses":["1.2.3.4","0.0.0.0/0"]}`
 
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
-	if req.URL.Path == "/v2/apps/example-go/whitelist/" && req.Method == "GET" {
-		res.Write([]byte(whitelistFixture))
+	if req.URL.Path == "/v2/apps/example-go/allowlist/" && req.Method == "GET" {
+		res.Write([]byte(allowlistFixture))
 		return
 	}
 
-	if req.URL.Path == "/v2/apps/example-go/whitelist/" && req.Method == "POST" {
+	if req.URL.Path == "/v2/apps/example-go/allowlist/" && req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
 
 		if err != nil {
@@ -38,31 +38,31 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.Write(nil)
 		}
 
-		if string(body) != whitelistCreateExpected {
-			fmt.Printf("Expected '%s', Got '%s'\n", whitelistCreateExpected, body)
+		if string(body) != allowlistCreateExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", allowlistCreateExpected, body)
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 			return
 		}
 
 		res.WriteHeader(http.StatusCreated)
-		res.Write([]byte(whitelistFixture))
+		res.Write([]byte(allowlistFixture))
 		return
 	}
 
-	if req.URL.Path == "/v2/apps/example-go/whitelist/" && req.Method == "DELETE" {
+	if req.URL.Path == "/v2/apps/example-go/allowlist/" && req.Method == "DELETE" {
 		res.WriteHeader(http.StatusNoContent)
-		res.Write([]byte(whitelistFixture))
+		res.Write([]byte(allowlistFixture))
 		return
 	}
 
-	if req.URL.Path == "/v2/apps/invalidjson-test/whitelist/" && req.Method == "POST" {
+	if req.URL.Path == "/v2/apps/invalidjson-test/allowlist/" && req.Method == "POST" {
 		res.WriteHeader(http.StatusCreated)
 		res.Write([]byte(`"addresses": "test"`))
 		return
 	}
 
-	if req.URL.Path == "/v2/apps/invalidjson-test/whitelist/" && req.Method == "GET" {
+	if req.URL.Path == "/v2/apps/invalidjson-test/allowlist/" && req.Method == "GET" {
 		res.Write([]byte(`"addresses": "test"`))
 		return
 	}
@@ -72,10 +72,10 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Write(nil)
 }
 
-func TestWhitelistList(t *testing.T) {
+func TestAllowlistList(t *testing.T) {
 	t.Parallel()
 
-	expected := api.Whitelist{
+	expected := api.Allowlist{
 		Addresses: []string{"1.2.3.4", "0.0.0.0/0"},
 	}
 
@@ -99,10 +99,10 @@ func TestWhitelistList(t *testing.T) {
 	}
 }
 
-func TestWhitelistAdd(t *testing.T) {
+func TestAllowlistAdd(t *testing.T) {
 	t.Parallel()
 
-	expected := api.Whitelist{
+	expected := api.Allowlist{
 		Addresses: []string{"1.2.3.4", "0.0.0.0/0"},
 	}
 
@@ -126,7 +126,7 @@ func TestWhitelistAdd(t *testing.T) {
 	}
 }
 
-func TestWhitelistRemove(t *testing.T) {
+func TestAllowlistRemove(t *testing.T) {
 	t.Parallel()
 
 	handler := fakeHTTPServer{}
@@ -156,7 +156,7 @@ func TestAppSettingsInvalidJson(t *testing.T) {
 	}
 
 	_, err = List(drycc, "invalidjson-test")
-	expected := "json: cannot unmarshal string into Go value of type api.Whitelist"
+	expected := "json: cannot unmarshal string into Go value of type api.Allowlist"
 	if err == nil || !reflect.DeepEqual(expected, err.Error()) {
 		t.Errorf("Expected %v, Got %v", expected, err)
 	}
