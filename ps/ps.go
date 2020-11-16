@@ -129,7 +129,7 @@ func ByType(processes api.PodsList) api.PodTypes {
 		if !exists {
 			p := api.PodsList{process}
 			status := "started"
-			if process.State == "stopped" && process.Replicas != 0 {
+			if process.State == "stopped" && process.Replicas != "0" {
 				status = "stopped"
 			}
 			if process.Name == "" {
