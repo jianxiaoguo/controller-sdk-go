@@ -15,7 +15,7 @@ type Pods struct {
 	Name     string    `json:"name,omitempty"`
 	State    string    `json:"state,omitempty"`
 	Started  time.Time `json:"started,omitempty"`
-	Replicas int       `json:"replicas,omitempty"`
+	Replicas string    `json:"replicas,omitempty"`
 }
 
 // PodsList defines a collection of app pods.
@@ -29,7 +29,7 @@ func (p PodsList) Less(i, j int) bool { return p[i].Name < p[j].Name }
 type PodType struct {
 	Type     string
 	PodsList PodsList
-	Replicas int
+	Replicas string
 	Status   string
 }
 

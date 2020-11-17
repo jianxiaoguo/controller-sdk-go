@@ -25,7 +25,7 @@ const processesFixture string = `
             "name": "example-go-v2-web-45678",
             "state": "up",
             "started": "2016-02-13T00:47:52",
-            "replicas": 1
+            "replicas": "1"
         }
     ]
 }`
@@ -37,7 +37,7 @@ const restartAllFixture string = `[
         "name": "example-go-v2-web-45678",
         "state": "up",
         "started": "2016-02-13T00:47:52",
-        "replicas": 1
+        "replicas": "1"
     }
 ]
 `
@@ -49,7 +49,7 @@ const restartWorkerFixture string = `[
         "name": "example-go-v2-worker-45678",
         "state": "up",
         "started": "2016-02-13T00:47:52",
-        "replicas": 1
+        "replicas": "1"
     }
 ]
 `
@@ -61,7 +61,7 @@ const restartWebTwoFixture string = `[
         "name": "example-go-v2-web-45678",
         "state": "up",
         "started": "2016-02-13T00:47:52",
-        "replicas": 1
+        "replicas": "1"
     }
 ]
 `
@@ -182,7 +182,7 @@ func TestProcessesList(t *testing.T) {
 			Name:     "example-go-v2-web-45678",
 			State:    "up",
 			Started:  started,
-			Replicas: 1,
+			Replicas: "1",
 		},
 	}
 
@@ -228,7 +228,7 @@ func TestAppsRestart(t *testing.T) {
 					Name:     "example-go-v2-web-45678",
 					State:    "up",
 					Started:  started,
-					Replicas: 1,
+					Replicas: "1",
 				},
 			},
 		},
@@ -242,7 +242,7 @@ func TestAppsRestart(t *testing.T) {
 					Name:     "example-go-v2-worker-45678",
 					State:    "up",
 					Started:  started,
-					Replicas: 1,
+					Replicas: "1",
 				},
 			},
 		},
@@ -256,7 +256,7 @@ func TestAppsRestart(t *testing.T) {
 					Name:     "example-go-v2-worker-45678",
 					State:    "up",
 					Started:  started,
-					Replicas: 1,
+					Replicas: "1",
 				},
 			},
 		},
@@ -270,7 +270,7 @@ func TestAppsRestart(t *testing.T) {
 					Name:     "example-go-v2-web-45678",
 					State:    "up",
 					Started:  started,
-					Replicas: 1,
+					Replicas: "1",
 				},
 			},
 		},
@@ -359,52 +359,52 @@ func TestByType(t *testing.T) {
 		{
 			Type: "abc",
 			PodsList: api.PodsList{
-				{Type: "abc", Name: "1", Started: started, Replicas: 3, State: "up"},
-				{Type: "abc", Name: "2", Started: started, Replicas: 3, State: "up"},
-				{Type: "abc", Name: "3", Started: started, Replicas: 3, State: "up"},
+				{Type: "abc", Name: "1", Started: started, Replicas: "3", State: "up"},
+				{Type: "abc", Name: "2", Started: started, Replicas: "3", State: "up"},
+				{Type: "abc", Name: "3", Started: started, Replicas: "3", State: "up"},
 			},
-			Replicas: 3,
+			Replicas: "3",
 			Status:   "started",
 		},
 		{
 			Type:     "job",
 			PodsList: api.PodsList{},
-			Replicas: 3,
+			Replicas: "3",
 			Status:   "stopped",
 		},
 		{
 			Type: "web",
 			PodsList: api.PodsList{
-				{Type: "web", Name: "test1", Started: started, Replicas: 3, State: "up"},
-				{Type: "web", Name: "test2", Started: started, Replicas: 3, State: "up"},
-				{Type: "web", Name: "test3", Started: started, Replicas: 3, State: "up"},
+				{Type: "web", Name: "test1", Started: started, Replicas: "3", State: "up"},
+				{Type: "web", Name: "test2", Started: started, Replicas: "3", State: "up"},
+				{Type: "web", Name: "test3", Started: started, Replicas: "3", State: "up"},
 			},
-			Replicas: 3,
+			Replicas: "3",
 			Status:   "started",
 		},
 		{
 			Type: "worker",
 			PodsList: api.PodsList{
-				{Type: "worker", Name: "a", Started: started, Replicas: 3, State: "up"},
-				{Type: "worker", Name: "b", Started: started, Replicas: 3, State: "up"},
-				{Type: "worker", Name: "c", Started: started, Replicas: 3, State: "up"},
+				{Type: "worker", Name: "a", Started: started, Replicas: "3", State: "up"},
+				{Type: "worker", Name: "b", Started: started, Replicas: "3", State: "up"},
+				{Type: "worker", Name: "c", Started: started, Replicas: "3", State: "up"},
 			},
-			Replicas: 3,
+			Replicas: "3",
 			Status:   "started",
 		},
 	}
 
 	input := api.PodsList{
-		{Type: "worker", Name: "c", Started: started, Replicas: 3, State: "up"},
-		{Type: "abc", Name: "2", Started: started, Replicas: 3, State: "up"},
-		{Type: "worker", Name: "b", Started: started, Replicas: 3, State: "up"},
-		{Type: "web", Name: "test1", Started: started, Replicas: 3, State: "up"},
-		{Type: "web", Name: "test3", Started: started, Replicas: 3, State: "up"},
-		{Type: "abc", Name: "1", Started: started, Replicas: 3, State: "up"},
-		{Type: "worker", Name: "a", Started: started, Replicas: 3, State: "up"},
-		{Type: "abc", Name: "3", Started: started, Replicas: 3, State: "up"},
-		{Type: "web", Name: "test2", Started: started, Replicas: 3, State: "up"},
-		{Type: "job", Replicas: 3, State: "stopped"},
+		{Type: "worker", Name: "c", Started: started, Replicas: "3", State: "up"},
+		{Type: "abc", Name: "2", Started: started, Replicas: "3", State: "up"},
+		{Type: "worker", Name: "b", Started: started, Replicas: "3", State: "up"},
+		{Type: "web", Name: "test1", Started: started, Replicas: "3", State: "up"},
+		{Type: "web", Name: "test3", Started: started, Replicas: "3", State: "up"},
+		{Type: "abc", Name: "1", Started: started, Replicas: "3", State: "up"},
+		{Type: "worker", Name: "a", Started: started, Replicas: "3", State: "up"},
+		{Type: "abc", Name: "3", Started: started, Replicas: "3", State: "up"},
+		{Type: "web", Name: "test2", Started: started, Replicas: "3", State: "up"},
+		{Type: "job", Replicas: "3", State: "stopped"},
 	}
 
 	actual := ByType(input)
