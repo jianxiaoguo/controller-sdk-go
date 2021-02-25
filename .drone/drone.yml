@@ -22,6 +22,9 @@ steps:
     - push
     - tag
     - pull_request
+  volumes:
+  - name: image_registries
+    path: /etc/containers/registries.conf
 
 - name: codecov
   image: docker.io/drycc/go-dev
@@ -40,3 +43,8 @@ trigger:
   - push
   - tag
   - pull_request
+
+volumes:
+- name: image_registries
+  host:
+    path: /etc/containers/registries.conf
