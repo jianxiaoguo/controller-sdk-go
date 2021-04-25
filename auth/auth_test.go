@@ -2,6 +2,7 @@ package auth
 
 import (
 	"fmt"
+	"github.com/drycc/controller-sdk-go/api"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -11,7 +12,6 @@ import (
 )
 
 const registerExpected string = `{"username":"test","password":"opensesame","email":"test@example.com"}`
-const loginExpected string = `{"username":"test","password":"opensesame"}`
 const passwdExpected string = `{"username":"test","password":"old","new_password":"new"}`
 const regenAllExpected string = `{"all":true}`
 const regenUserExpected string = `{"username":"test"}`
@@ -51,23 +51,15 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/auth/login/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		res.Header().Add("Location", "/v2/login/drycc/?key=fdbf3b34742e4ed2be4dfa848af13007/")
+		res.WriteHeader(http.StatusFound)
+		res.Write(nil)
+		return
+	}
 
-		if err != nil {
-			fmt.Println(err)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-			return
-		}
-
-		if string(body) != loginExpected {
-			fmt.Printf("Expected '%s', Got '%s'\n", loginExpected, body)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-			return
-		}
-
-		res.Write([]byte(`{"token":"abc"}`))
+	if req.URL.Path == "/v2/auth/token/fdbf3b34742e4ed2be4dfa848af13007/" && req.Method == "GET" {
+		res.WriteHeader(http.StatusOK)
+		res.Write([]byte(`{"username":"test","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"}`))
 		return
 	}
 
@@ -187,16 +179,42 @@ func TestLogin(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Login(drycc, "test", "opensesame")
+	actual, err := Login(drycc)
 
 	if err != nil {
 		t.Error(err)
 	}
 
-	expected := "abc"
-
+	expected := "/v2/login/drycc/?key=fdbf3b34742e4ed2be4dfa848af13007/"
 	if actual != expected {
 		t.Errorf("Expected %s, Got %s", expected, actual)
+	}
+}
+
+func TestToken(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := api.AuthLoginResponse{
+		Username: "test",
+		Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+	}
+
+	token, err := Token(drycc, "fdbf3b34742e4ed2be4dfa848af13007")
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if token != expected {
+		t.Errorf("Expected %s, Got %s", expected, token)
 	}
 }
 

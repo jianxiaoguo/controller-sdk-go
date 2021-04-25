@@ -3,9 +3,10 @@ package auth
 
 import (
 	"encoding/json"
-
+	"fmt"
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"net/http"
 )
 
 // Register a new user with the controller.
@@ -26,27 +27,35 @@ func Register(c *drycc.Client, username, password, email string) error {
 	return err
 }
 
-// Login to the controller and get a token
-func Login(c *drycc.Client, username, password string) (string, error) {
-	user := api.AuthLoginRequest{Username: username, Password: password}
-	reqBody, err := json.Marshal(user)
-
-	if err != nil {
-		return "", err
+// Login to the controller and get a oauth url
+func Login(c *drycc.Client) (string, error) {
+	c.HTTPClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		return http.ErrUseLastResponse
 	}
+	res, reqErr := c.Request("POST", "/v2/auth/login/", nil)
 
-	res, reqErr := c.Request("POST", "/v2/auth/login/", reqBody)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return "", reqErr
 	}
 	defer res.Body.Close()
 
-	token := api.AuthLoginResponse{}
-	if err = json.NewDecoder(res.Body).Decode(&token); err != nil {
-		return "", err
-	}
+	URL := res.Header.Get("Location")
+	return URL, reqErr
+}
 
-	return token.Token, reqErr
+// Token to the controller and get a token
+func Token(c *drycc.Client, key string) (api.AuthLoginResponse, error) {
+	path := fmt.Sprintf("/v2/auth/token/%s/", key)
+	res, reqErr := c.Request("GET", path, nil)
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
+		return api.AuthLoginResponse{}, reqErr
+	}
+	defer res.Body.Close()
+	token := api.AuthLoginResponse{}
+	if err := json.NewDecoder(res.Body).Decode(&token); err != nil {
+		return api.AuthLoginResponse{}, err
+	}
+	return token, reqErr
 }
 
 // Delete deletes a user.
