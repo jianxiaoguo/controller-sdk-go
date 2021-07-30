@@ -9,24 +9,6 @@ import (
 	"net/http"
 )
 
-// Register a new user with the controller.
-// If controller registration is set to administrators only, a valid administrative
-// user token is required in the client.
-func Register(c *drycc.Client, username, password, email string) error {
-	user := api.AuthRegisterRequest{Username: username, Password: password, Email: email}
-	body, err := json.Marshal(user)
-
-	if err != nil {
-		return err
-	}
-
-	res, err := c.Request("POST", "/v2/auth/register/", body)
-	if err == nil {
-		res.Body.Close()
-	}
-	return err
-}
-
 // Login to the controller and get a oauth url
 func Login(c *drycc.Client) (string, error) {
 	c.HTTPClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
@@ -56,96 +38,6 @@ func Token(c *drycc.Client, key string) (api.AuthLoginResponse, error) {
 		return api.AuthLoginResponse{}, err
 	}
 	return token, reqErr
-}
-
-// Delete deletes a user.
-func Delete(c *drycc.Client, username string) error {
-	var body []byte
-	var err error
-
-	if username != "" {
-		req := api.AuthCancelRequest{Username: username}
-		body, err = json.Marshal(req)
-
-		if err != nil {
-			return err
-		}
-	}
-
-	res, err := c.Request("DELETE", "/v2/auth/cancel/", body)
-	if err == nil {
-		res.Body.Close()
-	}
-	return err
-}
-
-// Regenerate auth tokens. This invalidates existing tokens, and if targeting a specific user
-// returns a new token.
-//
-// If username is an empty string and all is false, this regenerates the
-// client user's token and will return a new token. Make sure to update the client token
-// with this new token to avoid authentication errors.
-//
-// If username is set and all is false, this will regenerate that user's token
-// and return a new token. If not targeting yourself, regenerate requires administrative privileges.
-//
-// If all is true, this will regenerate every user's token. This requires administrative privileges.
-func Regenerate(c *drycc.Client, username string, all bool) (string, error) {
-	var reqBody []byte
-	var err error
-
-	if all {
-		reqBody, err = json.Marshal(api.AuthRegenerateRequest{All: all})
-	} else if username != "" {
-		reqBody, err = json.Marshal(api.AuthRegenerateRequest{Name: username})
-	}
-
-	if err != nil {
-		return "", err
-	}
-
-	res, reqErr := c.Request("POST", "/v2/auth/tokens/", reqBody)
-	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return "", reqErr
-	}
-	defer res.Body.Close()
-
-	if all {
-		return "", nil
-	}
-
-	token := api.AuthRegenerateResponse{}
-	if err = json.NewDecoder(res.Body).Decode(&token); err != nil {
-		return "", err
-	}
-
-	return token.Token, reqErr
-}
-
-// Passwd changes a user's password.
-//
-// If username if an empty string, change the password of the client's user.
-//
-// If username is set, change the password of another user and do not require
-// their password. This requires administrative privileges.
-func Passwd(c *drycc.Client, username, password, newPassword string) error {
-	req := api.AuthPasswdRequest{Password: password, NewPassword: newPassword}
-
-	if username != "" {
-		req.Username = username
-	}
-
-	body, err := json.Marshal(req)
-
-	if err != nil {
-		return err
-	}
-
-	res, err := c.Request("POST", "/v2/auth/passwd/", body)
-	if err == nil {
-		res.Body.Close()
-	}
-	return err
 }
 
 // Whoami retrives the user object for the authenticated user.
