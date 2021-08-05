@@ -9,12 +9,6 @@ type AuthRegisterRequest struct {
 	LastName  string `json:"last_name,omitempty"`
 }
 
-// AuthLoginRequest is the definition of POST /v2/auth/login/.
-type AuthLoginRequest struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
 // AuthLoginResponse is the definition of /v2/auth/login/.
 type AuthLoginResponse tokenResponse
 
@@ -41,5 +35,6 @@ type AuthRegenerateResponse tokenResponse
 
 // A generic defenition of a token response.
 type tokenResponse struct {
-	Token string `json:"token"`
+	Token    string `json:"token"`
+	Username string `json:"username,omitempty"`
 }
