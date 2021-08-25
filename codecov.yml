@@ -1,3 +1,10 @@
-codecov:
+# documentation is at https://codecov.io/gh/drycc/controller-sdk-go/settings/yaml
+comment:
+  layout: header, diff
+coverage:
   branch: main
-  slug: "drycc/controller-sdk-go"
+  status:
+    project:
+      default:
+        threshold: 0.2
+    changes: false
