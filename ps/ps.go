@@ -44,40 +44,6 @@ func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 	return err
 }
 
-// Stop decreases an app's processes to 0. The processes are specified in the target argument
-func Stop(c *drycc.Client, appID string, targets map[string][]string) error {
-	u := fmt.Sprintf("/v2/apps/%s/stop/", appID)
-
-	body, err := json.Marshal(targets)
-
-	if err != nil {
-		return err
-	}
-
-	res, err := c.Request("POST", u, body)
-	if err == nil {
-		return res.Body.Close()
-	}
-	return err
-}
-
-// Start increases an app's processes to setting. The processes are specified in the target argument
-func Start(c *drycc.Client, appID string, targets map[string][]string) error {
-	u := fmt.Sprintf("/v2/apps/%s/start/", appID)
-
-	body, err := json.Marshal(targets)
-
-	if err != nil {
-		return err
-	}
-
-	res, err := c.Request("POST", u, body)
-	if err == nil {
-		return res.Body.Close()
-	}
-	return err
-}
-
 // Restart restarts an app's processes. To restart all app processes, pass empty strings for
 // procType and name. To restart an specific process, pass an procType by leave name empty.
 // To restart a specific instance, pass a procType and a name.
@@ -118,28 +84,16 @@ func ByType(processes api.PodsList) api.PodTypes {
 		for i, pt := range pts {
 			if pt.Type == process.Type {
 				exists = true
-				if process.Name != "" {
-					pts[i].PodsList = append(pts[i].PodsList, process)
-				}
+				pts[i].PodsList = append(pts[i].PodsList, process)
 				break
 			}
 		}
 
 		// Is processtype for process doesn't exist, create a new one
 		if !exists {
-			p := api.PodsList{process}
-			status := "started"
-			if process.State == "stopped" && process.Replicas != "0" {
-				status = "stopped"
-			}
-			if process.Name == "" {
-				p = api.PodsList{}
-			}
 			pts = append(pts, api.PodType{
 				Type:     process.Type,
-				PodsList: p,
-				Replicas: process.Replicas,
-				Status:   status,
+				PodsList: api.PodsList{process},
 			})
 		}
 	}
