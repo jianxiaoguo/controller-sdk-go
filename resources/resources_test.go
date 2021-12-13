@@ -2,14 +2,41 @@ package resources
 
 import (
 	"fmt"
-	drycc "github.com/drycc/controller-sdk-go"
-	"github.com/drycc/controller-sdk-go/api"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
+
+const resourceServices string = `
+{
+	"results": [
+		{
+			"id": "332588e0-6c2c-4f56-a6af-a56fd01ec4b4",
+			"name": "mysql",
+			"updateable": true
+		}
+	],
+	"count": 1
+}
+`
+
+const resourceServicePlans string = `
+{
+	"results": [
+		{
+			"id": "4d1dbd33-201b-45bc-9abb-757584ef7ab8",
+			"name": "standard-1600",
+			"description": "mysql standard-1600 plan which limit persistence size 1600Gi."
+		}
+	],
+	"count": 1
+}
+`
 
 const resourceCreateExpected string = `{"name":"mysql","plan":"mysql:5.6"}`
 
@@ -126,7 +153,18 @@ type fakeHTTPServer struct{}
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
-
+	// Services
+	if req.URL.Path == "/v2/resources/services/" && req.Method == "GET" {
+		res.WriteHeader(http.StatusCreated)
+		res.Write([]byte(resourceServices))
+		return
+	}
+	// Plans
+	if req.URL.Path == "/v2/resources/services/mysql/plans/" && req.Method == "GET" {
+		res.WriteHeader(http.StatusCreated)
+		res.Write([]byte(resourceServicePlans))
+		return
+	}
 	// Create
 	if req.URL.Path == "/v2/apps/example-go/resources/" && req.Method == "POST" {
 		body, err := ioutil.ReadAll(req.Body)
@@ -257,6 +295,68 @@ func TestResourcesCreate(t *testing.T) {
 		Plan: "mysql:5.6",
 	}
 	actual, err := Create(drycc, "example-go", resource)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestServices(t *testing.T) {
+	t.Parallel()
+
+	expected := api.ResourceServices{
+		{
+			ID:         "332588e0-6c2c-4f56-a6af-a56fd01ec4b4",
+			Name:       "mysql",
+			Updateable: true,
+		},
+	}
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actual, _, err := Services(drycc, 100)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestServicePlans(t *testing.T) {
+	t.Parallel()
+
+	expected := api.ResourcePlans{
+		{
+			ID:          "4d1dbd33-201b-45bc-9abb-757584ef7ab8",
+			Name:        "standard-1600",
+			Description: "mysql standard-1600 plan which limit persistence size 1600Gi.",
+		},
+	}
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actual, _, err := Plans(drycc, "mysql", 100)
 
 	if err != nil {
 		t.Fatal(err)
@@ -426,7 +526,7 @@ func TestResourceBind(t *testing.T) {
 		Updated: "2020-09-08T00:00:00UTC",
 	}
 
-	resourceVars := api.Binding{
+	resourceVars := api.ResourceBinding{
 		BindAction: "bind",
 	}
 	actual, err := Binding(drycc, "example-bind", "mysql", resourceVars)
@@ -466,7 +566,7 @@ func TestResourceUnbind(t *testing.T) {
 		Updated: "2020-09-08T00:00:00UTC",
 	}
 
-	resourceVars := api.Binding{
+	resourceVars := api.ResourceBinding{
 		BindAction: "unbind",
 	}
 	actual, err := Binding(drycc, "example-unbind", "mysql", resourceVars)
