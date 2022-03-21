@@ -49,7 +49,7 @@ func Expand(c *drycc.Client, appID string, volume api.Volume) (api.Volume, error
 		return api.Volume{}, err
 	}
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/", appID, volume.Name)
-	res, reqErr := c.Request("PUT", u, body)
+	res, reqErr := c.Request("PATCH", u, body)
 	if reqErr != nil {
 		return api.Volume{}, reqErr
 	}
