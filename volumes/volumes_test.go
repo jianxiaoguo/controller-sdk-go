@@ -2,16 +2,17 @@ package volumes
 
 import (
 	"fmt"
-	drycc "github.com/drycc/controller-sdk-go"
-	"github.com/drycc/controller-sdk-go/api"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
 	"testing"
+
+	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
-const volumeCreateExpected string = `{"name":"myvolume","size":"500M"}`
+const volumeCreateExpected string = `{"name":"myvolume","size":"500G"}`
 
 const volumeCreateFixture string = `
 {
@@ -19,7 +20,22 @@ const volumeCreateFixture string = `
 	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
-	"size": "500M",
+	"size": "500G",
+	"path": {},
+	"created": "2020-08-26T00:00:00UTC",
+	"updated": "2020-08-26T00:00:00UTC"
+}
+`
+
+const volumeExpandExpected string = `{"name":"myvolume","size":"500G"}`
+
+const volumeExpandFixture string = `
+{
+	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+	"owner": "test",
+	"app": "example-go",
+	"name": "myvolume",
+	"size": "500G",
 	"path": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
@@ -37,7 +53,7 @@ const volumesFixture string = `
 			"owner": "test",
 			"app": "example-go",
 			"name": "myvolume",
-			"size": "500M",
+			"size": "500G",
 			"path": {},
 			"created": "2020-08-26T00:00:00UTC",
 			"updated": "2020-08-26T00:00:00UTC"
@@ -52,7 +68,7 @@ const volumeMountFixture string = `
 	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
-	"size": "500M",
+	"size": "500G",
 	"path": {
 		"cmd":  "/data/cmd1",
 		"web": "/data/web1"
@@ -68,7 +84,7 @@ const volumeUnmountFixture string = `
 	"owner": "test",
 	"app": "unmount-test",
 	"name": "myvolume",
-	"size": "500M",
+	"size": "500G",
 	"path": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
@@ -102,6 +118,28 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		res.WriteHeader(http.StatusCreated)
 		res.Write([]byte(volumeCreateFixture))
+		return
+	}
+
+	// Expand
+	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PUT" {
+		body, err := ioutil.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != volumeExpandExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", volumeExpandExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusOK)
+		res.Write([]byte(volumeExpandFixture))
 		return
 	}
 
@@ -171,7 +209,7 @@ func TestVolumesCreate(t *testing.T) {
 		Owner:   "test",
 		App:     "example-go",
 		Name:    "myvolume",
-		Size:    "500M",
+		Size:    "500G",
 		Path:    map[string]interface{}{},
 		Created: "2020-08-26T00:00:00UTC",
 		Updated: "2020-08-26T00:00:00UTC",
@@ -187,9 +225,46 @@ func TestVolumesCreate(t *testing.T) {
 	}
 	volume := api.Volume{
 		Name: "myvolume",
-		Size: "500M",
+		Size: "500G",
 	}
 	actual, err := Create(drycc, "example-go", volume)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestVolumesExpand(t *testing.T) {
+	t.Parallel()
+
+	expected := api.Volume{
+		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Owner:   "test",
+		App:     "example-go",
+		Name:    "myvolume",
+		Size:    "500G",
+		Path:    map[string]interface{}{},
+		Created: "2020-08-26T00:00:00UTC",
+		Updated: "2020-08-26T00:00:00UTC",
+	}
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	volume := api.Volume{
+		Name: "myvolume",
+		Size: "500G",
+	}
+	actual, err := Expand(drycc, "example-go", volume)
 
 	if err != nil {
 		t.Fatal(err)
@@ -227,7 +302,7 @@ func TestVolumesList(t *testing.T) {
 			Owner:   "test",
 			Name:    "myvolume",
 			Path:    map[string]interface{}{},
-			Size:    "500M",
+			Size:    "500G",
 			Created: "2020-08-26T00:00:00UTC",
 			Updated: "2020-08-26T00:00:00UTC",
 		},
@@ -273,7 +348,7 @@ func TestVolumeMount(t *testing.T) {
 			"cmd": "/data/cmd1",
 			"web": "/data/web1",
 		},
-		Size:    "500M",
+		Size:    "500G",
 		Created: "2020-08-26T00:00:00UTC",
 		Updated: "2020-08-26T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
@@ -313,7 +388,7 @@ func TestVolumeUnmount(t *testing.T) {
 		Owner:   "test",
 		App:     "unmount-test",
 		Path:    map[string]interface{}{},
-		Size:    "500M",
+		Size:    "500G",
 		Created: "2020-08-26T00:00:00UTC",
 		Updated: "2020-08-26T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",

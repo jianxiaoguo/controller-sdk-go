@@ -11,7 +11,7 @@ import (
 
 // Services is list all available resource services
 func Services(c *drycc.Client, results int) (api.ResourceServices, int, error) {
-	u := fmt.Sprintf("/v2/resources/services/")
+	u := "/v2/resources/services/"
 	body, count, reqErr := c.LimitedRequest(u, results)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.ResourceService{}, -1, reqErr

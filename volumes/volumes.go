@@ -42,13 +42,30 @@ func Create(c *drycc.Client, appID string, volume api.Volume) (api.Volume, error
 	return newVolume, reqErr
 }
 
+// Expand create an app's Volume.
+func Expand(c *drycc.Client, appID string, volume api.Volume) (api.Volume, error) {
+	body, err := json.Marshal(volume)
+	if err != nil {
+		return api.Volume{}, err
+	}
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/", appID, volume.Name)
+	res, reqErr := c.Request("PUT", u, body)
+	if reqErr != nil {
+		return api.Volume{}, reqErr
+	}
+	defer res.Body.Close()
+	newVolume := api.Volume{}
+	if err = json.NewDecoder(res.Body).Decode(&newVolume); err != nil {
+		return api.Volume{}, err
+	}
+	return newVolume, reqErr
+}
+
 // Delete delete an app's Volume.
 func Delete(c *drycc.Client, appID string, name string) error {
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/", appID, name)
 	res, err := c.Request("DELETE", u, nil)
-	if err == nil {
-		res.Body.Close()
-	}
+	defer res.Body.Close()
 	return err
 }
 
