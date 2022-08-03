@@ -122,7 +122,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	// Expand
-	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PUT" {
+	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PATCH" {
 		body, err := ioutil.ReadAll(req.Body)
 
 		if err != nil {
