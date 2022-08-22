@@ -3,6 +3,7 @@ package ps
 import (
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -11,6 +12,7 @@ import (
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
 	"github.com/drycc/controller-sdk-go/pkg/time"
+	"github.com/gorilla/websocket"
 )
 
 const processesFixture string = `
@@ -64,6 +66,8 @@ const restartWebTwoFixture string = `[
 
 const scaleExpected string = `{"web":2}`
 
+var upgrader = websocket.Upgrader{} // use default options
+
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -72,6 +76,29 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/v2/apps/example-go/pods/" && req.Method == "GET" {
 		res.Write([]byte(processesFixture))
 		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/pods/example-go-web-111/exec/" {
+		c, err := upgrader.Upgrade(res, req, nil)
+		if err != nil {
+			log.Print("upgrade:", err)
+			return
+		}
+		defer c.Close()
+		for {
+			messageType, message, err := c.ReadMessage()
+			if err != nil {
+				log.Println("read:", err)
+				break
+			}
+
+			log.Printf("recv: %s", message)
+			err = c.WriteMessage(messageType, []byte("# "+"\n"))
+			if err != nil {
+				log.Println("write:", err)
+				break
+			}
+		}
 	}
 
 	if req.URL.Path == "/v2/apps/example-go/pods/restart/" && req.Method == "POST" {
@@ -152,6 +179,30 @@ func TestProcessesList(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestExec(t *testing.T) {
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	conn, err := Exec(drycc, "example-go", "example-go-web-111", true, true, []string{"/bin/sh"})
+	if err != nil {
+		t.Fatal(err)
+	}
+	expected := []byte("# " + "\n")
+	_, actual, err := conn.ReadMessage()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expected: %v, Got %v", expected, actual)
 	}
 }
 

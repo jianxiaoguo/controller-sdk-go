@@ -1,8 +1,11 @@
 module github.com/drycc/controller-sdk-go
 
-go 1.17
+go 1.19
 
-require github.com/goware/urlx v0.3.1
+require (
+	github.com/gorilla/websocket v1.5.0
+	github.com/goware/urlx v0.3.1
+)
 
 require (
 	github.com/PuerkitoBio/purell v1.1.1 // indirect

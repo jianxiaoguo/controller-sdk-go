@@ -4,10 +4,13 @@ package ps
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/url"
 	"sort"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"github.com/gorilla/websocket"
 )
 
 // List lists an app's processes.
@@ -24,6 +27,36 @@ func List(c *drycc.Client, appID string, results int) (api.PodsList, int, error)
 	}
 
 	return procs, count, reqErr
+}
+
+// Exec a command in a container.
+func Exec(c *drycc.Client, app, pod string, tty, stdin bool, command []string) (*websocket.Conn, error) {
+	scheme := "ws"
+	if c.ControllerURL.Scheme == "https" {
+		scheme = "wss"
+	}
+	path := fmt.Sprintf("v2/apps/%s/pods/%s/exec/", app, pod)
+	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
+	conn, _, err := websocket.DefaultDialer.Dial(
+		endpoint.String(),
+		http.Header{
+			"User-Agent":           {c.UserAgent},
+			"Authorization":        {"token " + c.Token},
+			"X-Drycc-Builder-Auth": {c.HooksToken},
+		},
+	)
+	if err != nil {
+		return nil, err
+	}
+	data, err := json.Marshal(&command)
+	if err != nil {
+		return nil, err
+	}
+	conn.WriteMessage(
+		websocket.TextMessage,
+		[]byte(fmt.Sprintf(`{"tty": %t, "stdin": %t, "command": %s}`, tty, stdin, data)),
+	)
+	return conn, nil
 }
 
 // Scale increases or decreases an app's processes. The processes are specified in the target argument,
