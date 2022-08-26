@@ -1,8 +1,10 @@
 package apps
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -10,6 +12,7 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"github.com/gorilla/websocket"
 )
 
 const appFixture string = `
@@ -43,9 +46,17 @@ const appCreateExpected string = `{"id":"example-go"}`
 const appRunExpected string = `{"command":"echo hi"}`
 const appTransferExpected string = `{"owner":"test"}`
 
+var upgrader = websocket.Upgrader{} // use default options
+
 type fakeHTTPServer struct {
 	createID        bool
 	createWithoutID bool
+}
+
+type fakeLogReqMessage struct {
+	Lines   int  `json:"lines"`
+	Timeout int  `json:"timeout"`
+	Follow  bool `json:"follow"`
 }
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -96,15 +107,23 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	// The entire log message is prefixed and suffixed with a few characters (not entirely sure why)
 	// We mimic those here
-	if req.URL.Path == "/v2/apps/example-go/logs" && req.URL.RawQuery == "" && req.Method == "GET" {
-		res.Write([]byte(`test\nfoo\nbar`))
-		return
-	}
-
-	// The entire log message is prefixed and suffixed with a few characters (not entirely sure why)
-	// We mimic those here
-	if req.URL.Path == "/v2/apps/example-go/logs" && req.URL.RawQuery == "log_lines=1" && req.Method == "GET" {
-		res.Write([]byte("test"))
+	if req.URL.Path == "/v2/apps/example-go/logs" {
+		c, err := upgrader.Upgrade(res, req, nil)
+		if err != nil {
+			log.Print("upgrade:", err)
+			return
+		}
+		defer c.Close()
+		_, message, err := c.ReadMessage()
+		if err != nil {
+			log.Print("upgrade:", err)
+			return
+		}
+		reqJSON := fakeLogReqMessage{}
+		json.Unmarshal([]byte(message), &reqJSON)
+		for i := 0; i < reqJSON.Lines; i++ {
+			c.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("test %d", i)))
+		}
 		return
 	}
 
@@ -296,24 +315,8 @@ func TestAppsList(t *testing.T) {
 	}
 }
 
-type testExpected struct {
-	Input    int
-	Expected string
-}
-
 func TestAppsLogs(t *testing.T) {
 	t.Parallel()
-
-	tests := []testExpected{
-		{
-			Input:    -1,
-			Expected: `test\nfoo\nbar`,
-		},
-		{
-			Input:    1,
-			Expected: "test",
-		},
-	}
 
 	handler := fakeHTTPServer{}
 	server := httptest.NewServer(&handler)
@@ -324,16 +327,16 @@ func TestAppsLogs(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, test := range tests {
-		actual, err := Logs(drycc, "example-go", test.Input)
-
-		if err != nil {
-			t.Error(err)
-		}
-
-		if actual != test.Expected {
-			t.Errorf("Expected %s, Got %s", test.Expected, actual)
-		}
+	conn, err := Logs(drycc, "example-go", 1, false, 300)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, message, err := conn.ReadMessage()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(message) != "test 0" {
+		t.Errorf("Expected %s, Got %s", "test 0", message)
 	}
 }
 

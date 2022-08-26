@@ -5,11 +5,12 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
-	"strconv"
+	"net/http"
+	"net/url"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"github.com/gorilla/websocket"
 )
 
 // ErrNoLogs is returned when logs are missing from an app.
@@ -88,26 +89,30 @@ func Get(c *drycc.Client, appID string) (api.App, error) {
 
 // Logs retrieves logs from an app. The number of log lines fetched can be set by the lines
 // argument. Setting lines = -1 will retrieve all app logs.
-func Logs(c *drycc.Client, appID string, lines int) (string, error) {
-	u := fmt.Sprintf("/v2/apps/%s/logs", appID)
-
-	if lines > 0 {
-		u += "?log_lines=" + strconv.Itoa(lines)
+func Logs(c *drycc.Client, appID string, lines int, follow bool, timeout int) (*websocket.Conn, error) {
+	scheme := "ws"
+	if c.ControllerURL.Scheme == "https" {
+		scheme = "wss"
+	}
+	path := fmt.Sprintf("v2/apps/%s/logs", appID)
+	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
+	conn, _, err := websocket.DefaultDialer.Dial(
+		endpoint.String(),
+		http.Header{
+			"User-Agent":           {c.UserAgent},
+			"Authorization":        {"token " + c.Token},
+			"X-Drycc-Builder-Auth": {c.HooksToken},
+		},
+	)
+	if err != nil {
+		return nil, err
 	}
 
-	res, reqErr := c.Request("GET", u, nil)
-	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return "", ErrNoLogs
-	}
-	defer res.Body.Close()
-
-	body, err := ioutil.ReadAll(res.Body)
-	if err != nil || len(body) < 3 {
-		return "", ErrNoLogs
-	}
-
-	// We need to trim a few characters off the front and end of the string
-	return string(body), reqErr
+	conn.WriteMessage(
+		websocket.TextMessage,
+		[]byte(fmt.Sprintf(`{"lines": %d, "timeout": %d, "follow": %v}`, lines, timeout, follow)),
+	)
+	return conn, nil
 }
 
 // Run a one-time command in your app. This will start a kubernetes job with the
