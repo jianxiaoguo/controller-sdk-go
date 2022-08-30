@@ -4,7 +4,7 @@ go 1.19
 
 require (
 	github.com/gorilla/websocket v1.5.0
-	github.com/goware/urlx v0.3.1
+	github.com/goware/urlx v0.3.2
 )
 
 require (

@@ -72,10 +72,10 @@ func Delete(c *drycc.Client, appID string, name string) error {
 // Mount mount an app's volume and creates a new release.
 // This is a patching operation, which means when you call Mount() with an api.Volumes:
 //
-//    - If the variable does not exist, it will be set.
-//    - If the variable exists, it will be overwritten.
-//    - If the variable is set to nil, it will be unmount.
-//    - If the variable was ignored in the api.Volumes, it will remain unchanged.
+//   - If the variable does not exist, it will be set.
+//   - If the variable exists, it will be overwritten.
+//   - If the variable is set to nil, it will be unmount.
+//   - If the variable was ignored in the api.Volumes, it will remain unchanged.
 //
 // Calling Mount() with an empty api.Volume will return a drycc.ErrConflict.
 // Trying to Unmount a key that does not exist returns a drycc.ErrUnprocessable.

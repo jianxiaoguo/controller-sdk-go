@@ -34,25 +34,26 @@ func List(c *drycc.Client, appID string, results int) ([]api.Build, int, error) 
 // configuration object. This can be done with `drycc registry:set` or by using this SDK.
 //
 // This example adds custom registry credentials to an app:
-//    import (
-//    	"github.com/drycc/controller-sdk-go/api"
-//    	"github.com/drycc/controller-sdk-go/config"
-//    )
 //
-//    // Create username/password map
-//    registryMap := map[string]string{
-//    	"username": "password"
-//    }
+//	import (
+//		"github.com/drycc/controller-sdk-go/api"
+//		"github.com/drycc/controller-sdk-go/config"
+//	)
 //
-//    // Create a new configuration, assign the credentials, and set it.
-//    // Note that config setting is a patching operation, it doesn't overwrite or unset
-//    // unrelated configuration.
-//    newConfig := api.Config{}
-//    newConfig.Registry = registryMap
-//    _, err := config.Set(<client>, "appname", newConfig)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
+//	// Create username/password map
+//	registryMap := map[string]string{
+//		"username": "password"
+//	}
+//
+//	// Create a new configuration, assign the credentials, and set it.
+//	// Note that config setting is a patching operation, it doesn't overwrite or unset
+//	// unrelated configuration.
+//	newConfig := api.Config{}
+//	newConfig.Registry = registryMap
+//	_, err := config.Set(<client>, "appname", newConfig)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 func New(c *drycc.Client, appID string, image string,
 	stack string, procfile map[string]string) (api.Build, error) {
 

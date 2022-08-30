@@ -4,48 +4,48 @@
 // such as the controller url and user token. The client is then passed to api methods,
 // which use it to make requests.
 //
-// Basic Example
+// # Basic Example
 //
 // This example creates a client and then lists the apps that the user has access to:
 //
-//    import (
-//        drycc "github.com/drycc/controller-sdk-go"
-//        "github.com/drycc/controller-sdk-go/apps"
-//    )
+//	import (
+//	    drycc "github.com/drycc/controller-sdk-go"
+//	    "github.com/drycc/controller-sdk-go/apps"
+//	)
 //
-//    //                      Verify SSL, Controller URL, API Token
-//    client, err := drycc.New(true, "drycc.test.io", "abc123")
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//    apps, _, err := apps.List(client, 100)
-//    if err != nil {
-//        log.Fatal(err)
-//    }
+//	//                      Verify SSL, Controller URL, API Token
+//	client, err := drycc.New(true, "drycc.test.io", "abc123")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	apps, _, err := apps.List(client, 100)
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
 //
-// Authentication
+// # Authentication
 //
 // If you don't already have a token for a user, you can retrieve one with a
 // username and password.
 //
-//    import (
-//        drycc "github.com/drycc/controller-sdk-go"
-//        "github.com/drycc/controller-sdk-go/apps"
-//    )
+//	import (
+//	    drycc "github.com/drycc/controller-sdk-go"
+//	    "github.com/drycc/controller-sdk-go/apps"
+//	)
 //
-//    // Create a client with a blank token to pass to login.
-//    client, err := drycc.New(true, "drycc.test.io", "")
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//    token, err := auth.Login(client, "user", "password")
-//    if err != nil {
-//        log.Fatal(err)
-//    }
-//    // Set the client to use the retrieved token
-//    client.Token = token
+//	// Create a client with a blank token to pass to login.
+//	client, err := drycc.New(true, "drycc.test.io", "")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	token, err := auth.Login(client, "user", "password")
+//	if err != nil {
+//	    log.Fatal(err)
+//	}
+//	// Set the client to use the retrieved token
+//	client.Token = token
 //
-// Learning More
+// # Learning More
 //
 // See the godoc for the SDK's subpackages to learn more about specific SDK actions.
 package drycc

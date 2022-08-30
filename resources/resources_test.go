@@ -113,7 +113,6 @@ const resourceFixture string = `
 }
 `
 
-//
 const resourceBindingFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
@@ -367,7 +366,6 @@ func TestServicePlans(t *testing.T) {
 	}
 }
 
-//
 func TestResourcesList(t *testing.T) {
 	t.Parallel()
 

@@ -30,10 +30,10 @@ func List(c *drycc.Client, app string) (api.AppSettings, error) {
 // Set sets an app's settings variables.
 // This is a patching operation, which means when you call Set() with an api.AppSettings:
 //
-//    - If the variable does not exist, it will be set.
-//    - If the variable exists, it will be overwritten.
-//    - If the variable is set to nil, it will be unset.
-//    - If the variable was ignored in the api.AppSettings, it will remain unchanged.
+//   - If the variable does not exist, it will be set.
+//   - If the variable exists, it will be overwritten.
+//   - If the variable is set to nil, it will be unset.
+//   - If the variable was ignored in the api.AppSettings, it will remain unchanged.
 //
 // Calling Set() with an empty api.AppSettings will return a drycc.ErrConflict.
 func Set(c *drycc.Client, app string, appSettings api.AppSettings) (api.AppSettings, error) {

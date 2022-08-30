@@ -2,20 +2,16 @@ package auth
 
 import (
 	"fmt"
-	"github.com/drycc/controller-sdk-go/api"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/drycc/controller-sdk-go/api"
 
 	drycc "github.com/drycc/controller-sdk-go"
 )
 
 type fakeHTTPServer struct {
-	regenBodyEmpty    bool
-	regenBodyAll      bool
-	regenBodyUsername bool
-	cancelEmpty       bool
-	cancelUsername    bool
 }
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {

@@ -30,10 +30,10 @@ func List(c *drycc.Client, app string) (api.Config, error) {
 // Set sets an app's config variables and creates a new release.
 // This is a patching operation, which means when you call Set() with an api.Config:
 //
-//    - If the variable does not exist, it will be set.
-//    - If the variable exists, it will be overwritten.
-//    - If the variable is set to nil, it will be unset.
-//    - If the variable was ignored in the api.Config, it will remain unchanged.
+//   - If the variable does not exist, it will be set.
+//   - If the variable exists, it will be overwritten.
+//   - If the variable is set to nil, it will be unset.
+//   - If the variable was ignored in the api.Config, it will remain unchanged.
 //
 // Calling Set() with an empty api.Config will return a drycc.ErrConflict.
 // Trying to unset a key that does not exist returns a drycc.ErrUnprocessable.

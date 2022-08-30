@@ -25,7 +25,7 @@ func List(c *drycc.Client, results int) (api.Users, int, error) {
 	return users, count, reqErr
 }
 
-//Enable user with the controller.
+// Enable user with the controller.
 func Enable(c *drycc.Client, username string) error {
 	u := fmt.Sprintf("/v2/users/%s/enable/", username)
 	res, err := c.Request("PATCH", u, nil)
@@ -36,7 +36,7 @@ func Enable(c *drycc.Client, username string) error {
 	return err
 }
 
-//Disable user with the controller.
+// Disable user with the controller.
 func Disable(c *drycc.Client, username string) error {
 	u := fmt.Sprintf("/v2/users/%s/disable/", username)
 	res, err := c.Request("PATCH", u, nil)
