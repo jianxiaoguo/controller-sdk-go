@@ -31,39 +31,6 @@ const processesFixture string = `
     ]
 }`
 
-const restartAllFixture string = `[
-    {
-        "release": "v2",
-        "type": "web",
-        "name": "example-go-v2-web-45678",
-        "state": "up",
-        "started": "2016-02-13T00:47:52"
-    }
-]
-`
-
-const restartWorkerFixture string = `[
-    {
-        "release": "v2",
-        "type": "worker",
-        "name": "example-go-v2-worker-45678",
-        "state": "up",
-        "started": "2016-02-13T00:47:52"
-    }
-]
-`
-
-const restartWebTwoFixture string = `[
-    {
-        "release": "v2",
-        "type": "web",
-        "name": "example-go-v2-web-45678",
-        "state": "up",
-        "started": "2016-02-13T00:47:52"
-    }
-]
-`
-
 const scaleExpected string = `{"web":2}`
 
 var upgrader = websocket.Upgrader{} // use default options
@@ -102,22 +69,12 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/apps/example-go/pods/restart/" && req.Method == "POST" {
-		res.Write([]byte(restartAllFixture))
+		res.WriteHeader(http.StatusNoContent)
 		return
 	}
 
 	if req.URL.Path == "/v2/apps/example-go/pods/web/restart/" && req.Method == "POST" {
-		res.Write([]byte(restartWebTwoFixture))
-		return
-	}
-
-	if req.URL.Path == "/v2/apps/example-go/pods/worker/example-go-v2-worker-45678/restart/" && req.Method == "POST" {
-		res.Write([]byte(restartWorkerFixture))
-		return
-	}
-
-	if req.URL.Path == "/v2/apps/example-go/pods/worker/worker-45678/restart/" && req.Method == "POST" {
-		res.Write([]byte(restartWorkerFixture))
+		res.WriteHeader(http.StatusNoContent)
 		return
 	}
 
@@ -219,56 +176,10 @@ func TestAppsRestart(t *testing.T) {
 	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
 	tests := []testExpected{
 		{
-			Name: "",
 			Type: "",
-			Expected: []api.Pods{
-				{
-					Release: "v2",
-					Type:    "web",
-					Name:    "example-go-v2-web-45678",
-					State:   "up",
-					Started: started,
-				},
-			},
 		},
 		{
-			Name: "example-go-v2-worker-45678",
-			Type: "worker",
-			Expected: []api.Pods{
-				{
-					Release: "v2",
-					Type:    "worker",
-					Name:    "example-go-v2-worker-45678",
-					State:   "up",
-					Started: started,
-				},
-			},
-		},
-		{
-			Name: "worker-45678",
-			Type: "worker",
-			Expected: []api.Pods{
-				{
-					Release: "v2",
-					Type:    "worker",
-					Name:    "example-go-v2-worker-45678",
-					State:   "up",
-					Started: started,
-				},
-			},
-		},
-		{
-			Name: "",
 			Type: "web",
-			Expected: []api.Pods{
-				{
-					Release: "v2",
-					Type:    "web",
-					Name:    "example-go-v2-web-45678",
-					State:   "up",
-					Started: started,
-				},
-			},
 		},
 	}
 
@@ -282,14 +193,10 @@ func TestAppsRestart(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		actual, err := Restart(drycc, "example-go", test.Type, test.Name)
+		err := Restart(drycc, "example-go", test.Type)
 
 		if err != nil {
 			t.Error(err)
-		}
-
-		if !reflect.DeepEqual(test.Expected, actual) {
-			t.Error(fmt.Errorf("Expected %v, Got %v", test.Expected, actual))
 		}
 	}
 }

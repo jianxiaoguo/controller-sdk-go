@@ -71,40 +71,25 @@ func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 	}
 
 	res, err := c.Request("POST", u, body)
-	if err == nil {
-		return res.Body.Close()
-	}
+	defer res.Body.Close()
 	return err
 }
 
 // Restart restarts an app's processes. To restart all app processes, pass empty strings for
 // procType and name. To restart an specific process, pass an procType by leave name empty.
 // To restart a specific instance, pass a procType and a name.
-func Restart(c *drycc.Client, appID string, procType string, name string) (api.PodsList, error) {
+func Restart(c *drycc.Client, appID string, procType string) error {
 	u := fmt.Sprintf("/v2/apps/%s/pods/", appID)
 
 	if procType == "" {
 		u += "restart/"
 	} else {
-		if name == "" {
-			u += procType + "/restart/"
-		} else {
-			u += procType + "/" + name + "/restart/"
-		}
+		u += procType + "/restart/"
 	}
 
-	res, reqErr := c.Request("POST", u, nil)
-	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return []api.Pods{}, reqErr
-	}
+	res, err := c.Request("POST", u, nil)
 	defer res.Body.Close()
-
-	procs := []api.Pods{}
-	if err := json.NewDecoder(res.Body).Decode(&procs); err != nil {
-		return []api.Pods{}, err
-	}
-
-	return procs, reqErr
+	return err
 }
 
 // ByType organizes processes of an app by process type.
