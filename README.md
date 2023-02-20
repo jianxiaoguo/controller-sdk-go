@@ -1,5 +1,5 @@
 # Controller Go SDK
-[![Build Status](https://travis-ci.org/drycc/controller-sdk-go.svg?branch=main)](https://travis-ci.org/drycc/controller-sdk-go/)
+[![Build Status](https://woodpecker.drycc.cc/api/badges/drycc/controller-sdk-go/status.svg)](https://woodpecker.drycc.cc/drycc/controller-sdk-go)
 [![codecov](https://codecov.io/gh/drycc/controller-sdk-go/branch/main/graph/badge.svg)](https://codecov.io/gh/drycc/controller-sdk-go)
 [![Go Report Card](https://goreportcard.com/badge/github.com/drycc/controller-sdk-go)](https://goreportcard.com/report/github.com/drycc/controller-sdk-go)
 [![codebeat badge](https://codebeat.co/badges/79dde330-50c5-45db-a1ef-cb6c48af5f5f)](https://codebeat.co/projects/github-com-drycc-controller-sdk-go-main)
