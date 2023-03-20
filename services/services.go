@@ -48,13 +48,11 @@ func List(c *drycc.Client, appID string) (api.Services, error) {
 // Service is the way to route some traffic matching given URL pattern to worker different than `web`
 // procfileType - name of the process in Procfile (i.e. <process type> from the `<process type>: <command>`), e.g. `webhooks`
 // for more about Procfile see this https://devcenter.heroku.com/articles/procfile
-// pathPattern - one or several regexp patterns separated by comma, all request matching given regexp
-// are routed to the procfileType workers. E.g. `/webhooks/notify,~ ^/users/[0-9]+/.*/webhooks/notify,/webhooks/rest`
 // procfileType and pathPattern are mandatory and should have valid values.
-func New(c *drycc.Client, appID string, procfileType string, pathPattern string) (api.Service, error) {
+func New(c *drycc.Client, appID string, procfileType string, port int, protocol string, targetPort int) (api.Service, error) {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
-	req := api.ServiceCreateUpdateRequest{ProcfileType: procfileType, PathPattern: pathPattern}
+	req := api.ServiceCreateUpdateRequest{ProcfileType: procfileType, Port: port, Protocol: protocol, TargetPort: targetPort}
 
 	body, err := json.Marshal(req)
 
@@ -68,7 +66,7 @@ func New(c *drycc.Client, appID string, procfileType string, pathPattern string)
 	}
 	defer res.Body.Close()
 
-	d := api.Service{ProcfileType: procfileType, PathPattern: pathPattern}
+	d := api.Service{ProcfileType: procfileType, Port: port, Protocol: protocol, TargetPort: targetPort}
 	return d, reqErr
 }
 

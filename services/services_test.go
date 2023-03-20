@@ -17,11 +17,15 @@ const servicesFixture string = `
   "services": [
     {
         "procfile_type": "web",
-        "path_pattern":  "/abc/xyz"
+        "port": 5000,
+        "protocol": "UDP",
+        "target_port": 5000
     },
     {
         "procfile_type": "worker",
-        "path_pattern":  "/x1z/a2c"
+        "port": 5000,
+        "protocol": "TCP",
+        "target_port": 5000
     }
   ]
 }`
@@ -29,10 +33,12 @@ const servicesFixture string = `
 const serviceFixture string = `
 {
     "procfile_type": "web",
-    "path_pattern":  "/abc/xyz"
+    "port": 5000,
+    "protocol": "UDP",
+    "target_port": 5000
 }`
 
-const serviceCreateExpected string = `{"procfile_type":"web","path_pattern":"/abc/xyz"}`
+const serviceCreateExpected string = `{"procfile_type":"web","port":5000,"protocol":"UDP","target_port":5000}`
 
 type fakeHTTPServer struct{}
 
@@ -82,11 +88,15 @@ func TestServicesList(t *testing.T) {
 	expected := api.Services{
 		{
 			ProcfileType: "web",
-			PathPattern:  "/abc/xyz",
+			Port:         5000,
+			Protocol:     "UDP",
+			TargetPort:   5000,
 		},
 		{
 			ProcfileType: "worker",
-			PathPattern:  "/x1z/a2c",
+			Port:         5000,
+			Protocol:     "TCP",
+			TargetPort:   5000,
 		},
 	}
 
@@ -115,7 +125,9 @@ func TestServicesAdd(t *testing.T) {
 
 	expected := api.Service{
 		ProcfileType: "web",
-		PathPattern:  "/abc/xyz",
+		Port:         5000,
+		Protocol:     "UDP",
+		TargetPort:   5000,
 	}
 
 	handler := fakeHTTPServer{}
@@ -127,7 +139,7 @@ func TestServicesAdd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := New(drycc, "example-go", "web", "/abc/xyz")
+	actual, err := New(drycc, "example-go", "web", 5000, "UDP", 5000)
 
 	if err != nil {
 		t.Fatal(err)
