@@ -2,7 +2,7 @@ package drycc
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -84,7 +84,7 @@ func (f fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			return
 		}
 
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -168,7 +168,7 @@ func TestBasicRequest(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer res.Body.Close()
-	body, _ := ioutil.ReadAll(res.Body)
+	body, _ := io.ReadAll(res.Body)
 
 	expected := "request"
 	if string(body) != expected {

@@ -2,7 +2,7 @@ package tls
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -20,7 +20,8 @@ const (
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
 	"https_enforced": false,
-	"certs_auto_enabled": false
+	"certs_auto_enabled": false,
+	"issuer": {}
 }`
 	tlsEnabledFixture string = `{
 	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
@@ -31,8 +32,25 @@ const (
 	"https_enforced": true,
 	"certs_auto_enabled": null
 }`
+	issuerFixture string = `{
+    "uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
+    "app": "foo",
+    "owner": "test",
+    "created": "2016-08-22T17:40:16Z",
+    "updated": "2016-08-22T17:40:16Z",
+    "https_enforced": null,
+    "certs_auto_enabled": null,
+    "issuer": {
+        "email":"anonymous@cert-manager.io",
+        "server":"https://acme-v02.api.letsencrypt.org/directory",
+        "key_id":"keyID",
+        "key_secret":"keySecret"
+    }
+}`
+
 	tlsEnableExpected  string = `{"https_enforced":true}`
 	tlsDisableExpected string = `{"https_enforced":false}`
+	issuerExpected     string = `{"issuer":{"email":"anonymous@cert-manager.io","server":"https://acme-v02.api.letsencrypt.org/directory","key_id":"keyID","key_secret":"keySecret"}}`
 )
 
 type fakeHTTPServer struct{}
@@ -46,7 +64,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -62,10 +80,15 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(tlsDisableExpected))
 			return
+		} else if string(body) == issuerExpected {
+			res.WriteHeader(http.StatusCreated)
+			res.Write([]byte(issuerFixture))
+			return
 		} else {
-			fmt.Printf("Expected '%s' or '%s', Got '%s'\n",
+			fmt.Printf("Expected '%s', %s or '%s', Got '%s'\n",
 				tlsEnableExpected,
 				tlsDisableExpected,
+				issuerExpected,
 				body)
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
@@ -89,7 +112,7 @@ func (badJSONFakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Reques
 	}
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -104,6 +127,10 @@ func (badJSONFakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Reques
 		} else if string(body) == tlsDisableExpected {
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(tlsDisableExpected + "blarg"))
+			return
+		} else if string(body) == issuerExpected {
+			res.WriteHeader(http.StatusCreated)
+			res.Write([]byte(issuerFixture + "blarg"))
 			return
 		} else {
 			fmt.Printf("Expected '%s' or '%s', Got '%s'\n",
@@ -132,6 +159,7 @@ func TestTLSInfo(t *testing.T) {
 		UUID:             "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 		HTTPSEnforced:    new(bool),
 		CertsAutoEnabled: new(bool),
+		Issuer:           new(api.Issuer),
 	}
 
 	handler := fakeHTTPServer{}
@@ -259,5 +287,23 @@ func TestTLSDisable(t *testing.T) {
 
 	if _, err = DisableHTTPSEnforced(dClient, "foo"); err != nil {
 		t.Errorf("Expected Disable() with poorly JSON response to fail")
+	}
+}
+
+func TestAddIssuer(t *testing.T) {
+	t.Parallel()
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	dClient, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = AddCertsIssuer(dClient, "foo", "anonymous@cert-manager.io", "https://acme-v02.api.letsencrypt.org/directory", "keyID", "keySecret")
+
+	if err != nil {
+		t.Fatal(err)
 	}
 }

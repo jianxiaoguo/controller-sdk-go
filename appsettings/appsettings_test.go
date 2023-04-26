@@ -2,7 +2,7 @@ package appsettings
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -19,6 +19,7 @@ const appSettingsFixture string = `
     "routable": true,
     "allowlist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
+	"canaries": ["cmd"],
     "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
@@ -33,15 +34,16 @@ const appSettingsUnsetFixture string = `
     "routable": true,
     "allowlist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
+	"canaries": ["cmd"],
     "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
-
-const appSettingsSetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
-const appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+const appSettingsCanaryDeleteExpected string = `{"canaries":["cmd"]}`
+const appSettingsSetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"},"canaries":["cmd"]}`
+const appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"},"canaries":["cmd"]}`
 
 type fakeHTTPServer struct{}
 
@@ -49,7 +51,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/apps/example-go/settings/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -70,7 +72,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/apps/unset-test/settings/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -92,6 +94,25 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/settings/" && req.Method == "GET" {
 		res.Write([]byte(appSettingsFixture))
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/unset-test/settings/" && req.Method == "DELETE" {
+		body, err := io.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+		if string(body) != appSettingsCanaryDeleteExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", appSettingsCanaryDeleteExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+		res.WriteHeader(http.StatusNoContent)
+		res.Write(nil)
 		return
 	}
 
@@ -124,6 +145,7 @@ func TestAppSettingsSet(t *testing.T) {
 				CPUPercent: 40,
 			},
 		},
+		Canaries: []string{"cmd"},
 		Label: map[string]interface{}{
 			"git_repo": "https://github.com/drycc/controller-sdk-go",
 			"team":     "drycc",
@@ -143,6 +165,7 @@ func TestAppSettingsSet(t *testing.T) {
 				CPUPercent: 40,
 			},
 		},
+		Canaries: []string{"cmd"},
 		Label: map[string]interface{}{
 			"git_repo": "https://github.com/drycc/controller-sdk-go",
 			"team":     "drycc",
@@ -184,6 +207,7 @@ func TestAppSettingsUnset(t *testing.T) {
 				CPUPercent: 40,
 			},
 		},
+		Canaries: []string{"cmd"},
 		Label: map[string]interface{}{
 			"git_repo": "https://github.com/drycc/controller-sdk-go",
 			"team":     "drycc",
@@ -203,6 +227,7 @@ func TestAppSettingsUnset(t *testing.T) {
 				CPUPercent: 40,
 			},
 		},
+		Canaries: []string{"cmd"},
 		Label: map[string]interface{}{
 			"git_repo": "https://github.com/drycc/controller-sdk-go",
 			"team":     "drycc",
@@ -244,6 +269,7 @@ func TestAppSettingsList(t *testing.T) {
 				CPUPercent: 40,
 			},
 		},
+		Canaries: []string{"cmd"},
 		Label: map[string]interface{}{
 			"git_repo": "https://github.com/drycc/controller-sdk-go",
 			"team":     "drycc",
@@ -261,5 +287,66 @@ func TestAppSettingsList(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Expected %v, Got %v", expected, actual)
+	}
+}
+
+func TestAppSettingsCanaryDelete(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	appSettingsVars := api.AppSettings{
+		Canaries: []string{"cmd"},
+	}
+
+	err = CanaryRemove(drycc, "unset-test", appSettingsVars)
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAppSettingsCanaryRelease(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = CanaryRelease(drycc, "unset-test")
+
+	if err != nil {
+		t.Error(err)
+	}
+}
+
+func TestAppSettingsCanaryRollback(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = CanaryRollback(drycc, "unset-test")
+
+	if err != nil {
+		t.Error(err)
 	}
 }

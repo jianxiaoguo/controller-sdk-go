@@ -4,7 +4,7 @@ package services
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
@@ -21,7 +21,7 @@ func List(c *drycc.Client, appID string) (api.Services, error) {
 
 	defer res.Body.Close()
 
-	body, err := ioutil.ReadAll(res.Body)
+	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return []api.Service{}, err
 	}
@@ -49,7 +49,7 @@ func List(c *drycc.Client, appID string) (api.Services, error) {
 // procfileType - name of the process in Procfile (i.e. <process type> from the `<process type>: <command>`), e.g. `webhooks`
 // for more about Procfile see this https://devcenter.heroku.com/articles/procfile
 // procfileType and pathPattern are mandatory and should have valid values.
-func New(c *drycc.Client, appID string, procfileType string, port int, protocol string, targetPort int) (api.Service, error) {
+func New(c *drycc.Client, appID string, procfileType string, port int, protocol string, targetPort int) error {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
 	req := api.ServiceCreateUpdateRequest{ProcfileType: procfileType, Port: port, Protocol: protocol, TargetPort: targetPort}
@@ -57,25 +57,23 @@ func New(c *drycc.Client, appID string, procfileType string, port int, protocol 
 	body, err := json.Marshal(req)
 
 	if err != nil {
-		return api.Service{}, err
+		return err
 	}
 
 	res, reqErr := c.Request("POST", u, body)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return api.Service{}, reqErr
+		return reqErr
 	}
 	defer res.Body.Close()
-
-	d := api.Service{ProcfileType: procfileType, Port: port, Protocol: protocol, TargetPort: targetPort}
-	return d, reqErr
+	return reqErr
 }
 
 // Delete service from app
 // If given service for the app doesn't exists then error returned
-func Delete(c *drycc.Client, appID string, procfileType string) error {
+func Delete(c *drycc.Client, appID string, procfileType string, protocol string, port int) error {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
-	req := api.ServiceDeleteRequest{ProcfileType: procfileType}
+	req := api.ServiceDeleteRequest{ProcfileType: procfileType, Protocol: protocol, Port: port}
 
 	body, err := json.Marshal(req)
 

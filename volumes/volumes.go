@@ -65,7 +65,9 @@ func Expand(c *drycc.Client, appID string, volume api.Volume) (api.Volume, error
 func Delete(c *drycc.Client, appID string, name string) error {
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/", appID, name)
 	res, err := c.Request("DELETE", u, nil)
-	defer res.Body.Close()
+	if err == nil {
+		res.Body.Close()
+	}
 	return err
 }
 

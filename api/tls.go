@@ -20,7 +20,16 @@ type TLS struct {
 	//HTTPSEnforced determines if the router should enable or disable https-only requests.
 	HTTPSEnforced *bool `json:"https_enforced,omitempty"`
 	//Use ACME to automatically generate certificates if CertsAuto enable
-	CertsAutoEnabled *bool `json:"certs_auto_enabled,omitempty"`
+	CertsAutoEnabled *bool   `json:"certs_auto_enabled,omitempty"`
+	Issuer           *Issuer `json:"issuer,omitempty"`
+}
+
+// Issuer is the structure of POST /v2/app/<app id>/tls/.
+type Issuer struct {
+	Email     string `json:"email"`
+	Server    string `json:"server"`
+	KeyID     string `json:"key_id"`
+	KeySecret string `json:"key_secret"`
 }
 
 // NewTLS creates a new TLS object with fields properly zeroed
@@ -32,8 +41,15 @@ func NewTLS() *TLS {
 }
 
 func (t TLS) String() string {
-	tpl := `HTTPS Enforced: %s
-Certs Auto: %s`
+	tpl := `--- HTTPS Enforced: %s
+--- Certs Auto: %s
+--- Issuer: %s`
+	issuerTpl := `
+email: %s
+server: %s
+key-id: %s
+key-secret: %s
+`
 	httpsEnforced := "not set"
 	if t.HTTPSEnforced != nil {
 		httpsEnforced = fmt.Sprintf("%t", *(t.HTTPSEnforced))
@@ -42,5 +58,9 @@ Certs Auto: %s`
 	if t.CertsAutoEnabled != nil {
 		certsAutoEnabled = fmt.Sprintf("%t", *(t.CertsAutoEnabled))
 	}
-	return fmt.Sprintf(tpl, httpsEnforced, certsAutoEnabled)
+	issuer := "not set"
+	if t.Issuer != nil {
+		issuer = fmt.Sprintf(issuerTpl, t.Issuer.Email, t.Issuer.Server, t.Issuer.KeyID, t.Issuer.KeySecret)
+	}
+	return fmt.Sprintf(tpl, httpsEnforced, certsAutoEnabled, issuer)
 }

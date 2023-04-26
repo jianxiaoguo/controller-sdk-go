@@ -58,3 +58,39 @@ func Set(c *drycc.Client, app string, appSettings api.AppSettings) (api.AppSetti
 
 	return newAppSettings, reqErr
 }
+
+// CanaryDelete remove an app's canary settings.
+func CanaryRemove(c *drycc.Client, app string, appSettings api.AppSettings) error {
+	body, err := json.Marshal(appSettings)
+
+	if err != nil {
+		return err
+	}
+
+	u := fmt.Sprintf("/v2/apps/%s/settings/", app)
+	res, err := c.Request("DELETE", u, body)
+	if err == nil {
+		res.Body.Close()
+	}
+	return err
+}
+
+// CanaryRelease release an app's canary settings.
+func CanaryRelease(c *drycc.Client, app string) error {
+	u := fmt.Sprintf("/v2/apps/%s/canary/release/", app)
+	res, err := c.Request("POST", u, nil)
+	if err == nil {
+		res.Body.Close()
+	}
+	return nil
+}
+
+// CanaryRollback rollback an app's canary settings.
+func CanaryRollback(c *drycc.Client, app string) error {
+	u := fmt.Sprintf("/v2/apps/%s/canary/rollback/", app)
+	res, err := c.Request("POST", u, nil)
+	if err == nil {
+		res.Body.Close()
+	}
+	return nil
+}

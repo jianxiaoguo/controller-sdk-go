@@ -23,6 +23,7 @@ type AppSettings struct {
 	Allowlist []string              `json:"allowlist,omitempty"`
 	Autoscale map[string]*Autoscale `json:"autoscale,omitempty"`
 	Label     Labels                `json:"label,omitempty"`
+	Canaries  []string              `json:"canaries,omitempty"`
 }
 
 // NewRoutable returns a default value for the AppSettings.Routable field.

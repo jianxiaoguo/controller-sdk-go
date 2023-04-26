@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"strings"
 )
@@ -111,7 +111,7 @@ func checkForErrors(res *http.Response) error {
 	}
 	defer res.Body.Close()
 
-	out, err := ioutil.ReadAll(res.Body)
+	out, err := io.ReadAll(res.Body)
 	if err != nil {
 		return unknownServerError(res.StatusCode, err.Error())
 	}
@@ -120,7 +120,7 @@ func checkForErrors(res *http.Response) error {
 	case 400:
 		bodyMap := make(map[string]interface{})
 		if err := json.Unmarshal(out, &bodyMap); err != nil {
-			return unknownServerError(res.StatusCode, fmt.Sprintf(jsonParsingError, err, string(out)))
+			return unknownServerError(res.StatusCode, string(out))
 		}
 
 		if scanResponse(bodyMap, "username", []string{fieldReqMsg, invalidUserMsg}, true) {

@@ -2,10 +2,16 @@ package api
 
 // Service is the structure of the service object.
 type Service struct {
+	Domain       string `json:"domain"`
 	ProcfileType string `json:"procfile_type"`
-	Port         int    `json:"port"`
-	Protocol     string `json:"protocol"`
-	TargetPort   int    `json:"target_port"`
+	Ports        []Port `json:"ports"`
+}
+
+type Port struct {
+	Name       string `json:"name"`
+	Port       int    `json:"port"`
+	Protocol   string `json:"protocol"`
+	TargetPort int    `json:"targetPort"`
 }
 
 // Services defines a collection of service objects.
@@ -26,4 +32,6 @@ type ServiceCreateUpdateRequest struct {
 // ServiceDeleteRequest is the structure of DELETE /v2/app/<app id>/services/.
 type ServiceDeleteRequest struct {
 	ProcfileType string `json:"procfile_type"`
+	Port         int    `json:"port"`
+	Protocol     string `json:"protocol"`
 }

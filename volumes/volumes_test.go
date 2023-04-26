@@ -2,7 +2,7 @@ package volumes
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
@@ -101,7 +101,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	// Create
 	if req.URL.Path == "/v2/apps/example-go/volumes/" && req.Method == "POST" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -123,7 +123,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	// Expand
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PATCH" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -158,7 +158,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	//　Mount
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/path/" && req.Method == "PATCH" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
 			fmt.Println(err)
@@ -179,7 +179,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	//　Unmount
 	if req.URL.Path == "/v2/apps/unmount-test/volumes/myvolume/path/" && req.Method == "PATCH" {
-		body, err := ioutil.ReadAll(req.Body)
+		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)

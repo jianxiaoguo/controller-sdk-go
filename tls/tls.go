@@ -28,10 +28,11 @@ func Info(c *drycc.Client, app string) (api.TLS, error) {
 }
 
 // changeTLS enables the router to enforce https-only requests to the application.
-func changeTLS(c *drycc.Client, app string, httpsEnforced, certsAutoEnabled *bool) (api.TLS, error) {
+func changeTLS(c *drycc.Client, app string, httpsEnforced, certsAutoEnabled *bool, issuer *api.Issuer) (api.TLS, error) {
 	t := api.NewTLS()
 	t.HTTPSEnforced = httpsEnforced
 	t.CertsAutoEnabled = certsAutoEnabled
+	t.Issuer = issuer
 	body, err := json.Marshal(t)
 
 	if err != nil {
@@ -57,23 +58,29 @@ func changeTLS(c *drycc.Client, app string, httpsEnforced, certsAutoEnabled *boo
 // EnableHTTPSEnforced enables the router to enforce https-only requests to the application.
 func EnableHTTPSEnforced(c *drycc.Client, app string) (api.TLS, error) {
 	b := true
-	return changeTLS(c, app, &b, nil)
+	return changeTLS(c, app, &b, nil, nil)
 }
 
 // DisableHTTPSEnforced disables the router from enforcing https-only requests to the application.
 func DisableHTTPSEnforced(c *drycc.Client, app string) (api.TLS, error) {
 	b := false
-	return changeTLS(c, app, &b, nil)
+	return changeTLS(c, app, &b, nil, nil)
 }
 
 // EnableCertsAutoEnabled enables ACME to automatically generate certificates.
 func EnableCertsAutoEnabled(c *drycc.Client, app string) (api.TLS, error) {
 	b := true
-	return changeTLS(c, app, nil, &b)
+	return changeTLS(c, app, nil, &b, nil)
 }
 
 // DisableCertsAutoEnabled disables ACME to automatically generate certificates.
 func DisableCertsAutoEnabled(c *drycc.Client, app string) (api.TLS, error) {
 	b := false
-	return changeTLS(c, app, nil, &b)
+	return changeTLS(c, app, nil, &b, nil)
+}
+
+// AddCertsIssuer disables ACME to automatically generate certificates.
+func AddCertsIssuer(c *drycc.Client, app string, email string, server string, keyID string, keySecret string) (api.TLS, error) {
+	issuer := api.Issuer{Email: email, Server: server, KeyID: keyID, KeySecret: keySecret}
+	return changeTLS(c, app, nil, nil, &issuer)
 }
