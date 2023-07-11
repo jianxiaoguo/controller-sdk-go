@@ -55,8 +55,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
-
-	"github.com/goware/urlx"
+	"strings"
 )
 
 // Client oversees the interaction between the drycc and controller
@@ -117,9 +116,11 @@ func IsErrAPIMismatch(err error) bool {
 // verifySSL determines whether or not to verify SSL connections.
 // This should be true unless you know the controller is using untrusted SSL keys.
 func New(verifySSL bool, controllerURL string, token string) (*Client, error) {
-	// urlx, unlike the native url library, uses sane defaults when URL parsing,
 	// preventing issues like missing schemes.
-	u, err := urlx.Parse(controllerURL)
+	if !strings.HasPrefix(controllerURL, "http://") && !strings.HasPrefix(controllerURL, "https://") {
+		controllerURL = "http://" + controllerURL
+	}
+	u, err := url.Parse(controllerURL)
 	if err != nil {
 		return nil, err
 	}

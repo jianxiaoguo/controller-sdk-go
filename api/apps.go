@@ -37,3 +37,10 @@ type AppRunResponse struct {
 	Output     string `json:"output"`
 	ReturnCode int    `json:"exit_code"`
 }
+
+// AppLogsRequest is the definition of websocket /v2/apps/<app id>/logs
+type AppLogsRequest struct {
+	Lines   int  `json:"lines"`
+	Follow  bool `json:"follow"`
+	Timeout int  `json:"timeout"`
+}

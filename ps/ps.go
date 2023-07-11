@@ -10,7 +10,7 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/gorilla/websocket"
+	"golang.org/x/net/websocket"
 )
 
 // List lists an app's processes.
@@ -30,32 +30,27 @@ func List(c *drycc.Client, appID string, results int) (api.PodsList, int, error)
 }
 
 // Exec a command in a container.
-func Exec(c *drycc.Client, app, pod string, tty, stdin bool, command []string) (*websocket.Conn, error) {
+func Exec(c *drycc.Client, app, pod string, command api.Command) (*websocket.Conn, error) {
 	scheme := "ws"
 	if c.ControllerURL.Scheme == "https" {
 		scheme = "wss"
 	}
 	path := fmt.Sprintf("v2/apps/%s/pods/%s/exec/", app, pod)
-	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
-	conn, _, err := websocket.DefaultDialer.Dial(
-		endpoint.String(),
-		http.Header{
-			"User-Agent":           {c.UserAgent},
-			"Authorization":        {"token " + c.Token},
-			"X-Drycc-Builder-Auth": {c.HooksToken},
-		},
-	)
+	u := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
+	config, err := websocket.NewConfig(u.String(), c.ControllerURL.String())
 	if err != nil {
 		return nil, err
 	}
-	data, err := json.Marshal(&command)
+	config.Header = http.Header{
+		"User-Agent":           {c.UserAgent},
+		"Authorization":        {"token " + c.Token},
+		"X-Drycc-Builder-Auth": {c.HooksToken},
+	}
+	conn, err := websocket.DialConfig(config)
 	if err != nil {
 		return nil, err
 	}
-	conn.WriteMessage(
-		websocket.TextMessage,
-		[]byte(fmt.Sprintf(`{"tty": %t, "stdin": %t, "command": %s}`, tty, stdin, data)),
-	)
+	websocket.JSON.Send(conn, command)
 	return conn, nil
 }
 

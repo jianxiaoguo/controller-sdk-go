@@ -31,9 +31,9 @@ func (m *mockReadCloser) Read(msg []byte) (int, error) {
 
 	copy(msg, []byte(m.msg))
 
-	len := len(m.msg)
+	size := len(m.msg)
 	m.msg = ""
-	return len, nil
+	return size, nil
 }
 
 func readCloser(msg string) *mockReadCloser {

@@ -1,18 +1,18 @@
 package apps
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"sync"
 	"testing"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/gorilla/websocket"
+	"golang.org/x/net/websocket"
 )
 
 const appFixture string = `
@@ -46,17 +46,9 @@ const appCreateExpected string = `{"id":"example-go"}`
 const appRunExpected string = `{"command":"echo hi"}`
 const appTransferExpected string = `{"owner":"test"}`
 
-var upgrader = websocket.Upgrader{} // use default options
-
 type fakeHTTPServer struct {
 	createID        bool
 	createWithoutID bool
-}
-
-type fakeLogReqMessage struct {
-	Lines   int  `json:"lines"`
-	Timeout int  `json:"timeout"`
-	Follow  bool `json:"follow"`
 }
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -102,28 +94,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/v2/apps/example-go/" && req.Method == "DELETE" {
 		res.WriteHeader(http.StatusNoContent)
 		res.Write(nil)
-		return
-	}
-
-	// The entire log message is prefixed and suffixed with a few characters (not entirely sure why)
-	// We mimic those here
-	if req.URL.Path == "/v2/apps/example-go/logs" {
-		c, err := upgrader.Upgrade(res, req, nil)
-		if err != nil {
-			log.Print("upgrade:", err)
-			return
-		}
-		defer c.Close()
-		_, message, err := c.ReadMessage()
-		if err != nil {
-			log.Print("upgrade:", err)
-			return
-		}
-		reqJSON := fakeLogReqMessage{}
-		json.Unmarshal([]byte(message), &reqJSON)
-		for i := 0; i < reqJSON.Lines; i++ {
-			c.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("test %d", i)))
-		}
 		return
 	}
 
@@ -317,26 +287,39 @@ func TestAppsList(t *testing.T) {
 
 func TestAppsLogs(t *testing.T) {
 	t.Parallel()
-
-	handler := fakeHTTPServer{}
-	server := httptest.NewServer(&handler)
-	defer server.Close()
-
-	drycc, err := drycc.New(false, server.URL, "abc")
+	var once sync.Once
+	var addr string
+	once.Do(func() {
+		http.Handle(
+			"/v2/apps/example-go/logs",
+			websocket.Handler(func(conn *websocket.Conn) {
+				io.Copy(conn, conn)
+			}),
+		)
+		server := httptest.NewServer(nil)
+		addr = server.Listener.Addr().String()
+		log.Print("Test WebSocket server listening on ", addr)
+	})
+	drycc, err := drycc.New(false, addr, "abc")
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	conn, err := Logs(drycc, "example-go", 1, false, 300)
+	expected := api.AppLogsRequest{
+		Lines:   1,
+		Follow:  false,
+		Timeout: 300,
+	}
+	conn, err := Logs(drycc, "example-go", expected)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, message, err := conn.ReadMessage()
+	var actual api.AppLogsRequest
+	err = websocket.JSON.Receive(conn, &actual)
 	if err != nil {
 		t.Fatal(err)
 	}
-	if string(message) != "test 0" {
-		t.Errorf("Expected %s, Got %s", "test 0", message)
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expected: %v, Got %v", expected, actual)
 	}
 }
 

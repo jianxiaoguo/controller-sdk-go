@@ -10,7 +10,7 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/gorilla/websocket"
+	"golang.org/x/net/websocket"
 )
 
 // ErrNoLogs is returned when logs are missing from an app.
@@ -89,29 +89,31 @@ func Get(c *drycc.Client, appID string) (api.App, error) {
 
 // Logs retrieves logs from an app. The number of log lines fetched can be set by the lines
 // argument. Setting lines = -1 will retrieve all app logs.
-func Logs(c *drycc.Client, appID string, lines int, follow bool, timeout int) (*websocket.Conn, error) {
+func Logs(c *drycc.Client, appID string, request api.AppLogsRequest) (*websocket.Conn, error) {
 	scheme := "ws"
 	if c.ControllerURL.Scheme == "https" {
 		scheme = "wss"
 	}
 	path := fmt.Sprintf("v2/apps/%s/logs", appID)
 	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
-	conn, _, err := websocket.DefaultDialer.Dial(
-		endpoint.String(),
-		http.Header{
-			"User-Agent":           {c.UserAgent},
-			"Authorization":        {"token " + c.Token},
-			"X-Drycc-Builder-Auth": {c.HooksToken},
-		},
-	)
+
+	config, err := websocket.NewConfig(endpoint.String(), c.ControllerURL.String())
 	if err != nil {
 		return nil, err
 	}
-
-	conn.WriteMessage(
-		websocket.TextMessage,
-		[]byte(fmt.Sprintf(`{"lines": %d, "timeout": %d, "follow": %v}`, lines, timeout, follow)),
-	)
+	config.Header = http.Header{
+		"User-Agent":           {c.UserAgent},
+		"Authorization":        {"token " + c.Token},
+		"X-Drycc-Builder-Auth": {c.HooksToken},
+	}
+	conn, err := websocket.DialConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	err = websocket.JSON.Send(conn, request)
+	if err != nil {
+		return nil, err
+	}
 	return conn, nil
 }
 
