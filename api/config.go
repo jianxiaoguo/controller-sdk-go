@@ -37,7 +37,7 @@ type Config struct {
 	Healthcheck map[string]*Healthchecks `json:"healthcheck,omitempty"`
 	// Tags restrict applications to run on k8s nodes with that label.
 	Tags map[string]interface{} `json:"tags,omitempty"`
-	// Registry is a key-value pair to provide authentication for docker registries.
+	// Registry is a key-value pair to provide authentication for container registries.
 	// The key is the username and the value is the password.
 	Registry map[string]interface{} `json:"registry,omitempty"`
 	// Created is the time that the application was created and cannot be updated.

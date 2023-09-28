@@ -9,7 +9,7 @@ export GO15VENDOREXPERIMENT=1
 
 PKG_DIRS := ./...
 
-DEV_ENV_CMD := docker run --rm -v ${CURDIR}:${DEV_ENV_WORK_DIR} -w ${DEV_ENV_WORK_DIR} ${DEV_ENV_IMAGE}
+DEV_ENV_CMD := podman run --rm -v ${CURDIR}:${DEV_ENV_WORK_DIR} -w ${DEV_ENV_WORK_DIR} ${DEV_ENV_IMAGE}
 
 bootstrap:
 	${DEV_ENV_CMD} go mod vendor

@@ -26,11 +26,11 @@ func List(c *drycc.Client, appID string, results int) ([]api.Build, int, error) 
 	return builds, count, reqErr
 }
 
-// New creates a build for an app from an docker image.
+// New creates a build for an app from an container image.
 // By default this will create a cmd process that runs the CMD command from the Dockerfile.
 // If you want to define more process types, you can pass a Procfile map,
 // where the key is the process name and the value is the command for that process.
-// To pull from a private docker registry, a custom username and password must be set in the app's
+// To pull from a private container registry, a custom username and password must be set in the app's
 // configuration object. This can be done with `drycc registry:set` or by using this SDK.
 //
 // This example adds custom registry credentials to an app:
