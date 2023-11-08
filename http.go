@@ -56,11 +56,11 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 	res, err := c.HTTPClient.Do(req)
 
 	if err != nil {
-		return nil, err
+		return res, err
 	}
 
 	if err = checkForErrors(res); err != nil {
-		return nil, err
+		return res, err
 	}
 
 	apiVersion := res.Header.Get("DRYCC_API_VERSION")
