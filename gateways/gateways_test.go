@@ -37,6 +37,12 @@ const gatewaysFixture string = `
                     "protocol": "HTTPS",
                     "allowedRoutes": {"namespaces": {"from": "All"}}
                 }
+            ],
+            "addresses": [
+                {
+                    "type": "IPAddress",
+                    "value": "172.22.108.207"
+                }
             ]
         }
     ]
@@ -119,6 +125,12 @@ func TestGatewaysList(t *testing.T) {
 					Port:          443,
 					Protocol:      "HTTPS",
 					AllowedRoutes: map[string]interface{}{"namespaces": map[string]interface{}{"from": "All"}},
+				},
+			},
+			Addresses: []api.Address{
+				{
+					Type:  "IPAddress",
+					Value: "172.22.108.207",
 				},
 			},
 		},

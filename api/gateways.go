@@ -15,6 +15,7 @@ type Gateway struct {
 	UUID      string     `json:"uuid,omitempty"`
 	Name      string     `json:"name,omitempty"`
 	Listeners []Listener `json:"listeners,omitempty"`
+	Addresses []Address  `json:"addresses,omitempty"`
 }
 
 type Listener struct {
@@ -22,6 +23,11 @@ type Listener struct {
 	Port          int         `json:"port,omitempty"`
 	Protocol      string      `json:"protocol,omitempty"`
 	AllowedRoutes interface{} `json:"allowedRoutes,omitempty"`
+}
+
+type Address struct {
+	Type  string `json:"type,omitempty"`
+	Value string `json:"value,omitempty"`
 }
 
 // Gateways defines a collection of gateway objects.
