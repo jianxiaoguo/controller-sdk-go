@@ -53,6 +53,7 @@ const resourceCreateFixture string = `
 	"options": {},
 	"status": null,
 	"binding": null,
+	"message": null,
 	"created": "2020-09-08T00:00:00UTC",
 	"updated": "2020-09-08T00:00:00UTC"
 }
@@ -69,6 +70,7 @@ const resourcePutFixture string = `
 	"options": {},
 	"status": null,
 	"binding": null,
+	"message": null,
 	"created": "2020-09-08T00:00:00UTC",
 	"updated": "2020-09-08T00:00:00UTC"
 }
@@ -90,6 +92,7 @@ const resourcesFixture string = `
 			"options": {},
 			"status": null,
 			"binding": null,
+			"message": null,
 			"created": "2020-09-08T00:00:00UTC",
 			"updated": "2020-09-08T00:00:00UTC"
 		}
@@ -108,6 +111,7 @@ const resourceFixture string = `
 	"options": {},
 	"status": null,
 	"binding": null,
+	"message": null,
 	"created": "2020-09-08T00:00:00UTC",
 	"updated": "2020-09-08T00:00:00UTC"
 }
@@ -124,6 +128,7 @@ const resourceBindingFixture string = `
 	"options": {},
 	"status": null,
 	"binding": null,
+	"message": null,
 	"created": "2020-09-08T00:00:00UTC",
 	"updated": "2020-09-08T00:00:00UTC"
 }
@@ -140,6 +145,7 @@ const resourceUnbindFixture string = `
 	"options": {},
 	"status": null,
 	"binding": null,
+	"message": null,
 	"created": "2020-09-08T00:00:00UTC",
 	"updated": "2020-09-08T00:00:00UTC"
 }
@@ -277,6 +283,7 @@ func TestResourcesCreate(t *testing.T) {
 		Binding: "",
 		Data:    map[string]interface{}{},
 		Options: map[string]interface{}{},
+		Message: "",
 		Created: "2020-09-08T00:00:00UTC",
 		Updated: "2020-09-08T00:00:00UTC",
 	}
@@ -380,6 +387,7 @@ func TestResourcesList(t *testing.T) {
 			Binding: "",
 			Data:    map[string]interface{}{},
 			Options: map[string]interface{}{},
+			Message: "",
 			Created: "2020-09-08T00:00:00UTC",
 			Updated: "2020-09-08T00:00:00UTC",
 		},
@@ -435,6 +443,7 @@ func TestResourceGet(t *testing.T) {
 		Binding: "",
 		Data:    map[string]interface{}{},
 		Options: map[string]interface{}{},
+		Message: "",
 		Created: "2020-09-08T00:00:00UTC",
 		Updated: "2020-09-08T00:00:00UTC",
 	}
@@ -472,6 +481,7 @@ func TestResourcePut(t *testing.T) {
 		Binding: "",
 		Data:    map[string]interface{}{},
 		Options: map[string]interface{}{},
+		Message: "",
 		Created: "2020-09-08T00:00:00UTC",
 		Updated: "2020-09-08T00:00:00UTC",
 	}
@@ -520,6 +530,7 @@ func TestResourceBind(t *testing.T) {
 		Binding: "",
 		Data:    map[string]interface{}{},
 		Options: map[string]interface{}{},
+		Message: "",
 		Created: "2020-09-08T00:00:00UTC",
 		Updated: "2020-09-08T00:00:00UTC",
 	}
@@ -560,6 +571,7 @@ func TestResourceUnbind(t *testing.T) {
 		Binding: "",
 		Data:    map[string]interface{}{},
 		Options: map[string]interface{}{},
+		Message: "",
 		Created: "2020-09-08T00:00:00UTC",
 		Updated: "2020-09-08T00:00:00UTC",
 	}
