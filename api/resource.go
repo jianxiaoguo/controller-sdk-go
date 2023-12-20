@@ -49,6 +49,8 @@ type Resource struct {
 	Binding string `json:"binding,omitempty"`
 	// Resource Options
 	Options map[string]interface{} `json:"options,omitempty"`
+	// Resource instance message
+	Message string `json:"message,omitempty"`
 }
 
 type Resources []Resource
