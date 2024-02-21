@@ -42,7 +42,7 @@ func Get(c *drycc.Client, appID string, version int) (api.Release, error) {
 		return api.Release{}, err
 	}
 
-	return release, reqErr
+	return release, nil
 }
 
 // Rollback rolls back an app to a previous release. If version is -1, this rolls back to

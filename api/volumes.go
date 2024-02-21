@@ -27,8 +27,12 @@ type Volume struct {
 	Name string `json:"name,omitempty"`
 	//Volume's size
 	Size string `json:"size,omitempty"`
-	// mount application's path
+	// Volume's mount path
 	Path map[string]interface{} `json:"path,omitempty"`
+	// Volume's type
+	Type string `json:"type,omitempty"`
+	// Volume's parameters
+	Parameters map[string]interface{} `json:"parameters,omitempty"`
 }
 
 type Volumes []Volume

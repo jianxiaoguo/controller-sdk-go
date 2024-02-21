@@ -22,6 +22,8 @@ const volumeCreateFixture string = `
 	"name": "myvolume",
 	"size": "500G",
 	"path": {},
+    "type": "csi",
+    "parameters": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
 }
@@ -37,6 +39,8 @@ const volumeExpandFixture string = `
 	"name": "myvolume",
 	"size": "500G",
 	"path": {},
+    "type": "csi",
+    "parameters": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
 }
@@ -55,10 +59,27 @@ const volumesFixture string = `
 			"name": "myvolume",
 			"size": "500G",
 			"path": {},
+			"type": "csi",
+			"parameters": {},
 			"created": "2020-08-26T00:00:00UTC",
 			"updated": "2020-08-26T00:00:00UTC"
 		}
     ]
+}
+`
+
+const volumeGetFixture string = `
+{
+	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+	"owner": "test",
+	"app": "example-go",
+	"name": "myvolume",
+	"size": "500G",
+	"path": {},
+	"type": "csi",
+	"parameters": {},
+	"created": "2020-08-26T00:00:00UTC",
+	"updated": "2020-08-26T00:00:00UTC"
 }
 `
 
@@ -73,6 +94,8 @@ const volumeMountFixture string = `
 		"cmd":  "/data/cmd1",
 		"web": "/data/web1"
 	},
+	"type": "csi",
+    "parameters": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
 }
@@ -86,6 +109,8 @@ const volumeUnmountFixture string = `
 	"name": "myvolume",
 	"size": "500G",
 	"path": {},
+	"type": "csi",
+    "parameters": {},
 	"created": "2020-08-26T00:00:00UTC",
 	"updated": "2020-08-26T00:00:00UTC"
 }
@@ -118,6 +143,11 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 		res.WriteHeader(http.StatusCreated)
 		res.Write([]byte(volumeCreateFixture))
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "GET" {
+		res.Write([]byte(volumeGetFixture))
 		return
 	}
 
@@ -205,14 +235,16 @@ func TestVolumesCreate(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Volume{
-		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
-		App:     "example-go",
-		Name:    "myvolume",
-		Size:    "500G",
-		Path:    map[string]interface{}{},
-		Created: "2020-08-26T00:00:00UTC",
-		Updated: "2020-08-26T00:00:00UTC",
+		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Owner:      "test",
+		App:        "example-go",
+		Name:       "myvolume",
+		Size:       "500G",
+		Path:       map[string]interface{}{},
+		Type:       "csi",
+		Parameters: map[string]interface{}{},
+		Created:    "2020-08-26T00:00:00UTC",
+		Updated:    "2020-08-26T00:00:00UTC",
 	}
 
 	handler := fakeHTTPServer{}
@@ -242,14 +274,16 @@ func TestVolumesExpand(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Volume{
-		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
-		App:     "example-go",
-		Name:    "myvolume",
-		Size:    "500G",
-		Path:    map[string]interface{}{},
-		Created: "2020-08-26T00:00:00UTC",
-		Updated: "2020-08-26T00:00:00UTC",
+		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Owner:      "test",
+		App:        "example-go",
+		Name:       "myvolume",
+		Size:       "500G",
+		Path:       map[string]interface{}{},
+		Type:       "csi",
+		Parameters: map[string]interface{}{},
+		Created:    "2020-08-26T00:00:00UTC",
+		Updated:    "2020-08-26T00:00:00UTC",
 	}
 
 	handler := fakeHTTPServer{}
@@ -297,14 +331,16 @@ func TestVolumesList(t *testing.T) {
 
 	expected := api.Volumes{
 		{
-			UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-			App:     "example-go",
-			Owner:   "test",
-			Name:    "myvolume",
-			Path:    map[string]interface{}{},
-			Size:    "500G",
-			Created: "2020-08-26T00:00:00UTC",
-			Updated: "2020-08-26T00:00:00UTC",
+			UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+			App:        "example-go",
+			Owner:      "test",
+			Name:       "myvolume",
+			Path:       map[string]interface{}{},
+			Size:       "500G",
+			Type:       "csi",
+			Parameters: map[string]interface{}{},
+			Created:    "2020-08-26T00:00:00UTC",
+			Updated:    "2020-08-26T00:00:00UTC",
 		},
 	}
 
@@ -318,6 +354,39 @@ func TestVolumesList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestVolumeGet(t *testing.T) {
+	expected := api.Volume{
+		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		App:        "example-go",
+		Owner:      "test",
+		Name:       "myvolume",
+		Path:       map[string]interface{}{},
+		Size:       "500G",
+		Type:       "csi",
+		Parameters: map[string]interface{}{},
+		Created:    "2020-08-26T00:00:00UTC",
+		Updated:    "2020-08-26T00:00:00UTC",
+	}
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	actual, err := Get(drycc, "example-go", "myvolume")
 
 	if err != nil {
 		t.Fatal(err)
@@ -348,10 +417,12 @@ func TestVolumeMount(t *testing.T) {
 			"cmd": "/data/cmd1",
 			"web": "/data/web1",
 		},
-		Size:    "500G",
-		Created: "2020-08-26T00:00:00UTC",
-		Updated: "2020-08-26T00:00:00UTC",
-		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Size:       "500G",
+		Type:       "csi",
+		Parameters: map[string]interface{}{},
+		Created:    "2020-08-26T00:00:00UTC",
+		Updated:    "2020-08-26T00:00:00UTC",
+		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
 	volumeVars := api.Volume{
@@ -384,14 +455,16 @@ func TestVolumeUnmount(t *testing.T) {
 	}
 
 	expected := api.Volume{
-		Name:    "myvolume",
-		Owner:   "test",
-		App:     "unmount-test",
-		Path:    map[string]interface{}{},
-		Size:    "500G",
-		Created: "2020-08-26T00:00:00UTC",
-		Updated: "2020-08-26T00:00:00UTC",
-		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		Name:       "myvolume",
+		Owner:      "test",
+		App:        "unmount-test",
+		Path:       map[string]interface{}{},
+		Size:       "500G",
+		Type:       "csi",
+		Parameters: map[string]interface{}{},
+		Created:    "2020-08-26T00:00:00UTC",
+		Updated:    "2020-08-26T00:00:00UTC",
+		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
 	volumeVars := api.Volume{

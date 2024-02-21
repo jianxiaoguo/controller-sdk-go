@@ -23,6 +23,23 @@ func List(c *drycc.Client, appID string, results int) (api.Volumes, int, error) 
 	return volumes, count, reqErr
 }
 
+// Get an app's volume.
+func Get(c *drycc.Client, appID string, name string) (api.Volume, error) {
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/", appID, name)
+	res, reqErr := c.Request("GET", u, nil)
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
+		return api.Volume{}, reqErr
+	}
+	defer res.Body.Close()
+
+	volume := api.Volume{}
+	if err := json.NewDecoder(res.Body).Decode(&volume); err != nil {
+		return volume, err
+	}
+
+	return volume, nil
+}
+
 // Create create an app's Volume.
 func Create(c *drycc.Client, appID string, volume api.Volume) (api.Volume, error) {
 	body, err := json.Marshal(volume)
