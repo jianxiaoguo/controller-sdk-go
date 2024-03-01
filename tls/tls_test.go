@@ -84,16 +84,15 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(issuerFixture))
 			return
-		} else {
-			fmt.Printf("Expected '%s', %s or '%s', Got '%s'\n",
-				tlsEnableExpected,
-				tlsDisableExpected,
-				issuerExpected,
-				body)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-			return
 		}
+		fmt.Printf("Expected '%s', %s or '%s', Got '%s'\n",
+			tlsEnableExpected,
+			tlsDisableExpected,
+			issuerExpected,
+			body)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(nil)
+		return
 	}
 
 	fmt.Printf("Unrecongized URL %s\n", req.URL)
@@ -132,15 +131,14 @@ func (badJSONFakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Reques
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(issuerFixture + "blarg"))
 			return
-		} else {
-			fmt.Printf("Expected '%s' or '%s', Got '%s'\n",
-				tlsEnableExpected,
-				tlsDisableExpected,
-				body)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-			return
 		}
+		fmt.Printf("Expected '%s' or '%s', Got '%s'\n",
+			tlsEnableExpected,
+			tlsDisableExpected,
+			body)
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Write(nil)
+		return
 	}
 
 	fmt.Printf("Unrecongized URL %s\n", req.URL)

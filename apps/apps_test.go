@@ -43,7 +43,7 @@ const appsFixture string = `
 }`
 
 const appCreateExpected string = `{"id":"example-go"}`
-const appRunExpected string = `{"command":"echo hi"}`
+const appRunExpected string = `{"command":"echo hi","timeout":3600,"expires":3600}`
 const appTransferExpected string = `{"owner":"test"}`
 
 type fakeHTTPServer struct {
@@ -227,11 +227,6 @@ func TestAppsDestroy(t *testing.T) {
 func TestAppsRun(t *testing.T) {
 	t.Parallel()
 
-	expected := api.AppRunResponse{
-		Output:     "hi\n",
-		ReturnCode: 0,
-	}
-
 	handler := fakeHTTPServer{}
 	server := httptest.NewServer(&handler)
 	defer server.Close()
@@ -241,14 +236,8 @@ func TestAppsRun(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Run(drycc, "example-go", "echo hi", nil)
-
-	if err != nil {
+	if err := Run(drycc, "example-go", "echo hi", nil, 3600, 3600); err != nil {
 		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("Expected %v, Got %v", expected, actual)
 	}
 }
 

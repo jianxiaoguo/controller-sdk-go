@@ -156,6 +156,47 @@ func TestExec(t *testing.T) {
 	}
 }
 
+func TestPodLogs(t *testing.T) {
+	var once sync.Once
+	var addr string
+
+	once.Do(func() {
+		http.Handle(
+			"/v2/apps/example-go/pods/example-go-web-111/logs/",
+			websocket.Handler(func(conn *websocket.Conn) {
+				io.Copy(conn, conn)
+			}),
+		)
+		server := httptest.NewServer(nil)
+		addr = server.Listener.Addr().String()
+		log.Print("Test WebSocket server listening on ", addr)
+	})
+
+	drycc, err := drycc.New(false, addr, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := api.PodLogsRequest{
+		Lines:     100,
+		Follow:    true,
+		Container: "runner",
+	}
+
+	conn, err := Logs(drycc, "example-go", "example-go-web-111", expected)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var actual api.PodLogsRequest
+	err = websocket.JSON.Receive(conn, &actual)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !reflect.DeepEqual(actual, expected) {
+		t.Errorf("Expected: %v, Got %v", expected, actual)
+	}
+}
+
 type testExpected struct {
 	Name     string
 	Type     string

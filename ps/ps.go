@@ -30,12 +30,12 @@ func List(c *drycc.Client, appID string, results int) (api.PodsList, int, error)
 }
 
 // Exec a command in a container.
-func Exec(c *drycc.Client, app, pod string, command api.Command) (*websocket.Conn, error) {
+func Exec(c *drycc.Client, appID, podID string, command api.Command) (*websocket.Conn, error) {
 	scheme := "ws"
 	if c.ControllerURL.Scheme == "https" {
 		scheme = "wss"
 	}
-	path := fmt.Sprintf("v2/apps/%s/pods/%s/exec/", app, pod)
+	path := fmt.Sprintf("v2/apps/%s/pods/%s/exec/", appID, podID)
 	u := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
 	config, err := websocket.NewConfig(u.String(), c.ControllerURL.String())
 	if err != nil {
@@ -54,6 +54,35 @@ func Exec(c *drycc.Client, app, pod string, command api.Command) (*websocket.Con
 	return conn, nil
 }
 
+// Logs retrieves logs from an pod. The number of log lines fetched can be set by the lines
+func Logs(c *drycc.Client, appID, podID string, request api.PodLogsRequest) (*websocket.Conn, error) {
+	scheme := "ws"
+	if c.ControllerURL.Scheme == "https" {
+		scheme = "wss"
+	}
+	path := fmt.Sprintf("v2/apps/%s/pods/%s/logs/", appID, podID)
+	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
+
+	config, err := websocket.NewConfig(endpoint.String(), c.ControllerURL.String())
+	if err != nil {
+		return nil, err
+	}
+	config.Header = http.Header{
+		"User-Agent":           {c.UserAgent},
+		"Authorization":        {"token " + c.Token},
+		"X-Drycc-Builder-Auth": {c.HooksToken},
+	}
+	conn, err := websocket.DialConfig(config)
+	if err != nil {
+		return nil, err
+	}
+	err = websocket.JSON.Send(conn, request)
+	if err != nil {
+		return nil, err
+	}
+	return conn, nil
+}
+
 // Scale increases or decreases an app's processes. The processes are specified in the target argument,
 // a key-value map, where the key is the process name and the value is the number of replicas
 func Scale(c *drycc.Client, appID string, targets map[string]int) error {
@@ -66,6 +95,9 @@ func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 	}
 
 	res, err := c.Request("POST", u, body)
+	if err != nil && !drycc.IsErrAPIMismatch(err) {
+		return err
+	}
 	defer res.Body.Close()
 	return err
 }
@@ -83,6 +115,9 @@ func Restart(c *drycc.Client, appID string, procType string) error {
 	}
 
 	res, err := c.Request("POST", u, nil)
+	if err != nil && !drycc.IsErrAPIMismatch(err) {
+		return err
+	}
 	defer res.Body.Close()
 	return err
 }

@@ -119,31 +119,28 @@ func Logs(c *drycc.Client, appID string, request api.AppLogsRequest) (*websocket
 
 // Run a one-time command in your app. This will start a kubernetes job with the
 // same container image and environment as the rest of the app.
-func Run(c *drycc.Client, appID string, command string, volumes map[string]interface{}) (api.AppRunResponse, error) {
+func Run(c *drycc.Client, appID string, command string, volumes map[string]interface{}, timeout, expires uint32) error {
 	req := api.AppRunRequest{
 		Command: command,
 		Volumes: volumes,
+		Timeout: timeout,
+		Expires: expires,
 	}
 	body, err := json.Marshal(req)
 
 	if err != nil {
-		return api.AppRunResponse{}, err
+		return err
 	}
 
 	u := fmt.Sprintf("/v2/apps/%s/run", appID)
 
 	res, reqErr := c.Request("POST", u, body)
+
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return api.AppRunResponse{}, reqErr
+		return reqErr
 	}
-
-	arr := api.AppRunResponse{}
-
-	if err = json.NewDecoder(res.Body).Decode(&arr); err != nil {
-		return api.AppRunResponse{}, err
-	}
-
-	return arr, reqErr
+	defer res.Body.Close()
+	return reqErr
 }
 
 // Delete an app.

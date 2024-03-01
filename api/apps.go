@@ -30,12 +30,8 @@ type AppUpdateRequest struct {
 type AppRunRequest struct {
 	Command string                 `json:"command"`
 	Volumes map[string]interface{} `json:"volumes,omitempty"`
-}
-
-// AppRunResponse is the definition of /v2/apps/<app id>/run.
-type AppRunResponse struct {
-	Output     string `json:"output"`
-	ReturnCode int    `json:"exit_code"`
+	Timeout uint32                 `json:"timeout,omitempty"`
+	Expires uint32                 `json:"expires,omitempty"`
 }
 
 // AppLogsRequest is the definition of websocket /v2/apps/<app id>/logs

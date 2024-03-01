@@ -4,14 +4,15 @@ package auth
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"net/http"
 )
 
 // Login to the controller and get a oauth url
 func Login(c *drycc.Client) (string, error) {
-	c.HTTPClient.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+	c.HTTPClient.CheckRedirect = func(*http.Request, []*http.Request) error {
 		return http.ErrUseLastResponse
 	}
 	res, reqErr := c.Request("POST", "/v2/auth/login/", nil)
