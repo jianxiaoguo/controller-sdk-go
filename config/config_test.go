@@ -20,12 +20,9 @@ const configFixture string = `
       "TEST": "testing",
       "FOO": "bar"
     },
-    "memory": {
-      "web": "1G"
-    },
-    "cpu": {
-      "web": "1000"
-    },
+	"limits": {
+	  "web": "std1.xlarge.c1m1"
+	},
     "tags": {
       "test": "tests"
     },
@@ -43,8 +40,7 @@ const configUnsetFixture string = `
     "owner": "test",
     "app": "unset-test",
     "values": {},
-    "memory": {},
-    "cpu": {},
+    "limits": {},
     "tags": {},
 	"registry": {},
     "created": "2014-01-01T00:00:00UTC",
@@ -53,8 +49,8 @@ const configUnsetFixture string = `
 }
 `
 
-const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"memory":{"web":"1G"},"cpu":{"web":"1000"},"tags":{"test":"tests"},"registry":{"username":"bob"}}`
-const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"memory":{"web":null},"cpu":{"web":null},"tags":{"test":null},"registry":{"username":null}}`
+const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"test":"tests"},"registry":{"username":"bob"}}`
+const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"limits":{"web":null},"tags":{"test":null},"registry":{"username":null}}`
 
 type fakeHTTPServer struct{}
 
@@ -132,11 +128,8 @@ func TestConfigSet(t *testing.T) {
 			"TEST": "testing",
 			"FOO":  "bar",
 		},
-		Memory: map[string]interface{}{
-			"web": "1G",
-		},
-		CPU: map[string]interface{}{
-			"web": "1000",
+		Limits: map[string]interface{}{
+			"web": "std1.xlarge.c1m1",
 		},
 		Tags: map[string]interface{}{
 			"test": "tests",
@@ -154,11 +147,8 @@ func TestConfigSet(t *testing.T) {
 			"TEST": "testing",
 			"FOO":  "bar",
 		},
-		Memory: map[string]interface{}{
-			"web": "1G",
-		},
-		CPU: map[string]interface{}{
-			"web": "1000",
+		Limits: map[string]interface{}{
+			"web": "std1.xlarge.c1m1",
 		},
 		Tags: map[string]interface{}{
 			"test": "tests",
@@ -195,8 +185,7 @@ func TestConfigUnset(t *testing.T) {
 		Owner:    "test",
 		App:      "unset-test",
 		Values:   map[string]interface{}{},
-		Memory:   map[string]interface{}{},
-		CPU:      map[string]interface{}{},
+		Limits:   map[string]interface{}{},
 		Tags:     map[string]interface{}{},
 		Registry: map[string]interface{}{},
 		Created:  "2014-01-01T00:00:00UTC",
@@ -209,10 +198,7 @@ func TestConfigUnset(t *testing.T) {
 			"TEST": nil,
 			"FOO":  nil,
 		},
-		Memory: map[string]interface{}{
-			"web": nil,
-		},
-		CPU: map[string]interface{}{
+		Limits: map[string]interface{}{
 			"web": nil,
 		},
 		Tags: map[string]interface{}{
@@ -253,11 +239,8 @@ func TestConfigList(t *testing.T) {
 			"TEST": "testing",
 			"FOO":  "bar",
 		},
-		Memory: map[string]interface{}{
-			"web": "1G",
-		},
-		CPU: map[string]interface{}{
-			"web": "1000",
+		Limits: map[string]interface{}{
+			"web": "std1.xlarge.c1m1",
 		},
 		Tags: map[string]interface{}{
 			"test": "tests",

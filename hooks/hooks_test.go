@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/drycc/controller-sdk-go"
+	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
 )
 
@@ -26,11 +26,8 @@ const configFixture string = `
 		"TEST": "testing",
 		"FOO": "bar"
 	},
-	"memory": {
-		"web": "1G"
-	},
-	"cpu": {
-		"web": "1000"
+	"Limits": {
+		"web": "std1.xlarge.c1m1"
 	},
 	"tags": {
 		"test": "tests"
@@ -162,11 +159,8 @@ func TestConfigHook(t *testing.T) {
 			"TEST": "testing",
 			"FOO":  "bar",
 		},
-		Memory: map[string]interface{}{
-			"web": "1G",
-		},
-		CPU: map[string]interface{}{
-			"web": "1000",
+		Limits: map[string]interface{}{
+			"web": "std1.xlarge.c1m1",
 		},
 		Tags: map[string]interface{}{
 			"test": "tests",

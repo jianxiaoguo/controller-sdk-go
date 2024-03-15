@@ -24,12 +24,9 @@ type Config struct {
 	App string `json:"app,omitempty"`
 	// Values are exposed as environment variables to the app.
 	Values map[string]interface{} `json:"values,omitempty"`
-	// Memory is used to set process memory limits. The key is the process name
-	// and the value is a number followed by a memory unit (G, M, K, or B). Ex: 200G
-	Memory map[string]interface{} `json:"memory,omitempty"`
-	// CPU is used to set process CPU limits. It can be set in terms of whole CPUs
-	// (ex 1) or in milli units to reflect the number of CPU shares (ex 500m).
-	CPU map[string]interface{} `json:"cpu,omitempty"`
+	// Limits is used to set process resources limits. The key is the process name
+	// and the value is a limit plan. Ex: std1.xlarge.c1m1
+	Limits map[string]interface{} `json:"limits,omitempty"`
 	// Timeout is used to set termination grace period. The key is the process name
 	// and the value is a number in seconds, e.g. 30
 	Timeout map[string]interface{} `json:"termination_grace_period,omitempty"`
