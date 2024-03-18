@@ -28,7 +28,7 @@ func Specs(c *drycc.Client, keywords string, results int) ([]api.LimitSpec, int,
 }
 
 // Plans is list all available limit plans
-func Plans(c *drycc.Client, specId string, cpu, memory, results int) ([]api.LimitPlan, int, error) {
+func Plans(c *drycc.Client, specID string, cpu, memory, results int) ([]api.LimitPlan, int, error) {
 	var queryArray []string
 	if cpu > 0 {
 		queryArray = append(queryArray, fmt.Sprintf("cpu=%d", cpu))
@@ -36,8 +36,8 @@ func Plans(c *drycc.Client, specId string, cpu, memory, results int) ([]api.Limi
 	if memory > 0 {
 		queryArray = append(queryArray, fmt.Sprintf("memory=%d", memory))
 	}
-	if specId != "" {
-		queryArray = append(queryArray, fmt.Sprintf("spec-id=%s", specId))
+	if specID != "" {
+		queryArray = append(queryArray, fmt.Sprintf("spec-id=%s", specID))
 	}
 	u := "/v2/limits/plans/"
 	if len(queryArray) > 0 {
@@ -57,8 +57,8 @@ func Plans(c *drycc.Client, specId string, cpu, memory, results int) ([]api.Limi
 }
 
 // GetPlan is get a available Plan
-func GetPlan(c *drycc.Client, planId string) (api.LimitPlan, error) {
-	u := fmt.Sprintf("/v2/limits/plans/%s/", planId)
+func GetPlan(c *drycc.Client, planID string) (api.LimitPlan, error) {
+	u := fmt.Sprintf("/v2/limits/plans/%s/", planID)
 	res, reqErr := c.Request("GET", u, nil)
 
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
