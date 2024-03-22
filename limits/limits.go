@@ -41,7 +41,7 @@ func Plans(c *drycc.Client, specID string, cpu, memory, results int) ([]api.Limi
 	}
 	u := "/v2/limits/plans/"
 	if len(queryArray) > 0 {
-		u += fmt.Sprintf("%s?%s", u, strings.Join(queryArray, "&"))
+		u = fmt.Sprintf("%s?%s", u, strings.Join(queryArray, "&"))
 	}
 
 	body, count, reqErr := c.LimitedRequest(u, results)
