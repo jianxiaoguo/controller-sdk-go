@@ -52,7 +52,7 @@ const buildFixture = `
 const (
 	testingClientFingerprint = `78:b9:21:20:1a:ed:e6:10:05:35:47:da:d4:1f:b6:73`
 	configHookExpected       = `{"receive_user":"test","receive_repo":"example-go"}`
-	buildHookExpected        = `{"sha":"abc123","receive_user":"test","receive_repo":"example-go","image":"test:abc123","stack":"heroku-18","procfile":{"web":"./run"},"dockerfile":""}`
+	buildHookExpected        = `{"sha":"abc123","receive_user":"test","receive_repo":"example-go","image":"test:abc123","stack":"heroku-18","procfile":{"web":"./run"},"dockerfile":"","dryccfile":{}}`
 )
 
 type fakeHTTPServer struct{}
@@ -198,7 +198,9 @@ func TestBuildHook(t *testing.T) {
 
 	expected := 2
 
-	actual, err := CreateBuild(drycc, "test", "example-go", "test:abc123", "heroku-18", "abc123", map[string]string{"web": "./run"}, "")
+	actual, err := CreateBuild(
+		drycc, "test", "example-go", "test:abc123", "heroku-18", "abc123",
+		map[string]string{"web": "./run"}, map[string]interface{}{}, "")
 
 	if err != nil {
 		t.Error(err)

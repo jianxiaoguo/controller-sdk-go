@@ -28,6 +28,7 @@ const buildsFixture string = `
             "procfile": {
                 "web": "example-go"
             },
+			"dryccfile": {},
             "sha": "060da68f",
             "updated": "2014-01-01T00:00:00UTC",
             "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
@@ -46,6 +47,7 @@ const buildFixture string = `
     "procfile": {
         "web": "example-go"
     },
+	"dryccfile": {},
     "sha": "",
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
@@ -100,12 +102,11 @@ func TestBuildsList(t *testing.T) {
 			Image:      "example-go",
 			Stack:      "container",
 			Owner:      "test",
-			Procfile: map[string]string{
-				"web": "example-go",
-			},
-			Sha:     "060da68f",
-			Updated: "2014-01-01T00:00:00UTC",
-			UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+			Procfile:   map[string]string{"web": "example-go"},
+			Dryccfile:  map[string]interface{}{},
+			Sha:        "060da68f",
+			Updated:    "2014-01-01T00:00:00UTC",
+			UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 		},
 	}
 
@@ -133,16 +134,15 @@ func TestBuildCreate(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Build{
-		App:     "example-go",
-		Created: "2014-01-01T00:00:00UTC",
-		Image:   "drycc/example-go:latest",
-		Stack:   "heroku-18",
-		Owner:   "test",
-		Procfile: map[string]string{
-			"web": "example-go",
-		},
-		Updated: "2014-01-01T00:00:00UTC",
-		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
+		App:       "example-go",
+		Created:   "2014-01-01T00:00:00UTC",
+		Image:     "drycc/example-go:latest",
+		Stack:     "heroku-18",
+		Owner:     "test",
+		Procfile:  map[string]string{"web": "example-go"},
+		Dryccfile: map[string]interface{}{},
+		Updated:   "2014-01-01T00:00:00UTC",
+		UUID:      "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
 	handler := fakeHTTPServer{}
@@ -158,7 +158,7 @@ func TestBuildCreate(t *testing.T) {
 		"web": "example-go",
 	}
 
-	actual, err := New(drycc, "example-go", "drycc/example-go", "heroku-18", procfile)
+	actual, err := New(drycc, "example-go", "drycc/example-go", "heroku-18", procfile, map[string]interface{}{})
 
 	if err != nil {
 		t.Fatal(err)

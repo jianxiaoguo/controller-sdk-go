@@ -3,6 +3,7 @@ package api
 // Release is the definition of the release object.
 type Release struct {
 	App     string `json:"app"`
+	State   string `json:"state"`
 	Build   string `json:"build,omitempty"`
 	Config  string `json:"config"`
 	Created string `json:"created"`

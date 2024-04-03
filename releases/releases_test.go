@@ -20,6 +20,7 @@ const releasesFixture string = `
     "results": [
         {
             "app": "example-go",
+			"state": "succeed",
             "build": null,
             "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
             "created": "2014-01-01T00:00:00UTC",
@@ -36,6 +37,7 @@ const releaseFixture string = `
 {
     "app": "example-go",
     "build": null,
+	"state": "succeed",
     "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
     "created": "2014-01-01T00:00:00UTC",
     "owner": "test",
@@ -125,6 +127,7 @@ func TestReleasesList(t *testing.T) {
 		{
 			App:     "example-go",
 			Build:   "",
+			State:   "succeed",
 			Config:  "95bd6dea-1685-4f78-a03d-fd7270b058d1",
 			Created: "2014-01-01T00:00:00UTC",
 			Owner:   "test",
@@ -160,6 +163,7 @@ func TestReleasesGet(t *testing.T) {
 
 	expected := api.Release{
 		App:     "example-go",
+		State:   "succeed",
 		Build:   "",
 		Config:  "95bd6dea-1685-4f78-a03d-fd7270b058d1",
 		Created: "2014-01-01T00:00:00UTC",

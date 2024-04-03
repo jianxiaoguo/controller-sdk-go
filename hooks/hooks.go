@@ -53,8 +53,8 @@ func GetAppConfig(c *drycc.Client, username, app string) (api.Config, error) {
 // CreateBuild creates a new release of an application. It returns the version of the new release.
 // gitSha should be the first 8 characters of the git commit sha. Image is either the container image
 // location for the dockerfile app the absolute url to the tar file for a buldpack app.
-func CreateBuild(c *drycc.Client, username, app, image, stack, gitSha string, procfile api.ProcessType,
-	dockerfile string) (int, error) {
+func CreateBuild(c *drycc.Client, username, app, image, stack, gitSha string,
+	procfile api.ProcessType, dryccfile map[string]interface{}, dockerfile string) (int, error) {
 	req := api.BuildHookRequest{
 		Sha:        gitSha,
 		User:       username,
@@ -63,6 +63,7 @@ func CreateBuild(c *drycc.Client, username, app, image, stack, gitSha string, pr
 		Stack:      stack,
 		Procfile:   procfile,
 		Dockerfile: dockerfile,
+		Dryccfile:  dryccfile,
 	}
 
 	b, err := json.Marshal(req)
