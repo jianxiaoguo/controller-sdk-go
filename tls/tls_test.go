@@ -1,6 +1,7 @@
 package tls
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -10,6 +11,7 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"github.com/stretchr/testify/require"
 )
 
 const (
@@ -48,9 +50,26 @@ const (
     }
 }`
 
-	tlsEnableExpected  string = `{"https_enforced":true}`
-	tlsDisableExpected string = `{"https_enforced":false}`
-	issuerExpected     string = `{"issuer":{"email":"anonymous@cert-manager.io","server":"https://acme-v02.api.letsencrypt.org/directory","key_id":"keyID","key_secret":"keySecret"}}`
+	tlsEnableExpected   string = `{"https_enforced":true}`
+	tlsDisableExpected  string = `{"https_enforced":false}`
+	tlsCertsAutoEnabled string = `{"certs_auto_enabled":true}`
+	tlsCertsAutoFixture string = `{
+	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
+	"app": "foo",
+	"owner": "test",
+	"created": "2016-08-22T17:40:16Z",
+	"updated": "2016-08-22T17:40:16Z",
+	"https_enforced": null,
+	"certs_auto_enabled": true,
+	"issuer": {
+		"email":"anonymous@cert-manager.io",
+		"server":"https://acme-v02.api.letsencrypt.org/directory",
+		"key_id":"keyID",
+		"key_secret":"keySecret"
+	},
+	"events": [{"name": "foo", "kind": "Issuer", "time": "2024-04-08T01:14:49Z", "type": "Ready", "status": "True", "message": "ready message"}]
+}`
+	issuerExpected string = `{"issuer":{"email":"anonymous@cert-manager.io","server":"https://acme-v02.api.letsencrypt.org/directory","key_id":"keyID","key_secret":"keySecret"}}`
 )
 
 type fakeHTTPServer struct{}
@@ -83,6 +102,10 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		} else if string(body) == issuerExpected {
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(issuerFixture))
+			return
+		} else if string(body) == tlsCertsAutoEnabled {
+			res.WriteHeader(http.StatusCreated)
+			res.Write([]byte(tlsCertsAutoFixture))
 			return
 		}
 		fmt.Printf("Expected '%s', %s or '%s', Got '%s'\n",
@@ -288,6 +311,38 @@ func TestTLSDisable(t *testing.T) {
 	}
 }
 
+func TestEnableCertsAutoEnabled(t *testing.T) {
+	t.Parallel()
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	dClient, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	tls, err := EnableCertsAutoEnabled(dClient, "foo")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := []api.Event{
+		{
+			"name":    "foo",
+			"kind":    "Issuer",
+			"time":    "2024-04-08T01:14:49Z",
+			"type":    "Ready",
+			"status":  "True",
+			"message": "ready message",
+		},
+	}
+	actual := tls.Events
+	a, _ := json.Marshal(expected)
+	b, _ := json.Marshal(actual)
+	require.JSONEq(t, string(a), string(b), "Expected %v, Got %v", expected, actual)
+}
+
 func TestAddIssuer(t *testing.T) {
 	t.Parallel()
 	handler := fakeHTTPServer{}
@@ -300,7 +355,6 @@ func TestAddIssuer(t *testing.T) {
 	}
 
 	_, err = AddCertsIssuer(dClient, "foo", "anonymous@cert-manager.io", "https://acme-v02.api.letsencrypt.org/directory", "keyID", "keySecret")
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -4,6 +4,8 @@ import (
 	"fmt"
 )
 
+type Event = map[string]string
+
 // TLS is the structure of an app's TLS settings.
 type TLS struct {
 	// Owner is the app owner. It cannot be updated with TLS.Set(). See app.Transfer().
@@ -22,6 +24,7 @@ type TLS struct {
 	//Use ACME to automatically generate certificates if CertsAuto enable
 	CertsAutoEnabled *bool   `json:"certs_auto_enabled,omitempty"`
 	Issuer           *Issuer `json:"issuer,omitempty"`
+	Events           []Event `json:"events,omitempty"`
 }
 
 // Issuer is the structure of POST /v2/app/<app id>/tls/.
