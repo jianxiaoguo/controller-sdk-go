@@ -20,6 +20,11 @@ const configFixture string = `
       "TEST": "testing",
       "FOO": "bar"
     },
+    "typed_values": {
+		"web": {
+		  "PORT": "9000"
+		}
+	},
 	"limits": {
 	  "web": "std1.xlarge.c1m1"
 	},
@@ -40,6 +45,7 @@ const configUnsetFixture string = `
     "owner": "test",
     "app": "unset-test",
     "values": {},
+	"typed_values": {"web":{"PORT":null}},
     "limits": {},
     "tags": {},
 	"registry": {},
@@ -49,8 +55,8 @@ const configUnsetFixture string = `
 }
 `
 
-const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"test":"tests"},"registry":{"username":"bob"}}`
-const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"limits":{"web":null},"tags":{"test":null},"registry":{"username":null}}`
+const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"typed_values":{"web":{"PORT":"9000"}},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"test":"tests"},"registry":{"username":"bob"}}`
+const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"typed_values":{"web":{"PORT":null}},"limits":{"web":null},"tags":{"test":null},"registry":{"username":null}}`
 
 type fakeHTTPServer struct{}
 
@@ -124,9 +130,12 @@ func TestConfigSet(t *testing.T) {
 	expected := api.Config{
 		Owner: "test",
 		App:   "example-go",
-		Values: map[string]interface{}{
+		Values: api.ConfigValues{
 			"TEST": "testing",
 			"FOO":  "bar",
+		},
+		TypedValues: map[string]api.ConfigValues{
+			"web": {"PORT": "9000"},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -143,9 +152,12 @@ func TestConfigSet(t *testing.T) {
 	}
 
 	configVars := api.Config{
-		Values: map[string]interface{}{
+		Values: api.ConfigValues{
 			"TEST": "testing",
 			"FOO":  "bar",
+		},
+		TypedValues: map[string]api.ConfigValues{
+			"web": {"PORT": "9000"},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -182,9 +194,12 @@ func TestConfigUnset(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner:    "test",
-		App:      "unset-test",
-		Values:   map[string]interface{}{},
+		Owner:  "test",
+		App:    "unset-test",
+		Values: map[string]interface{}{},
+		TypedValues: map[string]api.ConfigValues{
+			"web": {"PORT": nil},
+		},
 		Limits:   map[string]interface{}{},
 		Tags:     map[string]interface{}{},
 		Registry: map[string]interface{}{},
@@ -197,6 +212,9 @@ func TestConfigUnset(t *testing.T) {
 		Values: map[string]interface{}{
 			"TEST": nil,
 			"FOO":  nil,
+		},
+		TypedValues: map[string]api.ConfigValues{
+			"web": {"PORT": nil},
 		},
 		Limits: map[string]interface{}{
 			"web": nil,
@@ -238,6 +256,9 @@ func TestConfigList(t *testing.T) {
 		Values: map[string]interface{}{
 			"TEST": "testing",
 			"FOO":  "bar",
+		},
+		TypedValues: map[string]api.ConfigValues{
+			"web": {"PORT": "9000"},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",

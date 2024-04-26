@@ -6,14 +6,19 @@ import (
 	"text/template"
 )
 
+// ConfigValues is the key, value for env
+type ConfigValues map[string]interface{}
+
 // ConfigSet is the definition of POST /v2/apps/<app id>/config/.
 type ConfigSet struct {
-	Values map[string]string `json:"values"`
+	Values      ConfigValues            `json:"values"`
+	TypedValues map[string]ConfigValues `json:"typed_values"`
 }
 
 // ConfigUnset is the definition of POST /v2/apps/<app id>/config/.
 type ConfigUnset struct {
-	Values map[string]interface{} `json:"values"`
+	Values      ConfigValues            `json:"values"`
+	TypedValues map[string]ConfigValues `json:"typed_values"`
 }
 
 // Config is the structure of an app's config.
@@ -23,7 +28,9 @@ type Config struct {
 	// App is the app name. It cannot be updated at all right now.
 	App string `json:"app,omitempty"`
 	// Values are exposed as environment variables to the app.
-	Values map[string]interface{} `json:"values,omitempty"`
+	Values ConfigValues `json:"values,omitempty"`
+	// Typed values are exposed as environment variables to the app.
+	TypedValues map[string]ConfigValues `json:"typed_values,omitempty"`
 	// Limits is used to set process resources limits. The key is the process name
 	// and the value is a limit plan. Ex: std1.xlarge.c1m1
 	Limits map[string]interface{} `json:"limits,omitempty"`
