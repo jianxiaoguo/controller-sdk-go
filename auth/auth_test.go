@@ -29,7 +29,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.Write(nil)
 		}
 		if len(body) == 0 {
-			res.Header().Add("Location", fmt.Sprintf("/v2/login/drycc/?key=%s/", keyFixture))
+			res.Header().Add("Location", fmt.Sprintf("/v2/login/drycc/?key=%s/?alias=test", keyFixture))
 			res.WriteHeader(http.StatusFound)
 			res.Write(nil)
 		} else {
@@ -66,7 +66,7 @@ func TestLogin(t *testing.T) {
 		t.Error(err)
 	}
 
-	expected := fmt.Sprintf("/v2/login/drycc/?key=%s/", keyFixture)
+	expected := fmt.Sprintf("/v2/login/drycc/?key=%s/?alias=test", keyFixture)
 	if actual != expected {
 		t.Errorf("Expected %s, Got %s", expected, actual)
 	}
@@ -97,7 +97,7 @@ func TestToken(t *testing.T) {
 		Token:    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
 	}
 
-	token, err := Token(drycc, keyFixture)
+	token, err := Token(drycc, keyFixture, "test")
 
 	if err != nil {
 		t.Error(err)

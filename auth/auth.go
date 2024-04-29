@@ -44,8 +44,8 @@ func Login(c *drycc.Client, username, password string) (string, error) {
 }
 
 // Token to the controller and get a token
-func Token(c *drycc.Client, key string) (api.AuthTokenResponse, error) {
-	path := fmt.Sprintf("/v2/auth/token/%s/", key)
+func Token(c *drycc.Client, key, alias string) (api.AuthTokenResponse, error) {
+	path := fmt.Sprintf("/v2/auth/token/%s/?alias=%s", key, alias)
 	res, reqErr := c.Request("GET", path, nil)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.AuthTokenResponse{}, reqErr
