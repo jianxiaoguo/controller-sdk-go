@@ -7,10 +7,10 @@ import (
 
 func TestDomainsSorted(t *testing.T) {
 	domains := Domains{
-		{"Alpha", "", "gamma.example.com", "", ""},
-		{"Alpha", "", "alpha1.example.com", "", ""},
-		{"Alpha", "", "zulu.example.com", "", ""},
-		{"Alpha", "", "delta.example.com", "", ""},
+		{"Alpha", "", "gamma.example.com", "web", "", ""},
+		{"Alpha", "", "alpha1.example.com", "web", "", ""},
+		{"Alpha", "", "zulu.example.com", "web", "", ""},
+		{"Alpha", "", "delta.example.com", "web", "", ""},
 	}
 
 	sort.Sort(domains)

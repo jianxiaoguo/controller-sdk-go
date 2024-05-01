@@ -22,6 +22,7 @@ const domainsFixture string = `
             "app": "example-go",
             "created": "2014-01-01T00:00:00UTC",
             "domain": "example.example.com",
+			"procfile_type": "web",
             "owner": "test",
             "updated": "2014-01-01T00:00:00UTC"
         }
@@ -33,11 +34,12 @@ const domainFixture string = `
     "app": "example-go",
     "created": "2014-01-01T00:00:00UTC",
     "domain": "example.example.com",
+	"procfile_type": "web",
     "owner": "test",
     "updated": "2014-01-01T00:00:00UTC"
 }`
 
-const domainCreateExpected string = `{"domain":"example.example.com"}`
+const domainCreateExpected string = `{"domain":"example.example.com","procfile_type":"web"}`
 
 type fakeHTTPServer struct{}
 
@@ -86,11 +88,12 @@ func TestDomainsList(t *testing.T) {
 
 	expected := api.Domains{
 		{
-			App:     "example-go",
-			Created: "2014-01-01T00:00:00UTC",
-			Domain:  "example.example.com",
-			Owner:   "test",
-			Updated: "2014-01-01T00:00:00UTC",
+			App:          "example-go",
+			Created:      "2014-01-01T00:00:00UTC",
+			Domain:       "example.example.com",
+			ProcfileType: "web",
+			Owner:        "test",
+			Updated:      "2014-01-01T00:00:00UTC",
 		},
 	}
 
@@ -118,11 +121,12 @@ func TestDomainsAdd(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Domain{
-		App:     "example-go",
-		Created: "2014-01-01T00:00:00UTC",
-		Domain:  "example.example.com",
-		Owner:   "test",
-		Updated: "2014-01-01T00:00:00UTC",
+		App:          "example-go",
+		Created:      "2014-01-01T00:00:00UTC",
+		Domain:       "example.example.com",
+		ProcfileType: "web",
+		Owner:        "test",
+		Updated:      "2014-01-01T00:00:00UTC",
 	}
 
 	handler := fakeHTTPServer{}
@@ -134,7 +138,7 @@ func TestDomainsAdd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := New(drycc, "example-go", "example.example.com")
+	actual, err := New(drycc, "example-go", "example.example.com", "web")
 
 	if err != nil {
 		t.Fatal(err)
