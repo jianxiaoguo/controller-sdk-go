@@ -32,6 +32,39 @@ const processesFixture string = `
     ]
 }`
 
+const podStateFixture string = `
+{
+	"count": 1,
+	"next": null,
+	"previous": null,
+	"results": [{
+		"container": "web",
+		"image": "registry.drycc.cc/base/base",
+		"command": ["bash", "-c"],
+		"args": ["sleep 3600s"],
+		"state": {
+			"running": {
+			  "startedAt": "2024-05-21T02:27:03+00:00"
+			},
+			"waiting": {
+			  "message": "container create failed: executable file './start.sh' not found in $PATH: No such file or directory\n",
+			  "reason": "CreateContainerError"
+			}
+		},
+		"lastState": {
+			"terminated": {
+			  "containerID": "cri-o://ccfc73b0b4d966af4f93ca871a04fa97460620cd8005c1c36f7734a08ba49ed0",
+			  "exitCode": 1,
+			  "finishedAt": "2024-05-21T02:27:03+00:00",
+			  "reason": "Error",
+			  "startedAt": "2024-05-21T02:26:33+00:00"
+			}
+		},
+		"ready": true,
+		"restartCount": 1
+	}]
+}`
+
 const scaleExpected string = `{"web":2}`
 
 type fakeHTTPServer struct{}
@@ -41,6 +74,11 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/pods/" && req.Method == "GET" {
 		res.Write([]byte(processesFixture))
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/pods/test-pod-web/describe/" && req.Method == "GET" {
+		res.Write([]byte(podStateFixture))
 		return
 	}
 
@@ -232,6 +270,54 @@ func TestAppsRestart(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
+	}
+}
+
+func TestDescribe(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	actual, _, err := Describe(drycc, "example-go", "test-pod-web", 100)
+	if err != nil {
+		t.Error(err)
+	}
+	expected := api.PodState{
+		{
+			Container: "web",
+			Image:     "registry.drycc.cc/base/base",
+			Command:   []string{"bash", "-c"},
+			Args:      []string{"sleep 3600s"},
+			State: map[string]map[string]interface{}{
+				"running": {
+					"startedAt": "2024-05-21T02:27:03+00:00",
+				},
+				"waiting": {
+					"message": "container create failed: executable file './start.sh' not found in $PATH: No such file or directory\n",
+					"reason":  "CreateContainerError",
+				},
+			},
+			LastState: map[string]map[string]interface{}{
+				"terminated": {
+					"containerID": "cri-o://ccfc73b0b4d966af4f93ca871a04fa97460620cd8005c1c36f7734a08ba49ed0",
+					"exitCode":    1,
+					"finishedAt":  "2024-05-21T02:27:03+00:00",
+					"reason":      "Error",
+					"startedAt":   "2024-05-21T02:26:33+00:00",
+				},
+			},
+			Ready:        true,
+			RestartCount: 1,
+		},
+	}
+	if !reflect.DeepEqual(actual[0].State, expected[0].State) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", actual[0].State, expected[0].State))
 	}
 }
 

@@ -122,6 +122,22 @@ func Restart(c *drycc.Client, appID string, procType string) error {
 	return err
 }
 
+// Describe pod state
+func Describe(c *drycc.Client, appID string, podID string, results int) (api.PodState, int, error) {
+	u := fmt.Sprintf("/v2/apps/%s/pods/%s/describe/", appID, podID)
+
+	body, count, reqErr := c.LimitedRequest(u, results)
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
+		return api.PodState{}, -1, reqErr
+	}
+
+	var podState api.PodState
+	if err := json.Unmarshal([]byte(body), &podState); err != nil {
+		return api.PodState{}, -1, err
+	}
+	return podState, count, reqErr
+}
+
 // ByType organizes processes of an app by process type.
 func ByType(processes api.PodsList) api.PodTypes {
 	var pts api.PodTypes

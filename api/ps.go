@@ -55,3 +55,18 @@ type Types struct {
 func (p PodTypes) Len() int           { return len(p) }
 func (p PodTypes) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
 func (p PodTypes) Less(i, j int) bool { return p[i].Type < p[j].Type }
+
+// ContainerState defines a container state.
+type ContainerState struct {
+	Container    string                            `json:"container"`
+	Image        string                            `json:"image"`
+	Command      []string                          `json:"command"`
+	Args         []string                          `json:"args"`
+	State        map[string]map[string]interface{} `json:"state"`
+	LastState    map[string]map[string]interface{} `json:"lastState"`
+	Ready        bool                              `json:"ready"`
+	RestartCount int                               `json:"restartCount"`
+}
+
+// PodState defines a collection of container state.
+type PodState []ContainerState
