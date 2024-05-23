@@ -9,10 +9,10 @@ import (
 
 func TestPodsListSorted(t *testing.T) {
 	pods := PodsList{
-		{"", "web", "web.fsdfgh4", "up", time.Time{}},
-		{"", "web", "web.asdfgh1", "up", time.Time{}},
-		{"", "web", "web.csdfgh3", "up", time.Time{}},
-		{"", "web", "web.bsdfgh2", "up", time.Time{}},
+		{"", "web", "web.fsdfgh4", "up", "1/1", 0, time.Time{}},
+		{"", "web", "web.asdfgh1", "up", "1/1", 0, time.Time{}},
+		{"", "web", "web.csdfgh3", "up", "1/1", 0, time.Time{}},
+		{"", "web", "web.bsdfgh2", "up", "1/1", 0, time.Time{}},
 	}
 
 	sort.Sort(pods)
