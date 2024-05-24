@@ -67,6 +67,8 @@ const podStateFixture string = `
 
 const scaleExpected string = `{"web":2}`
 
+const restartExpected string = `{"types":"web,worker"}`
+
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -83,11 +85,19 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/apps/example-go/pods/restart/" && req.Method == "POST" {
-		res.WriteHeader(http.StatusNoContent)
-		return
-	}
+		body, err := io.ReadAll(req.Body)
 
-	if req.URL.Path == "/v2/apps/example-go/pods/web/restart/" && req.Method == "POST" {
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+		if string(body) != restartExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", restartExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
 		res.WriteHeader(http.StatusNoContent)
 		return
 	}
@@ -235,24 +245,13 @@ func TestPodLogs(t *testing.T) {
 	}
 }
 
-type testExpected struct {
-	Name     string
-	Type     string
-	Expected api.PodsList
-}
-
 func TestAppsRestart(t *testing.T) {
 	t.Parallel()
 
 	started := time.Time{}
 	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
-	tests := []testExpected{
-		{
-			Type: "",
-		},
-		{
-			Type: "web",
-		},
+	types := map[string]string{
+		"types": "web,worker",
 	}
 
 	handler := fakeHTTPServer{}
@@ -264,12 +263,10 @@ func TestAppsRestart(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	for _, test := range tests {
-		err := Restart(drycc, "example-go", test.Type)
+	err = Restart(drycc, "example-go", types)
 
-		if err != nil {
-			t.Error(err)
-		}
+	if err != nil {
+		t.Error(err)
 	}
 }
 

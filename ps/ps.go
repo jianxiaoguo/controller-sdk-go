@@ -105,16 +105,13 @@ func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 // Restart restarts an app's processes. To restart all app processes, pass empty strings for
 // procType and name. To restart an specific process, pass an procType by leave name empty.
 // To restart a specific instance, pass a procType and a name.
-func Restart(c *drycc.Client, appID string, procType string) error {
-	u := fmt.Sprintf("/v2/apps/%s/pods/", appID)
-
-	if procType == "" {
-		u += "restart/"
-	} else {
-		u += procType + "/restart/"
+func Restart(c *drycc.Client, appID string, targets map[string]string) error {
+	u := fmt.Sprintf("/v2/apps/%s/pods/restart/", appID)
+	body, err := json.Marshal(targets)
+	if err != nil {
+		return err
 	}
-
-	res, err := c.Request("POST", u, nil)
+	res, err := c.Request("POST", u, body)
 	if err != nil && !drycc.IsErrAPIMismatch(err) {
 		return err
 	}
