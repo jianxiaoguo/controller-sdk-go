@@ -5,7 +5,9 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"reflect"
+	"strings"
 	"testing"
 
 	drycc "github.com/drycc/controller-sdk-go"
@@ -13,6 +15,8 @@ import (
 )
 
 const volumeCreateExpected string = `{"name":"myvolume","size":"500G"}`
+
+const volumeFileContentExpected string = `hello world`
 
 const volumeCreateFixture string = `
 {
@@ -150,6 +154,47 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte(volumeGetFixture))
 		return
 	}
+	// Client
+	if strings.Contains(req.URL.Path, "/v2/apps/example-go/volumes/myvolume/files/") {
+		if req.Method == "GET" {
+			if req.Header.Get("Accept") == "application/octet-stream" {
+				res.Header().Add("Content-Type", "application/octet-stream")
+				res.Write([]byte(volumeFileContentExpected))
+				return
+			} else if req.Header.Get("Accept") == "application/json" {
+				res.Header().Add("Content-Type", "application/json")
+				res.Write([]byte("[]"))
+				return
+			}
+		} else if req.Method == "POST" {
+			if err := req.ParseMultipartForm(1024 * 1024); err != nil {
+				return
+			}
+			for _, tmpFiles := range req.MultipartForm.File {
+				for _, tmpFile := range tmpFiles {
+					srcFile, err := tmpFile.Open()
+					if err != nil {
+						return
+					}
+					body, err := io.ReadAll(srcFile)
+					if err != nil {
+						return
+					}
+					if string(body) != volumeFileContentExpected {
+						fmt.Printf("Expected '%s', Got '%s'\n", volumeFileContentExpected, body)
+						res.WriteHeader(http.StatusInternalServerError)
+						res.Write(nil)
+						return
+					}
+				}
+			}
+			return
+		} else if req.Method == "DELETE" {
+			res.WriteHeader(http.StatusNoContent)
+			res.Write(nil)
+			return
+		}
+	}
 
 	// Expand
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PATCH" {
@@ -267,6 +312,106 @@ func TestVolumesCreate(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestVolumesListDir(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := ListDir(drycc, "example-go", "myvolume", "/tmp")
+	if err != nil {
+		t.Fatal(err)
+	}
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if string(body) != "[]" {
+		t.Error(fmt.Errorf("Expected %v, Got %v", "[]", string(body)))
+	}
+}
+
+func TestVolumesGetFile(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	res, err := GetFile(drycc, "example-go", "myvolume", "/tmp/helloword.txt")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if !reflect.DeepEqual(volumeFileContentExpected, string(body)) {
+		t.Error(fmt.Errorf("Expected %v, Got %v", volumeFileContentExpected, string(body)))
+	}
+}
+
+func TestVolumesPostFile(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	testFile := "helloword.txt"
+
+	err := os.WriteFile(testFile, []byte(volumeFileContentExpected), 0644)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if err := os.Remove(testFile); err != nil {
+			t.Fatal(err)
+		}
+	}()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := PostFile(drycc, "example-go", "myvolume", "/tmp", testFile); err != nil {
+		t.Fatal(err)
+	}
+
+}
+
+func TestVolumesDeleteFile(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	_, err = DeleteFile(drycc, "example-go", "myvolume", "/tmp/helloword.txt")
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

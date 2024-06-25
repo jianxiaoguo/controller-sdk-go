@@ -2,8 +2,15 @@
 package volumes
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
+	"mime/multipart"
+	"net/http"
+	"os"
+	"strings"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
@@ -38,6 +45,65 @@ func Get(c *drycc.Client, appID string, name string) (api.Volume, error) {
 	}
 
 	return volume, nil
+}
+
+// ListDir to an app's volume.
+func ListDir(c *drycc.Client, appID, volumeID, path string) (*http.Response, error) {
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/files%s", appID, volumeID, path)
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Accept", "application/json")
+	return c.Do(req)
+}
+
+// Getfile to an app's volume.
+func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, error) {
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/files%s", appID, volumeID, path)
+	req, err := c.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Add("Accept", "application/octet-stream")
+	return c.Do(req)
+}
+
+// Put file to an app's volume.
+func PostFile(c *drycc.Client, appID, volumeID, path string, files ...string) (*http.Response, error) {
+	buffer := new(bytes.Buffer)
+	writer := multipart.NewWriter(buffer)
+	for _, file := range files {
+		if f, err := os.Open(file); err != nil {
+			return nil, err
+		} else if part, err := writer.CreateFormFile("file", f.Name()); err != nil {
+			return nil, err
+		} else if _, err = io.Copy(part, f); err != nil {
+			return nil, err
+		} else {
+			defer f.Close()
+		}
+	}
+	writer.Close()
+
+	if !strings.HasPrefix(path, "/") {
+		return nil, errors.New("please use an absolute path starting with /")
+	}
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/files%s", appID, volumeID, path)
+	r, err := c.NewRequest("POST", u, buffer)
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(r)
+}
+
+// Get file to an app's volume.
+func DeleteFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, error) {
+	if !strings.HasPrefix(path, "/") {
+		return nil, errors.New("please use an absolute path starting with /")
+	}
+	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/files%s", appID, volumeID, path)
+	return c.Request("DELETE", u, nil)
 }
 
 // Create create an app's Volume.
