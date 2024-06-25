@@ -21,27 +21,9 @@ func createHTTPClient(sslVerify bool) *http.Client {
 	return &http.Client{Transport: tr}
 }
 
-// Request makes a HTTP request with the given method, relative URL, and body on the controller.
-// It also sets the Authorization and Content-Type headers to properly authenticate and communicate
-// API. This is primarily intended to use be used by the SDK itself, but could potentially be used elsewhere.
-func (c *Client) Request(method string, path string, body []byte) (*http.Response, error) {
-	url := *c.ControllerURL
-
-	if strings.Contains(path, "?") {
-		parts := strings.Split(path, "?")
-		url.Path = parts[0]
-		url.RawQuery = parts[1]
-	} else {
-		url.Path = path
-	}
-
-	req, err := http.NewRequest(method, url.String(), bytes.NewBuffer(body))
-
-	if err != nil {
-		return nil, err
-	}
-
-	req.Header.Add("Content-Type", "application/json")
+// Do sends an HTTP request and returns an HTTP response,
+// following policy (such as redirects, cookies, auth) as configured on the client.
+func (c *Client) Do(req *http.Request) (*http.Response, error) {
 
 	if c.Token != "" {
 		req.Header.Add("Authorization", "token "+c.Token)
@@ -49,6 +31,9 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 
 	if c.HooksToken != "" {
 		req.Header.Add("X-Drycc-Builder-Auth", c.HooksToken)
+	}
+	if req.Header.Get("Content-Type") == "" {
+		req.Header.Add("Content-Type", "application/json")
 	}
 
 	addUserAgent(&req.Header, c.UserAgent)
@@ -71,6 +56,31 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 
 	// Return results along with api compatibility error
 	return res, checkAPICompatibility(apiVersion, APIVersion)
+}
+
+// NewRequest wraps [NewRequestWithContext] using [context.Background].
+func (c *Client) NewRequest(method string, path string, body io.Reader) (*http.Request, error) {
+	url := *c.ControllerURL
+
+	if strings.Contains(path, "?") {
+		parts := strings.Split(path, "?")
+		url.Path = parts[0]
+		url.RawQuery = parts[1]
+	} else {
+		url.Path = path
+	}
+	return http.NewRequest(method, url.String(), body)
+}
+
+// Request makes a HTTP request with the given method, relative URL, and body on the controller.
+// It also sets the Authorization and Content-Type headers to properly authenticate and communicate
+// API. This is primarily intended to use be used by the SDK itself, but could potentially be used elsewhere.
+func (c *Client) Request(method string, path string, body []byte) (*http.Response, error) {
+	req, err := c.NewRequest(method, path, bytes.NewBuffer(body))
+	if err != nil {
+		return nil, err
+	}
+	return c.Do(req)
 }
 
 // LimitedRequest allows limiting the number of responses in a request.

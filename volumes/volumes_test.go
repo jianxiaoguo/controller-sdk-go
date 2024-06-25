@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"reflect"
+	"strings"
 	"testing"
 
 	drycc "github.com/drycc/controller-sdk-go"
@@ -149,6 +150,47 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "GET" {
 		res.Write([]byte(volumeGetFixture))
 		return
+	}
+	// Client
+	if strings.Contains(req.URL.Path, "/v2/apps/example-go/volumes/myvolume/files/") {
+		if req.Method == "GET" {
+			if req.URL.Query().Get("action") == "get" {
+				res.Header().Add("Content-Type", "application/octet-stream")
+				res.Write([]byte(volumeFileContentExpected))
+				return
+			} else if req.URL.Query().Get("action") == "list" {
+				res.Header().Add("Content-Type", "application/json")
+				res.Write([]byte("[]"))
+				return
+			}
+		} else if req.Method == "POST" {
+			if err := req.ParseMultipartForm(1024 * 1024); err != nil {
+				return
+			}
+			for _, tmpFiles := range req.MultipartForm.File {
+				for _, tmpFile := range tmpFiles {
+					srcFile, err := tmpFile.Open()
+					if err != nil {
+						return
+					}
+					body, err := io.ReadAll(srcFile)
+					if err != nil {
+						return
+					}
+					if string(body) != volumeFileContentExpected {
+						fmt.Printf("Expected '%s', Got '%s'\n", volumeFileContentExpected, body)
+						res.WriteHeader(http.StatusInternalServerError)
+						res.Write(nil)
+						return
+					}
+				}
+			}
+			return
+		} else if req.Method == "DELETE" {
+			res.WriteHeader(http.StatusNoContent)
+			res.Write(nil)
+			return
+		}
 	}
 
 	// Expand
