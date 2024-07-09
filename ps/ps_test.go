@@ -65,9 +65,7 @@ const podStateFixture string = `
 	}]
 }`
 
-const scaleExpected string = `{"web":2}`
-
-const restartExpected string = `{"types":"web,worker"}`
+const podDeleteExpected string = `{"pod_ids":"test-pod-web"}`
 
 type fakeHTTPServer struct{}
 
@@ -83,8 +81,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.Write([]byte(podStateFixture))
 		return
 	}
-
-	if req.URL.Path == "/v2/apps/example-go/pods/restart/" && req.Method == "POST" {
+	if req.URL.Path == "/v2/apps/example-go/pods/" && req.Method == "DELETE" {
 		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
@@ -92,34 +89,13 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 		}
-		if string(body) != restartExpected {
-			fmt.Printf("Expected '%s', Got '%s'\n", restartExpected, body)
+		if string(body) != podDeleteExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", podDeleteExpected, body)
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 			return
 		}
 		res.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	if req.URL.Path == "/v2/apps/example-go/scale/" && req.Method == "POST" {
-		body, err := io.ReadAll(req.Body)
-
-		if err != nil {
-			fmt.Println(err)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-		}
-
-		if string(body) != scaleExpected {
-			fmt.Printf("Expected '%s', Got '%s'\n", scaleExpected, body)
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write(nil)
-			return
-		}
-
-		res.WriteHeader(http.StatusNoContent)
-		res.Write(nil)
 		return
 	}
 
@@ -245,31 +221,6 @@ func TestPodLogs(t *testing.T) {
 	}
 }
 
-func TestAppsRestart(t *testing.T) {
-	t.Parallel()
-
-	started := time.Time{}
-	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
-	types := map[string]string{
-		"types": "web,worker",
-	}
-
-	handler := fakeHTTPServer{}
-	server := httptest.NewServer(&handler)
-	defer server.Close()
-
-	drycc, err := drycc.New(false, server.URL, "abc")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	err = Restart(drycc, "example-go", types)
-
-	if err != nil {
-		t.Error(err)
-	}
-}
-
 func TestDescribe(t *testing.T) {
 	t.Parallel()
 
@@ -315,23 +266,6 @@ func TestDescribe(t *testing.T) {
 	}
 	if !reflect.DeepEqual(actual[0].State, expected[0].State) {
 		t.Error(fmt.Errorf("Expected %v, Got %v", actual[0].State, expected[0].State))
-	}
-}
-
-func TestScale(t *testing.T) {
-	t.Parallel()
-
-	handler := fakeHTTPServer{}
-	server := httptest.NewServer(&handler)
-	defer server.Close()
-
-	drycc, err := drycc.New(false, server.URL, "abc")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if err = Scale(drycc, "example-go", map[string]int{"web": 2}); err != nil {
-		t.Fatal(err)
 	}
 }
 
@@ -384,5 +318,22 @@ func TestByType(t *testing.T) {
 
 	if !reflect.DeepEqual(actual, expected) {
 		t.Errorf("Expected: %v, Got %v", expected, actual)
+	}
+}
+
+func TestPodsDelete(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = Delete(drycc, "example-go", "test-pod-web"); err != nil {
+		t.Fatal(err)
 	}
 }

@@ -72,3 +72,7 @@ type ContainerState struct {
 
 // PodState defines a collection of container state.
 type PodState []ContainerState
+
+type PodIDs struct {
+	PodIDs string `json:"pod_ids"`
+}
