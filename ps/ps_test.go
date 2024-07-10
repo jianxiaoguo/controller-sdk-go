@@ -12,7 +12,6 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/drycc/controller-sdk-go/pkg/time"
 	"golang.org/x/net/websocket"
 )
 
@@ -107,8 +106,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func TestProcessesList(t *testing.T) {
 	t.Parallel()
 
-	started := time.Time{}
-	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
+	started := "2016-02-13T00:47:52"
 	expected := api.PodsList{
 		{
 			Release: "v2",
@@ -272,8 +270,7 @@ func TestDescribe(t *testing.T) {
 func TestByType(t *testing.T) {
 	t.Parallel()
 
-	started := time.Time{}
-	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
+	started := "2016-02-13T00:47:52"
 
 	expected := api.PodTypes{
 		{

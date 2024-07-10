@@ -6,8 +6,8 @@ import "github.com/drycc/controller-sdk-go/pkg/time"
 // Some fields are omtempty because they are only
 // returned when creating or getting a cert.
 type Cert struct {
-	Updated        time.Time `json:"updated,omitempty"`
-	Created        time.Time `json:"created,omitempty"`
+	Updated        string    `json:"updated,omitempty"`
+	Created        string    `json:"created,omitempty"`
 	Name           string    `json:"name"`
 	CommonName     string    `json:"common_name"`
 	Expires        time.Time `json:"expires"`

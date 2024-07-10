@@ -8,9 +8,10 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/drycc/controller-sdk-go/pkg/time"
+
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const certsFixture string = `
@@ -141,15 +142,16 @@ func TestCertsList(t *testing.T) {
 func TestCert(t *testing.T) {
 	t.Parallel()
 
-	created := time.Time{}
-	created.UnmarshalText([]byte("2014-01-01T00:00:00UTC"))
+	created := "2014-01-01T00:00:00UTC"
+	starts := time.Time{}
+	starts.UnmarshalText([]byte("2014-01-01T00:00:00UTC"))
 	expires := time.Time{}
 	expires.UnmarshalText([]byte("2015-01-01T00:00:00UTC"))
 
 	expected := api.Cert{
 		Updated:     created,
 		Created:     created,
-		Starts:      created,
+		Starts:      starts,
 		Expires:     expires,
 		Fingerprint: "12:34:56:78:90",
 		Name:        "test-example-com",
@@ -180,15 +182,16 @@ func TestCert(t *testing.T) {
 func TestCertInfo(t *testing.T) {
 	t.Parallel()
 
-	created := time.Time{}
-	created.UnmarshalText([]byte("2014-01-01T00:00:00UTC"))
+	created := "2014-01-01T00:00:00UTC"
+	starts := time.Time{}
+	starts.UnmarshalText([]byte("2014-01-01T00:00:00UTC"))
 	expires := time.Time{}
 	expires.UnmarshalText([]byte("2015-01-01T00:00:00UTC"))
 
 	expected := api.Cert{
 		Updated:     created,
 		Created:     created,
-		Starts:      created,
+		Starts:      starts,
 		Expires:     expires,
 		Fingerprint: "12:34:56:78:90",
 		Name:        "test-example-com",

@@ -1,15 +1,13 @@
 package api
 
-import "github.com/drycc/controller-sdk-go/pkg/time"
-
 // Ptype defines the structure of ptype deployment.
 type Ptype struct {
-	Name              string    `json:"name"`
-	Release           string    `json:"release"`
-	Ready             string    `json:"ready"`
-	UpToDate          int       `json:"up_to_date"`
-	AvailableReplicas int       `json:"available_replicas"`
-	Started           time.Time `json:"started"`
+	Name              string `json:"name"`
+	Release           string `json:"release"`
+	Ready             string `json:"ready"`
+	UpToDate          int    `json:"up_to_date"`
+	AvailableReplicas int    `json:"available_replicas"`
+	Started           string `json:"started"`
 }
 
 // Ptypes defines a collection of app Ptypes.

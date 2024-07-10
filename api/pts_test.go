@@ -3,15 +3,13 @@ package api
 import (
 	"sort"
 	"testing"
-
-	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 func TestPtypesSorted(t *testing.T) {
 	ptypes := Ptypes{
-		{"web", "v1", "1/1", 1, 1, time.Time{}},
-		{"cronjob", "v1", "1/1", 1, 1, time.Time{}},
-		{"sleep", "v1", "1/1", 1, 1, time.Time{}},
+		{"web", "v1", "1/1", 1, 1, ""},
+		{"cronjob", "v1", "1/1", 1, 1, ""},
+		{"sleep", "v1", "1/1", 1, 1, ""},
 	}
 
 	sort.Sort(ptypes)

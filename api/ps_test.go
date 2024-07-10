@@ -3,16 +3,14 @@ package api
 import (
 	"sort"
 	"testing"
-
-	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 func TestPodsListSorted(t *testing.T) {
 	pods := PodsList{
-		{"", "web", "web.fsdfgh4", "up", "1/1", 0, time.Time{}},
-		{"", "web", "web.asdfgh1", "up", "1/1", 0, time.Time{}},
-		{"", "web", "web.csdfgh3", "up", "1/1", 0, time.Time{}},
-		{"", "web", "web.bsdfgh2", "up", "1/1", 0, time.Time{}},
+		{"", "web", "web.fsdfgh4", "up", "1/1", 0, ""},
+		{"", "web", "web.asdfgh1", "up", "1/1", 0, ""},
+		{"", "web", "web.csdfgh3", "up", "1/1", 0, ""},
+		{"", "web", "web.bsdfgh2", "up", "1/1", 0, ""},
 	}
 
 	sort.Sort(pods)

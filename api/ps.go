@@ -1,7 +1,5 @@
 package api
 
-import "github.com/drycc/controller-sdk-go/pkg/time"
-
 // ProcessType represents the key/value mappings of a process type to a process inside
 // a Heroku Procfile.
 //
@@ -10,13 +8,13 @@ type ProcessType map[string]string
 
 // Pods defines the structure of a process.
 type Pods struct {
-	Release  string    `json:"release"`
-	Type     string    `json:"type"`
-	Name     string    `json:"name"`
-	State    string    `json:"state"`
-	Ready    string    `json:"ready"`
-	Restarts int       `json:"restarts"`
-	Started  time.Time `json:"started"`
+	Release  string `json:"release"`
+	Type     string `json:"type"`
+	Name     string `json:"name"`
+	State    string `json:"state"`
+	Ready    string `json:"ready"`
+	Restarts int    `json:"restarts"`
+	Started  string `json:"started"`
 }
 
 // PodsList defines a collection of app pods.

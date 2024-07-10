@@ -10,7 +10,6 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const ptypesFixture string = `
@@ -127,8 +126,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func TestPtype(t *testing.T) {
 	t.Parallel()
 
-	started := time.Time{}
-	started.UnmarshalText([]byte("2024-07-03T16:28:00"))
+	started := "2024-07-03T16:28:00"
 	expected := api.Ptypes{
 		{
 			Name:              "example-go-web",
@@ -211,8 +209,6 @@ func TestDescribe(t *testing.T) {
 func TestAppsRestart(t *testing.T) {
 	t.Parallel()
 
-	started := time.Time{}
-	started.UnmarshalText([]byte("2016-02-13T00:47:52"))
 	types := map[string]string{
 		"types": "web,worker",
 	}

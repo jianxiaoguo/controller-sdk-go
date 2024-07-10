@@ -9,7 +9,6 @@ import (
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const podEventsFixture string = `
@@ -61,8 +60,7 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 func TestEvents(t *testing.T) {
 	t.Parallel()
 
-	created := time.Time{}
-	created.UnmarshalText([]byte("2024-07-03T16:28:00"))
+	created := "2024-07-03T16:28:00"
 	podExpected := api.AppEvents{
 		{
 			Reason:  "Scheduled",
