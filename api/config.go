@@ -60,7 +60,7 @@ type ConfigHookRequest struct {
 }
 
 // Healthchecks is a map of healthcheck probes.
-// The valid values are "livenessProbe" and "readinessProbe".
+// The valid values are "startupProbe" "livenessProbe" and "readinessProbe".
 type Healthchecks map[string]*Healthcheck
 
 // Healthcheck is the structure for an application healthcheck.
