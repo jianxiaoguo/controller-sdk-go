@@ -6,6 +6,9 @@ import (
 	"text/template"
 )
 
+// ConfigTags is the key, value for tag
+type ConfigTags map[string]interface{}
+
 // ConfigValues is the key, value for env
 type ConfigValues map[string]interface{}
 
@@ -40,7 +43,7 @@ type Config struct {
 	// Healthcheck is map of healthchecks for each process that the application uses.
 	Healthcheck map[string]*Healthchecks `json:"healthcheck,omitempty"`
 	// Tags restrict applications to run on k8s nodes with that label.
-	Tags map[string]interface{} `json:"tags,omitempty"`
+	Tags map[string]ConfigTags `json:"tags,omitempty"`
 	// Registry is a key-value pair to provide authentication for container registries.
 	// The key is the username and the value is the password.
 	Registry map[string]interface{} `json:"registry,omitempty"`

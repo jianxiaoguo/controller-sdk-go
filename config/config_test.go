@@ -29,7 +29,9 @@ const configFixture string = `
 	  "web": "std1.xlarge.c1m1"
 	},
     "tags": {
-      "test": "tests"
+	  "web": {
+        "test": "tests"
+	  }
     },
     "registry": {
       "username": "bob"
@@ -55,8 +57,8 @@ const configUnsetFixture string = `
 }
 `
 
-const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"typed_values":{"web":{"PORT":"9000"}},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"test":"tests"},"registry":{"username":"bob"}}`
-const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"typed_values":{"web":{"PORT":null}},"limits":{"web":null},"tags":{"test":null},"registry":{"username":null}}`
+const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"typed_values":{"web":{"PORT":"9000"}},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"web":{"test":"tests"}},"registry":{"username":"bob"}}`
+const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"typed_values":{"web":{"PORT":null}},"limits":{"web":null},"tags":{"web":{"test":null}},"registry":{"username":null}}`
 
 type fakeHTTPServer struct{}
 
@@ -140,8 +142,10 @@ func TestConfigSet(t *testing.T) {
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
 		},
-		Tags: map[string]interface{}{
-			"test": "tests",
+		Tags: map[string]api.ConfigTags{
+			"web": {
+				"test": "tests",
+			},
 		},
 		Registry: map[string]interface{}{
 			"username": "bob",
@@ -162,8 +166,10 @@ func TestConfigSet(t *testing.T) {
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
 		},
-		Tags: map[string]interface{}{
-			"test": "tests",
+		Tags: map[string]api.ConfigTags{
+			"web": {
+				"test": "tests",
+			},
 		},
 		Registry: map[string]interface{}{
 			"username": "bob",
@@ -201,7 +207,7 @@ func TestConfigUnset(t *testing.T) {
 			"web": {"PORT": nil},
 		},
 		Limits:   map[string]interface{}{},
-		Tags:     map[string]interface{}{},
+		Tags:     map[string]api.ConfigTags{},
 		Registry: map[string]interface{}{},
 		Created:  "2014-01-01T00:00:00UTC",
 		Updated:  "2014-01-01T00:00:00UTC",
@@ -219,8 +225,8 @@ func TestConfigUnset(t *testing.T) {
 		Limits: map[string]interface{}{
 			"web": nil,
 		},
-		Tags: map[string]interface{}{
-			"test": nil,
+		Tags: map[string]api.ConfigTags{
+			"web": {"test": nil},
 		},
 		Registry: map[string]interface{}{
 			"username": nil,
@@ -263,8 +269,8 @@ func TestConfigList(t *testing.T) {
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
 		},
-		Tags: map[string]interface{}{
-			"test": "tests",
+		Tags: map[string]api.ConfigTags{
+			"web": {"test": "tests"},
 		},
 		Registry: map[string]interface{}{
 			"username": "bob",

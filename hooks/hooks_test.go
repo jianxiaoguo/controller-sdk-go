@@ -30,7 +30,9 @@ const configFixture string = `
 		"web": "std1.xlarge.c1m1"
 	},
 	"tags": {
-		"test": "tests"
+		"web": {
+			"test": "tests"
+		}
 	},
 	"registry": {
 		"username": "bob"
@@ -162,8 +164,10 @@ func TestConfigHook(t *testing.T) {
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
 		},
-		Tags: map[string]interface{}{
-			"test": "tests",
+		Tags: map[string]api.ConfigTags{
+			"web": {
+				"test": "tests",
+			},
 		},
 		Registry: map[string]interface{}{
 			"username": "bob",
