@@ -28,6 +28,7 @@ type PtypeState struct {
 	ReadinessProbe Healthcheck       `json:"readiness_probe,omitempty"`
 	Limits         map[string]string `json:"limits,omitempty"`
 	VolumeMounts   []VolumeMount     `json:"volume_mounts,omitempty"`
+	NodeSelector   map[string]string `json:"node_selector,omitempty"`
 }
 
 type VolumeMount struct {

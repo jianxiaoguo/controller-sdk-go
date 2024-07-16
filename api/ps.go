@@ -66,6 +66,9 @@ type ContainerState struct {
 	LastState    map[string]map[string]interface{} `json:"lastState"`
 	Ready        bool                              `json:"ready"`
 	RestartCount int                               `json:"restartCount"`
+	Status       string                            `json:"status"`
+	Reason       string                            `json:"reason"`
+	Message      string                            `json:"message"`
 }
 
 // PodState defines a collection of container state.

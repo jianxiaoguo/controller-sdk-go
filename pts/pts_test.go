@@ -58,7 +58,8 @@ const ptypeStateFixture string = `
                 "mountPath": "/data",
                 "name": "myvolume"
             }
-        ]
+        ],
+		"node_selector": ["kubernetes.io/os=linux"]
     }]
 }`
 
@@ -199,6 +200,7 @@ func TestDescribe(t *testing.T) {
 					MountPath: "/data",
 				},
 			},
+			NodeSelector: []string{"kubernetes.io/os=linux"},
 		},
 	}
 	if !reflect.DeepEqual(actual, expected) {
