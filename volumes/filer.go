@@ -47,14 +47,15 @@ func PostFile(c *drycc.Client, appID, volumeID, path string, files ...string) (*
 	buffer := new(bytes.Buffer)
 	writer := multipart.NewWriter(buffer)
 	for _, file := range files {
-		if f, err := os.Open(file); err != nil {
+		f, err := os.Open(file)
+		if err != nil {
 			return nil, err
-		} else if part, err := writer.CreateFormFile("file", f.Name()); err != nil {
+		}
+		defer f.Close()
+		if part, err := writer.CreateFormFile("file", f.Name()); err != nil {
 			return nil, err
 		} else if _, err = io.Copy(part, f); err != nil {
 			return nil, err
-		} else {
-			defer f.Close()
 		}
 	}
 
