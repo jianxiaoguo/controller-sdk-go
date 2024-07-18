@@ -8,7 +8,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"os"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
@@ -43,23 +42,16 @@ func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, err
 }
 
 // Put file to an app's volume.
-func PostFile(c *drycc.Client, appID, volumeID, path string, files ...string) (*http.Response, error) {
+func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, reader io.Reader) (*http.Response, error) {
 	buffer := new(bytes.Buffer)
 	writer := multipart.NewWriter(buffer)
-	for _, file := range files {
-		f, err := os.Open(file)
-		if err != nil {
-			return nil, err
-		}
-		defer f.Close()
-		if part, err := writer.CreateFormFile("file", f.Name()); err != nil {
-			return nil, err
-		} else if _, err = io.Copy(part, f); err != nil {
-			return nil, err
-		}
+	if part, err := writer.CreateFormFile("file", name); err != nil {
+		return nil, err
+	} else if _, err = io.Copy(part, reader); err != nil {
+		return nil, err
 	}
 
-	if err := writer.WriteField("path", path); err != nil {
+	if err := writer.WriteField("path", volumePath); err != nil {
 		return nil, err
 	}
 	writer.Close()
