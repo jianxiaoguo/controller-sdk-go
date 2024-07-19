@@ -2,7 +2,6 @@
 package volumes
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -43,21 +42,28 @@ func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, err
 
 // Put file to an app's volume.
 func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, reader io.Reader) (*http.Response, error) {
-	buffer := new(bytes.Buffer)
-	writer := multipart.NewWriter(buffer)
-	if part, err := writer.CreateFormFile("file", name); err != nil {
-		return nil, err
-	} else if _, err = io.Copy(part, reader); err != nil {
-		return nil, err
-	}
-
-	if err := writer.WriteField("path", volumePath); err != nil {
-		return nil, err
-	}
-	writer.Close()
+	pr, pw := io.Pipe()
+	writer := multipart.NewWriter(pw)
+	go func() {
+		if err := writer.WriteField("path", volumePath); err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		part, err := writer.CreateFormFile("file", name)
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		_, err = io.Copy(part, reader)
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		pw.CloseWithError(writer.Close())
+	}()
 
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/client/", appID, volumeID)
-	r, err := c.NewRequest("POST", u, buffer)
+	r, err := c.NewRequest("POST", u, pr)
 	if err != nil {
 		return nil, err
 	}
