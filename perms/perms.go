@@ -9,64 +9,49 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-// List users that can access an app.
-func List(c *drycc.Client, appID string) ([]string, error) {
-	res, reqErr := c.Request("GET", fmt.Sprintf("/v2/apps/%s/perms/", appID), nil)
-	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return []string{}, reqErr
-	}
-	defer res.Body.Close()
-
-	var users api.PermsAppResponse
-	if err := json.NewDecoder(res.Body).Decode(&users); err != nil {
-		return []string{}, err
-	}
-
-	return users.Users, reqErr
-}
-
-// ListAdmins lists drycc platform administrators.
-func ListAdmins(c *drycc.Client, results int) ([]string, int, error) {
-	body, count, reqErr := c.LimitedRequest("/v2/admin/perms/", results)
+// List Codename
+func Codes(c *drycc.Client, results int) ([]api.PermCodeResponse, int, error) {
+	body, count, reqErr := c.LimitedRequest("/v2/perms/codes/", results)
 
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return []string{}, -1, reqErr
+		return []api.PermCodeResponse{}, count, reqErr
 	}
 
-	var users []api.PermsRequest
-	if err := json.Unmarshal([]byte(body), &users); err != nil {
-		return []string{}, -1, err
+	var codenames []api.PermCodeResponse
+	if err := json.Unmarshal([]byte(body), &codenames); err != nil {
+		return []api.PermCodeResponse{}, count, err
 	}
 
-	usersList := []string{}
+	return codenames, count, reqErr
+}
 
-	for _, user := range users {
-		usersList = append(usersList, user.Username)
+// List UserPerm
+func List(c *drycc.Client, codename string, results int) ([]api.UserPermResponse, int, error) {
+	u := fmt.Sprintf("/v2/perms/rules/?codename=%s", codename)
+	body, count, reqErr := c.LimitedRequest(u, results)
+
+	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
+		return []api.UserPermResponse{}, count, reqErr
 	}
 
-	return usersList, count, reqErr
+	var userPerm []api.UserPermResponse
+	if err := json.Unmarshal([]byte(body), &userPerm); err != nil {
+		return []api.UserPermResponse{}, count, err
+	}
+
+	return userPerm, count, reqErr
 }
 
-// New gives a user access to an app.
-func New(c *drycc.Client, appID string, username string) error {
-	return doNew(c, fmt.Sprintf("/v2/apps/%s/perms/", appID), username)
-}
-
-// NewAdmin makes a user an administrator.
-func NewAdmin(c *drycc.Client, username string) error {
-	return doNew(c, "/v2/admin/perms/", username)
-}
-
-func doNew(c *drycc.Client, u string, username string) error {
-	req := api.PermsRequest{Username: username}
-
+// Create a UserPerm
+func Create(c *drycc.Client, codename, uniqueid, username string) error {
+	req := api.UserPermRequest{Codename: codename, Uniqueid: uniqueid, Username: username}
 	reqBody, err := json.Marshal(req)
 
 	if err != nil {
 		return err
 	}
 
-	res, err := c.Request("POST", u, reqBody)
+	res, err := c.Request("POST", "/v2/perms/rules/", reqBody)
 	if err == nil {
 		res.Body.Close()
 	}
@@ -74,18 +59,9 @@ func doNew(c *drycc.Client, u string, username string) error {
 	return err
 }
 
-// Delete removes a user from an app.
-func Delete(c *drycc.Client, appID string, username string) error {
-	return doDelete(c, fmt.Sprintf("/v2/apps/%s/perms/%s", appID, username))
-}
-
-// DeleteAdmin removes administrative privileges from a user.
-func DeleteAdmin(c *drycc.Client, username string) error {
-	return doDelete(c, fmt.Sprintf("/v2/admin/perms/%s", username))
-}
-
-func doDelete(c *drycc.Client, u string) error {
-	res, err := c.Request("DELETE", u, nil)
+// Delete a UserPerm.
+func Delete(c *drycc.Client, userPermID string) error {
+	res, err := c.Request("DELETE", fmt.Sprintf("/v2/perms/rules/%s/", userPermID), nil)
 	if err == nil {
 		res.Body.Close()
 	}

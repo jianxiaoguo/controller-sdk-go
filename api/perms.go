@@ -1,11 +1,22 @@
 package api
 
-// PermsAppResponse is the definition of GET /v2/apps/<app id>/perms/.
-type PermsAppResponse struct {
-	Users []string `json:"users"`
+// PermCodeResponse is the definition of GET /v2/perms/codes/.
+type PermCodeResponse struct {
+	Codename    string `json:"codename"`
+	Description string `json:"description"`
 }
 
-// PermsRequest is the definition of a requst on /perms/.
-type PermsRequest struct {
+// UserPermResponse is the definition of GET /v2/perms/rules/.
+type UserPermResponse struct {
+	ID       uint64 `json:"id"`
+	Codename string `json:"codename"`
+	Uniqueid string `json:"uniqueid"`
+	Username string `json:"username"`
+}
+
+// UserPermRequest is the definition of a requst on /v2/perms/rules/.
+type UserPermRequest struct {
+	Codename string `json:"codename"`
+	Uniqueid string `json:"uniqueid"`
 	Username string `json:"username"`
 }
