@@ -17,6 +17,7 @@ const appSettingsFixture string = `
     "owner": "test",
     "app": "example-go",
     "routable": true,
+    "autorollback": true,
     "allowlist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
     "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
@@ -31,6 +32,7 @@ const appSettingsUnsetFixture string = `
     "owner": "test",
     "app": "unset-test",
     "routable": true,
+    "autorollback": true,
     "allowlist": ["1.2.3.4", "0.0.0.0/0"],
     "autoscale": {"cmd": {"min": 3, "max": 8, "cpu_percent": 40}},
     "label": {"git_repo": "https://github.com/drycc/controller-sdk-go", "team" : "drycc"},
@@ -39,8 +41,8 @@ const appSettingsUnsetFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
-const appSettingsSetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
-const appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+const appSettingsSetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+const appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
 
 type fakeHTTPServer struct{}
 
@@ -112,10 +114,11 @@ func TestAppSettingsSet(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:     "test",
-		App:       "example-go",
-		Routable:  api.NewRoutable(),
-		Allowlist: []string{"1.2.3.4", "0.0.0.0/0"},
+		Owner:        "test",
+		App:          "example-go",
+		Routable:     api.NewRoutable(),
+		Autorollback: api.NewAutorollback(),
+		Allowlist:    []string{"1.2.3.4", "0.0.0.0/0"},
 		Autoscale: map[string]*api.Autoscale{
 			"cmd": {
 				Min:        3,
@@ -133,8 +136,9 @@ func TestAppSettingsSet(t *testing.T) {
 	}
 
 	appSettingsVars := api.AppSettings{
-		Routable:  api.NewRoutable(),
-		Allowlist: []string{"1.2.3.4", "0.0.0.0/0"},
+		Routable:     api.NewRoutable(),
+		Autorollback: api.NewAutorollback(),
+		Allowlist:    []string{"1.2.3.4", "0.0.0.0/0"},
 		Autoscale: map[string]*api.Autoscale{
 			"cmd": {
 				Min:        3,
@@ -172,10 +176,11 @@ func TestAppSettingsUnset(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:     "test",
-		App:       "unset-test",
-		Routable:  api.NewRoutable(),
-		Allowlist: []string{"1.2.3.4", "0.0.0.0/0"},
+		Owner:        "test",
+		App:          "unset-test",
+		Routable:     api.NewRoutable(),
+		Autorollback: api.NewAutorollback(),
+		Allowlist:    []string{"1.2.3.4", "0.0.0.0/0"},
 		Autoscale: map[string]*api.Autoscale{
 			"cmd": {
 				Min:        3,
@@ -193,8 +198,9 @@ func TestAppSettingsUnset(t *testing.T) {
 	}
 
 	appSettingsVars := api.AppSettings{
-		Routable:  api.NewRoutable(),
-		Allowlist: []string{"1.2.3.4", "0.0.0.0/0"},
+		Routable:     api.NewRoutable(),
+		Autorollback: api.NewAutorollback(),
+		Allowlist:    []string{"1.2.3.4", "0.0.0.0/0"},
 		Autoscale: map[string]*api.Autoscale{
 			"cmd": {
 				Min:        3,
@@ -232,10 +238,11 @@ func TestAppSettingsList(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:     "test",
-		App:       "example-go",
-		Routable:  api.NewRoutable(),
-		Allowlist: []string{"1.2.3.4", "0.0.0.0/0"},
+		Owner:        "test",
+		App:          "example-go",
+		Routable:     api.NewRoutable(),
+		Autorollback: api.NewAutorollback(),
+		Allowlist:    []string{"1.2.3.4", "0.0.0.0/0"},
 		Autoscale: map[string]*api.Autoscale{
 			"cmd": {
 				Min:        3,

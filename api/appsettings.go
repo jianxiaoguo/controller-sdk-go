@@ -19,14 +19,21 @@ type AppSettings struct {
 	// It changes every time the application settings is changed and cannot be updated.
 	UUID string `json:"uuid,omitempty"`
 	// Routable determines if the application should be exposed by the router.
-	Routable  *bool                 `json:"routable,omitempty"`
-	Allowlist []string              `json:"allowlist,omitempty"`
-	Autoscale map[string]*Autoscale `json:"autoscale,omitempty"`
-	Label     Labels                `json:"label,omitempty"`
+	Routable     *bool                 `json:"routable,omitempty"`
+	Allowlist    []string              `json:"allowlist,omitempty"`
+	Autorollback *bool                 `json:"autorollback,omitempty"`
+	Autoscale    map[string]*Autoscale `json:"autoscale,omitempty"`
+	Label        Labels                `json:"label,omitempty"`
 }
 
 // NewRoutable returns a default value for the AppSettings.Routable field.
 func NewRoutable() *bool {
+	b := true
+	return &b
+}
+
+// NewAutorollback returns a default value for the AppSettings.Autorollback field.
+func NewAutorollback() *bool {
 	b := true
 	return &b
 }
