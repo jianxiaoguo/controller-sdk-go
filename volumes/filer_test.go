@@ -147,7 +147,12 @@ func TestVolumesPostFile(t *testing.T) {
 	}
 	defer file.Close()
 
-	if _, err := PostFile(drycc, "example-go", "myvolume", "tmp/", file.Name(), file); err != nil {
+	fileinfo, err := file.Stat()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if _, err := PostFile(drycc, "example-go", "myvolume", "tmp/", file.Name(), fileinfo.Size(), file); err != nil {
 		t.Fatal(err)
 	}
 
