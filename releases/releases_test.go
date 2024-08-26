@@ -48,6 +48,8 @@ const releaseFixture string = `
 }
 `
 
+const deployExpected string = `{"types":"web,task"}`
+
 const rollbackFixture string = `
 {"version": 5}
 `
@@ -70,6 +72,26 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/releases/v1/" && req.Method == "GET" {
 		res.Write([]byte(releaseFixture))
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/releases/deploy/" && req.Method == "POST" {
+		body, err := io.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != deployExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", deployExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusCreated)
 		return
 	}
 
@@ -191,6 +213,26 @@ func TestReleasesGet(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
+	}
+}
+
+func TestDeploy(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+	targets := map[string]string{"types": "web,task"}
+
+	err = Deploy(drycc, "example-go", targets)
+
+	if err != nil {
+		t.Fatal(err)
 	}
 }
 

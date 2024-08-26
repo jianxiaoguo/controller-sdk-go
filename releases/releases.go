@@ -45,6 +45,23 @@ func Get(c *drycc.Client, appID string, version int) (api.Release, error) {
 	return release, nil
 }
 
+// Deploy deploy an app's processes. To deploy all app processes, pass empty strings for
+// procType and name. To deploy an specific process, pass an procType by leave name empty.
+// To deploy a specific instance, pass a procType and a name.
+func Deploy(c *drycc.Client, appID string, targets map[string]string) error {
+	u := fmt.Sprintf("/v2/apps/%s/releases/deploy/", appID)
+	body, err := json.Marshal(targets)
+	if err != nil {
+		return err
+	}
+	res, err := c.Request("POST", u, body)
+	if err != nil && !drycc.IsErrAPIMismatch(err) {
+		return err
+	}
+	defer res.Body.Close()
+	return err
+}
+
 // Rollback rolls back an app to a previous release. If version is -1, this rolls back to
 // the previous release. Otherwise, roll back to the specified version.
 func Rollback(c *drycc.Client, appID string, version int) (int, error) {
