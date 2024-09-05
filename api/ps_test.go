@@ -35,8 +35,8 @@ func TestPodTypesSorted(t *testing.T) {
 	expectedPodTypes := []string{"clock", "web", "worker"}
 
 	for i, podType := range podTypes {
-		if expectedPodTypes[i] != podType.Type {
-			t.Errorf("Expected pod types to be sorted %v, Got %v at index %v", expectedPodTypes[i], podType.Type, i)
+		if expectedPodTypes[i] != podType.Ptype {
+			t.Errorf("Expected pod types to be sorted %v, Got %v at index %v", expectedPodTypes[i], podType.Ptype, i)
 		}
 	}
 }

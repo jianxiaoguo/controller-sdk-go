@@ -27,7 +27,7 @@ func ListPodEvents(c *drycc.Client, appID string, podName string, results int) (
 
 // List events of an app ptype.
 func ListPtypeEvents(c *drycc.Client, appID string, ptype string, results int) (api.AppEvents, int, error) {
-	u := fmt.Sprintf("/v2/apps/%s/events/?ptype_name=%s-%s", appID, appID, ptype)
+	u := fmt.Sprintf("/v2/apps/%s/events/?ptype=%s-%s", appID, appID, ptype)
 	body, count, reqErr := c.LimitedRequest(u, results)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.AppEvent{}, -1, reqErr

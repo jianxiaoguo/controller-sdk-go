@@ -10,8 +10,9 @@ import (
 )
 
 // List lists certificates added to drycc.
-func List(c *drycc.Client, results int) ([]api.Cert, int, error) {
-	body, count, reqErr := c.LimitedRequest("/v2/certs/", results)
+func List(c *drycc.Client, appID string, results int) ([]api.Cert, int, error) {
+	u := fmt.Sprintf("/v2/apps/%s/certs/", appID)
+	body, count, reqErr := c.LimitedRequest(u, results)
 
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return []api.Cert{}, -1, reqErr
@@ -29,14 +30,14 @@ func List(c *drycc.Client, results int) ([]api.Cert, int, error) {
 // Certificates are created independently from apps and are applied on a per domain basis.
 // So to enable SSL for an app with the domain test.com, you would first create the certificate,
 // then use the attach method to attach test.com to the certificate.
-func New(c *drycc.Client, cert string, key string, name string) (api.Cert, error) {
+func New(c *drycc.Client, appID string, cert string, key string, name string) (api.Cert, error) {
 	req := api.CertCreateRequest{Certificate: cert, Key: key, Name: name}
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return api.Cert{}, err
 	}
-
-	res, reqErr := c.Request("POST", "/v2/certs/", reqBody)
+	u := fmt.Sprintf("/v2/apps/%s/certs/", appID)
+	res, reqErr := c.Request("POST", u, reqBody)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
 		return api.Cert{}, reqErr
 	}
@@ -51,8 +52,8 @@ func New(c *drycc.Client, cert string, key string, name string) (api.Cert, error
 }
 
 // Get retrieves information about a certificate
-func Get(c *drycc.Client, name string) (api.Cert, error) {
-	url := fmt.Sprintf("/v2/certs/%s", name)
+func Get(c *drycc.Client, appID string, name string) (api.Cert, error) {
+	url := fmt.Sprintf("/v2/apps/%s/certs/%s", appID, name)
 	res, reqErr := c.Request("GET", url, nil)
 	if reqErr != nil {
 		return api.Cert{}, reqErr
@@ -68,8 +69,8 @@ func Get(c *drycc.Client, name string) (api.Cert, error) {
 }
 
 // Delete removes a certificate.
-func Delete(c *drycc.Client, name string) error {
-	url := fmt.Sprintf("/v2/certs/%s", name)
+func Delete(c *drycc.Client, appID string, name string) error {
+	url := fmt.Sprintf("/v2/apps/%s/certs/%s", appID, name)
 	res, err := c.Request("DELETE", url, nil)
 	if err == nil {
 		res.Body.Close()
@@ -78,14 +79,14 @@ func Delete(c *drycc.Client, name string) error {
 }
 
 // Attach adds a domain to a certificate.
-func Attach(c *drycc.Client, name string, domain string) error {
+func Attach(c *drycc.Client, appID string, name string, domain string) error {
 	req := api.CertAttachRequest{Domain: domain}
 	reqBody, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	url := fmt.Sprintf("/v2/certs/%s/domain/", name)
+	url := fmt.Sprintf("/v2/apps/%s/certs/%s/domain/", appID, name)
 	res, err := c.Request("POST", url, reqBody)
 	if err == nil {
 		res.Body.Close()
@@ -94,8 +95,8 @@ func Attach(c *drycc.Client, name string, domain string) error {
 }
 
 // Detach removes a domain from a certificate.
-func Detach(c *drycc.Client, name string, domain string) error {
-	url := fmt.Sprintf("/v2/certs/%s/domain/%s", name, domain)
+func Detach(c *drycc.Client, appID string, name string, domain string) error {
+	url := fmt.Sprintf("/v2/apps/%s/certs/%s/domain/%s", appID, name, domain)
 	res, err := c.Request("DELETE", url, nil)
 	if err == nil {
 		res.Body.Close()

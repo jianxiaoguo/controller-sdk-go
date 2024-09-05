@@ -28,10 +28,10 @@ func List(c *drycc.Client, appID string, results int) (api.Routes, int, error) {
 }
 
 // New adds a route to an app.
-func New(c *drycc.Client, appID string, name string, procType string, kind string, port int) error {
+func New(c *drycc.Client, appID string, name string, Ptype string, kind string, port int) error {
 	u := fmt.Sprintf("/v2/apps/%s/routes/", appID)
 
-	req := api.RouteCreateRequest{Name: name, Type: procType, Kind: kind, Port: port}
+	req := api.RouteCreateRequest{Name: name, Ptype: Ptype, Kind: kind, Port: port}
 
 	body, err := json.Marshal(req)
 

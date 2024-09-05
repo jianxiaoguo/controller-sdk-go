@@ -27,10 +27,10 @@ func List(c *drycc.Client, appID string, results int) (api.Domains, int, error) 
 }
 
 // New adds a domain to an app.
-func New(c *drycc.Client, appID, domain, procfileType string) (api.Domain, error) {
+func New(c *drycc.Client, appID, domain, Ptype string) (api.Domain, error) {
 	u := fmt.Sprintf("/v2/apps/%s/domains/", appID)
 
-	req := api.DomainCreateRequest{Domain: domain, ProcfileType: procfileType}
+	req := api.DomainCreateRequest{Domain: domain, Ptype: Ptype}
 
 	body, err := json.Marshal(req)
 

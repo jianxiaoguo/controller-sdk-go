@@ -46,13 +46,13 @@ func List(c *drycc.Client, appID string) (api.Services, error) {
 
 // New adds a new service to an app. App should already exists.
 // Service is the way to route some traffic matching given URL pattern to worker different than `web`
-// procfileType - name of the process in Procfile (i.e. <process type> from the `<process type>: <command>`), e.g. `webhooks`
+// Ptype - name of the process in Procfile (i.e. <process type> from the `<process type>: <command>`), e.g. `webhooks`
 // for more about Procfile see this https://devcenter.heroku.com/articles/procfile
-// procfileType and pathPattern are mandatory and should have valid values.
-func New(c *drycc.Client, appID string, procfileType string, port int, protocol string, targetPort int) error {
+// Ptype and pathPattern are mandatory and should have valid values.
+func New(c *drycc.Client, appID string, Ptype string, port int, protocol string, targetPort int) error {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
-	req := api.ServiceCreateUpdateRequest{ProcfileType: procfileType, Port: port, Protocol: protocol, TargetPort: targetPort}
+	req := api.ServiceCreateUpdateRequest{Ptype: Ptype, Port: port, Protocol: protocol, TargetPort: targetPort}
 
 	body, err := json.Marshal(req)
 
@@ -70,10 +70,10 @@ func New(c *drycc.Client, appID string, procfileType string, port int, protocol 
 
 // Delete service from app
 // If given service for the app doesn't exists then error returned
-func Delete(c *drycc.Client, appID string, procfileType string, protocol string, port int) error {
+func Delete(c *drycc.Client, appID string, Ptype string, protocol string, port int) error {
 	u := fmt.Sprintf("/v2/apps/%s/services/", appID)
 
-	req := api.ServiceDeleteRequest{ProcfileType: procfileType, Protocol: protocol, Port: port}
+	req := api.ServiceDeleteRequest{Ptype: Ptype, Protocol: protocol, Port: port}
 
 	body, err := json.Marshal(req)
 

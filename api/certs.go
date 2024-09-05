@@ -8,6 +8,7 @@ import "github.com/drycc/controller-sdk-go/pkg/time"
 type Cert struct {
 	Updated        string    `json:"updated,omitempty"`
 	Created        string    `json:"created,omitempty"`
+	App            string    `json:"app"`
 	Name           string    `json:"name"`
 	CommonName     string    `json:"common_name"`
 	Expires        time.Time `json:"expires"`

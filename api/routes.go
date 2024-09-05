@@ -14,7 +14,7 @@ type Route struct {
 	// It changes every time the application settings is changed and cannot be updated.
 	UUID       string      `json:"uuid,omitempty"`
 	Name       string      `json:"name,omitempty"`
-	Type       string      `json:"procfile_type,omitempty"`
+	Ptype      string      `json:"ptype,omitempty"`
 	Kind       string      `json:"kind,omitempty"`
 	Port       int         `json:"port,omitempty"`
 	ParentRefs []ParentRef `json:"parent_refs,omitempty"`
@@ -30,10 +30,10 @@ type Routes []Route
 
 // RouteCreateRequest is the structure of POST /v2/app/<app id>/routes/.
 type RouteCreateRequest struct {
-	Name string `json:"name,omitempty"`
-	Type string `json:"procfile_type,omitempty"`
-	Port int    `json:"port,omitempty"`
-	Kind string `json:"kind,omitempty"`
+	Name  string `json:"name,omitempty"`
+	Ptype string `json:"ptype,omitempty"`
+	Port  int    `json:"port,omitempty"`
+	Kind  string `json:"kind,omitempty"`
 }
 
 // RouteAttackRequest is the structure of PATCH /v2/apps/(?P<id>{})/routes/(?P<name>{})/attach/?$.
@@ -51,7 +51,7 @@ type RouteDetackRequest struct {
 // RouteRule is the structure of GET RESPONSE /v2/apps/(?P<id>{})/routes/(?P<name>{})/rules/?$.
 type RouteRule struct {
 	Name  string      `json:"name,omitempty"`
-	Type  string      `json:"procfile_type,omitempty"`
+	Ptype string      `json:"ptype,omitempty"`
 	Kind  string      `json:"kind,omitempty"`
 	Rules interface{} `json:"rules,omitempty"`
 }

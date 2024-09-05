@@ -274,7 +274,7 @@ func TestByType(t *testing.T) {
 
 	expected := api.PodTypes{
 		{
-			Type: "abc",
+			Ptype: "abc",
 			PodsList: api.PodsList{
 				{Type: "abc", Name: "1", Started: started},
 				{Type: "abc", Name: "2", Started: started},
@@ -282,7 +282,7 @@ func TestByType(t *testing.T) {
 			},
 		},
 		{
-			Type: "web",
+			Ptype: "web",
 			PodsList: api.PodsList{
 				{Type: "web", Name: "test1", Started: started},
 				{Type: "web", Name: "test2", Started: started},
@@ -290,7 +290,7 @@ func TestByType(t *testing.T) {
 			},
 		},
 		{
-			Type: "worker",
+			Ptype: "worker",
 			PodsList: api.PodsList{
 				{Type: "worker", Name: "a", Started: started},
 				{Type: "worker", Name: "b", Started: started},

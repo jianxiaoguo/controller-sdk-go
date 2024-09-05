@@ -17,7 +17,7 @@ const servicesFixture string = `
     "services": [
         {
             "domain": "example-go.example-go.svc.cluster.local",
-            "procfile_type": "web",
+            "ptype": "web",
             "ports": [
                 {
                     "name": "example-go-web-udp-5000",
@@ -35,7 +35,7 @@ const servicesFixture string = `
         },
         {
             "domain": "example-go-worker.example-go.svc.cluster.local",
-            "procfile_type": "worker",
+            "ptype": "worker",
             "ports": [
                 {
                     "name": "example-go-worker-tcp-5000",
@@ -48,8 +48,8 @@ const servicesFixture string = `
     ]
 }`
 
-const serviceCreateExpected string = `{"procfile_type":"web","port":5000,"protocol":"UDP","target_port":5000}`
-const serviceDeleteExpected string = `{"procfile_type":"web","port":5000,"protocol":"UDP"}`
+const serviceCreateExpected string = `{"ptype":"web","port":5000,"protocol":"UDP","target_port":5000}`
+const serviceDeleteExpected string = `{"ptype":"web","port":5000,"protocol":"UDP"}`
 
 type fakeHTTPServer struct{}
 
@@ -113,8 +113,8 @@ func TestServicesList(t *testing.T) {
 
 	expected := api.Services{
 		{
-			Domain:       "example-go.example-go.svc.cluster.local",
-			ProcfileType: "web",
+			Domain: "example-go.example-go.svc.cluster.local",
+			Ptype:  "web",
 			Ports: []api.Port{
 				{
 					Name:       "example-go-web-udp-5000",
@@ -131,8 +131,8 @@ func TestServicesList(t *testing.T) {
 			},
 		},
 		{
-			Domain:       "example-go-worker.example-go.svc.cluster.local",
-			ProcfileType: "worker",
+			Domain: "example-go-worker.example-go.svc.cluster.local",
+			Ptype:  "worker",
 			Ports: []api.Port{
 				{
 					Name:       "example-go-worker-tcp-5000",

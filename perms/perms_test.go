@@ -12,42 +12,29 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-const codenamesFixture string = `
-{
-	"results": [
-		{"codename": "use_app", "description": "Can use app"},
-		{"codename": "use_cert", "description": "Can use cert"}
-	],
-	"count": 2
-}`
-
 const listUserPermFixture string = `
 {
 	"results": [
-		{"id": 1, "codename": "use_app", "uniqueid": "autotest-app", "username": "foo"},
-		{"id": 2, "codename": "use_cert", "uniqueid": "autotest-cert-1", "username": "foo"}
+		{"app": "example-go", "username": "foo", "permissions": ["view", "change", "delete"]},
+		{"app": "example-go", "username": "bar", "permissions": ["view", "change", "delete"]}
 	],
 	"count": 2
 }`
 
-const createUserPermExpected = `{"codename":"use_app","uniqueid":"autotest","username":"foo"}`
+const createUserPermExpected = `{"username":"foo","permissions":"view,change,delete"}`
+const updateUserPermExpected = `{"username":"foo","permissions":"view"}`
 
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
-	if req.URL.Path == "/v2/perms/codes/" && req.Method == "GET" {
-		res.Write([]byte(codenamesFixture))
-		return
-	}
-
-	if req.URL.Path == "/v2/perms/rules/" && req.Method == "GET" {
+	if req.URL.Path == "/v2/apps/example-go/perms/" && req.Method == "GET" {
 		res.Write([]byte(listUserPermFixture))
 		return
 	}
 
-	if req.URL.Path == "/v2/perms/rules/" && req.Method == "POST" {
+	if req.URL.Path == "/v2/apps/example-go/perms/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
 
 		if err != nil {
@@ -68,7 +55,28 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if req.URL.Path == "/v2/perms/rules/1/" && req.Method == "DELETE" {
+	if req.URL.Path == "/v2/apps/example-go/perms/foo/" && req.Method == "PUT" {
+		body, err := io.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != updateUserPermExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", updateUserPermExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusCreated)
+		res.Write(nil)
+		return
+	}
+
+	if req.URL.Path == "/v2/apps/example-go/perms/foo/" && req.Method == "DELETE" {
 		res.WriteHeader(http.StatusNoContent)
 		res.Write(nil)
 		return
@@ -79,40 +87,12 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Write(nil)
 }
 
-func TestNames(t *testing.T) {
-	t.Parallel()
-
-	expected := []api.PermCodeResponse{
-		{Codename: "use_app", Description: "Can use app"},
-		{Codename: "use_cert", Description: "Can use cert"},
-	}
-
-	handler := fakeHTTPServer{}
-	server := httptest.NewServer(handler)
-	defer server.Close()
-
-	drycc, err := drycc.New(false, server.URL, "abc")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	actual, _, err := Codes(drycc, 300)
-
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if !reflect.DeepEqual(expected, actual) {
-		t.Errorf("Expected %v, Got %v", expected, actual)
-	}
-}
-
 func TestList(t *testing.T) {
 	t.Parallel()
 
 	expected := []api.UserPermResponse{
-		{ID: 1, Codename: "use_app", Uniqueid: "autotest-app", Username: "foo"},
-		{ID: 2, Codename: "use_cert", Uniqueid: "autotest-cert-1", Username: "foo"},
+		{App: "example-go", Username: "foo", Permissions: []string{"view", "change", "delete"}},
+		{App: "example-go", Username: "bar", Permissions: []string{"view", "change", "delete"}},
 	}
 
 	handler := fakeHTTPServer{}
@@ -124,7 +104,7 @@ func TestList(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(drycc, "", 300)
+	actual, _, err := List(drycc, "example-go", 300)
 
 	if err != nil {
 		t.Fatal(err)
@@ -147,7 +127,24 @@ func TestCreate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = Create(drycc, "use_app", "autotest", "foo"); err != nil {
+	if err = Create(drycc, "example-go", "foo", "view,change,delete"); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if err = Update(drycc, "example-go", "foo", "view"); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -164,7 +161,7 @@ func TestDelete(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if err = Delete(drycc, "1"); err != nil {
+	if err = Delete(drycc, "example-go", "foo"); err != nil {
 		t.Fatal(err)
 	}
 }

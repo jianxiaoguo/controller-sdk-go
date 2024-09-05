@@ -20,12 +20,19 @@ const releasesFixture string = `
     "results": [
         {
             "app": "example-go",
-			"state": "succeed",
+            "state": "succeed",
             "build": null,
             "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
             "created": "2014-01-01T00:00:00UTC",
             "owner": "test",
             "summary": "test created initial release",
+            "exception": null,
+            "conditions": [{
+                "state":   "succeed",
+                "action":  "pipeline",
+                "ptypes":  ["web"],
+                "created": "2024-08-27T08:31:36Z"
+            }],
             "updated": "2014-01-01T00:00:00UTC",
             "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
             "version": 1
@@ -37,11 +44,18 @@ const releaseFixture string = `
 {
     "app": "example-go",
     "build": null,
-	"state": "succeed",
+    "state": "succeed",
     "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
     "created": "2014-01-01T00:00:00UTC",
     "owner": "test",
     "summary": "test created initial release",
+    "exception": null,
+    "conditions": [{
+        "state":   "succeed",
+        "action":  "pipeline",
+        "ptypes":  ["web"],
+        "created": "2024-08-27T08:31:36Z"
+    }],
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
     "version": 1
@@ -51,13 +65,13 @@ const releaseFixture string = `
 const deployExpected string = `{"types":"web,task"}`
 
 const rollbackFixture string = `
-{"version": 5}
+{"ptypes":"web,task", "version": 5}
 `
 const rollbackerFixture string = `
-{"version": 7}
+{"ptypes":"web,task", "version": 7}
 `
 
-const rollbackExpected string = `{"version":2}`
+const rollbackExpected string = `{"version":2,"ptypes":"web,task"}`
 const rollbackerExpected string = ``
 
 type fakeHTTPServer struct{}
@@ -147,13 +161,22 @@ func TestReleasesList(t *testing.T) {
 
 	expected := []api.Release{
 		{
-			App:     "example-go",
-			Build:   "",
-			State:   "succeed",
-			Config:  "95bd6dea-1685-4f78-a03d-fd7270b058d1",
-			Created: "2014-01-01T00:00:00UTC",
-			Owner:   "test",
-			Summary: "test created initial release",
+			App:       "example-go",
+			Build:     "",
+			State:     "succeed",
+			Config:    "95bd6dea-1685-4f78-a03d-fd7270b058d1",
+			Created:   "2014-01-01T00:00:00UTC",
+			Owner:     "test",
+			Summary:   "test created initial release",
+			Exception: "",
+			Conditions: []api.Condition{
+				{
+					State:   "succeed",
+					Action:  "pipeline",
+					Ptypes:  []string{"web"},
+					Created: "2024-08-27T08:31:36Z",
+				},
+			},
 			Updated: "2014-01-01T00:00:00UTC",
 			UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 			Version: 1,
@@ -184,13 +207,22 @@ func TestReleasesGet(t *testing.T) {
 	t.Parallel()
 
 	expected := api.Release{
-		App:     "example-go",
-		State:   "succeed",
-		Build:   "",
-		Config:  "95bd6dea-1685-4f78-a03d-fd7270b058d1",
-		Created: "2014-01-01T00:00:00UTC",
-		Owner:   "test",
-		Summary: "test created initial release",
+		App:       "example-go",
+		State:     "succeed",
+		Build:     "",
+		Config:    "95bd6dea-1685-4f78-a03d-fd7270b058d1",
+		Created:   "2014-01-01T00:00:00UTC",
+		Owner:     "test",
+		Summary:   "test created initial release",
+		Exception: "",
+		Conditions: []api.Condition{
+			{
+				State:   "succeed",
+				Action:  "pipeline",
+				Ptypes:  []string{"web"},
+				Created: "2024-08-27T08:31:36Z",
+			},
+		},
 		Updated: "2014-01-01T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 		Version: 1,
@@ -227,7 +259,7 @@ func TestDeploy(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	targets := map[string]string{"types": "web,task"}
+	targets := map[string]interface{}{"types": "web,task"}
 
 	err = Deploy(drycc, "example-go", targets)
 
@@ -250,7 +282,7 @@ func TestRollback(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Rollback(drycc, "example-go", 2)
+	actual, err := Rollback(drycc, "example-go", "web,task", 2)
 
 	if err != nil {
 		t.Fatal(err)
@@ -275,7 +307,7 @@ func TestRollbacker(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, err := Rollback(drycc, "rollbacker", -1)
+	actual, err := Rollback(drycc, "rollbacker", "web,task", -1)
 
 	if err != nil {
 		t.Fatal(err)

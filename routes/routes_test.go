@@ -24,9 +24,9 @@ const routesFixture string = `
             "owner": "test",
             "updated": "2023-04-19T00:00:00UTC",
             "name": "example-go",
-            "procfile_type": "web",
+            "ptype": "web",
             "kind": "HTTPRoute",
-			"port": 80,
+            "port": 80,
             "parent_refs": [
                 {
                     "name": "example-go",
@@ -52,7 +52,7 @@ const routerulesFixture string = `
 
 const routerulesSetFixture string = `"[{\"backendRefs\": [{\"kind\": \"Service\",\"name\": \"py3django3\",\"port\": 80}]}]"`
 
-const routeCreateExpected string = `{"name":"example-go","procfile_type":"web","port":80,"kind":"HTTPRoute"}`
+const routeCreateExpected string = `{"name":"example-go","ptype":"web","port":80,"kind":"HTTPRoute"}`
 
 const routeRulesSetExpected string = `[{"backendRefs": [{"kind": "Service","name": "py3django3","port": 80}]}]`
 
@@ -171,7 +171,7 @@ func TestRoutesList(t *testing.T) {
 			Name:    "example-go",
 			Owner:   "test",
 			Updated: "2023-04-19T00:00:00UTC",
-			Type:    "web",
+			Ptype:   "web",
 			Kind:    "HTTPRoute",
 			Port:    80,
 			ParentRefs: []api.ParentRef{

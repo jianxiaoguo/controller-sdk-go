@@ -21,6 +21,7 @@ type AppSettings struct {
 	// Routable determines if the application should be exposed by the router.
 	Routable     *bool                 `json:"routable,omitempty"`
 	Allowlist    []string              `json:"allowlist,omitempty"`
+	Autodeploy   *bool                 `json:"autodeploy,omitempty"`
 	Autorollback *bool                 `json:"autorollback,omitempty"`
 	Autoscale    map[string]*Autoscale `json:"autoscale,omitempty"`
 	Label        Labels                `json:"label,omitempty"`
@@ -28,6 +29,12 @@ type AppSettings struct {
 
 // NewRoutable returns a default value for the AppSettings.Routable field.
 func NewRoutable() *bool {
+	b := true
+	return &b
+}
+
+// NewAutodeploy returns a default value for the AppSettings.NewAutodeploy field.
+func NewAutodeploy() *bool {
 	b := true
 	return &b
 }

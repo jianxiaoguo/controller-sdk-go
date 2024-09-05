@@ -124,7 +124,7 @@ func ByType(processes api.PodsList) api.PodTypes {
 		exists := false
 		// Is processtype for process already exists, append to it.
 		for i, pt := range pts {
-			if pt.Type == process.Type {
+			if pt.Ptype == process.Type {
 				exists = true
 				pts[i].PodsList = append(pts[i].PodsList, process)
 				break
@@ -134,7 +134,7 @@ func ByType(processes api.PodsList) api.PodTypes {
 		// Is processtype for process doesn't exist, create a new one
 		if !exists {
 			pts = append(pts, api.PodType{
-				Type:     process.Type,
+				Ptype:    process.Type,
 				PodsList: api.PodsList{process},
 			})
 		}

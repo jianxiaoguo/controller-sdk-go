@@ -33,7 +33,7 @@ type Command struct {
 
 // PodType holds pods of the same type.
 type PodType struct {
-	Type     string
+	Ptype    string
 	PodsList PodsList
 }
 
@@ -54,7 +54,7 @@ type Types struct {
 
 func (p PodTypes) Len() int           { return len(p) }
 func (p PodTypes) Swap(i, j int)      { p[i], p[j] = p[j], p[i] }
-func (p PodTypes) Less(i, j int) bool { return p[i].Type < p[j].Type }
+func (p PodTypes) Less(i, j int) bool { return p[i].Ptype < p[j].Ptype }
 
 // ContainerState defines a container state.
 type ContainerState struct {
