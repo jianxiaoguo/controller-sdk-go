@@ -38,27 +38,17 @@ func (f *fakeFilerServer) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 			res.Write([]byte(`{"results":[], "count": 0}`))
 			return
 		} else if req.Method == "POST" {
-			if err := req.ParseMultipartForm(1024 * 1024); err != nil {
-				http.Error(res, fmt.Sprintf("Parse multipart form error: %v", err), http.StatusBadRequest)
-				return
+			body, err := io.ReadAll(req.Body)
+			if err != nil {
+				fmt.Println(err)
+				res.WriteHeader(http.StatusInternalServerError)
+				res.Write(nil)
 			}
-			for _, tmpFiles := range req.MultipartForm.File {
-				for _, tmpFile := range tmpFiles {
-					srcFile, err := tmpFile.Open()
-					if err != nil {
-						return
-					}
-					body, err := io.ReadAll(srcFile)
-					if err != nil {
-						return
-					}
-					if string(body) != volumeFileContentExpected {
-						fmt.Printf("Expected '%s', Got '%s'\n", volumeFileContentExpected, body)
-						res.WriteHeader(http.StatusInternalServerError)
-						res.Write(nil)
-						return
-					}
-				}
+			if string(body) != volumeFileContentExpected {
+				fmt.Printf("Expected '%s', Got '%s'\n", volumeFileContentExpected, body)
+				res.WriteHeader(http.StatusInternalServerError)
+				res.Write(nil)
+				return
 			}
 			return
 		}

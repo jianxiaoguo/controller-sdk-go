@@ -2,14 +2,11 @@
 package volumes
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
-	"mime/multipart"
 	"net/http"
 	"net/url"
-	"strings"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
@@ -45,29 +42,14 @@ func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, err
 
 // Put file to an app's volume.
 func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, size int64, reader io.Reader) (*http.Response, error) {
-
-	buffer := new(bytes.Buffer)
-	writer := multipart.NewWriter(buffer)
-	if err := writer.WriteField("path", volumePath); err != nil {
-		return nil, err
-	}
-	if _, err := writer.CreateFormFile("file", name); err != nil {
-		return nil, err
-	}
-	size += int64(buffer.Len())
-	head := strings.NewReader(buffer.String())
-	buffer.Reset()
-	writer.Close()
-	bottom := strings.NewReader(buffer.String())
-	size += int64(buffer.Len())
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/client/", appID, volumeID)
-
-	r, err := c.NewRequest("POST", u, io.MultiReader(head, reader, bottom))
+	r, err := c.NewRequest("POST", u, reader)
 	if err != nil {
 		return nil, err
 	}
 	r.ContentLength = size
-	r.Header.Add("Content-Type", writer.FormDataContentType())
+	r.Header.Add("Content-Type", "filer/octet-stream")
+	r.Header.Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"; filepath="%s"`, name, volumePath))
 	return c.Do(r)
 }
 
