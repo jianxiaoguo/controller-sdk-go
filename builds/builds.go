@@ -9,55 +9,31 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-// List lists an app's builds.
-func List(c *drycc.Client, appID string, results int) ([]api.Build, int, error) {
-	u := fmt.Sprintf("/v2/apps/%s/builds/", appID)
-	body, count, reqErr := c.LimitedRequest(u, results)
+// Get a build of an app.
+func Get(c *drycc.Client, appID string, version int) (api.Build, error) {
+	u := fmt.Sprintf("/v2/apps/%s/build/", appID)
+	if version > 0 {
+		u = fmt.Sprintf("%s?version=v%d", u, version)
+	}
 
+	res, reqErr := c.Request("GET", u, nil)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
-		return []api.Build{}, -1, reqErr
+		return api.Build{}, reqErr
 	}
+	defer res.Body.Close()
 
-	var builds []api.Build
-	if err := json.Unmarshal([]byte(body), &builds); err != nil {
-		return []api.Build{}, -1, err
+	var build api.Build
+	if err := json.NewDecoder(res.Body).Decode(&build); err != nil {
+		return api.Build{}, err
 	}
-
-	return builds, count, reqErr
+	return build, reqErr
 }
 
-// New creates a build for an app from an container image.
-// By default this will create a cmd process that runs the CMD command from the Dockerfile.
-// If you want to define more process types, you can pass a Procfile map,
-// where the key is the process name and the value is the command for that process.
-// To pull from a private container registry, a custom username and password must be set in the app's
-// configuration object. This can be done with `drycc registry:set` or by using this SDK.
-//
-// This example adds custom registry credentials to an app:
-//
-//	import (
-//		"github.com/drycc/controller-sdk-go/api"
-//		"github.com/drycc/controller-sdk-go/config"
-//	)
-//
-//	// Create username/password map
-//	registryMap := map[string]string{
-//		"username": "password"
-//	}
-//
-//	// Create a new configuration, assign the credentials, and set it.
-//	// Note that config setting is a patching operation, it doesn't overwrite or unset
-//	// unrelated configuration.
-//	newConfig := api.Config{}
-//	newConfig.Registry = registryMap
-//	_, err := config.Set(<client>, "appname", newConfig)
-//	if err != nil {
-//	    log.Fatal(err)
-//	}
+// New a build of an app.
 func New(c *drycc.Client, appID string, image string, stack string,
 	procfile map[string]string, dryccfile map[string]interface{}) (api.Build, error) {
 
-	u := fmt.Sprintf("/v2/apps/%s/builds/", appID)
+	u := fmt.Sprintf("/v2/apps/%s/build/", appID)
 
 	req := api.CreateBuildRequest{
 		Image:     image,
