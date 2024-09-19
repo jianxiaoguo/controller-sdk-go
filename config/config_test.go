@@ -12,13 +12,44 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-const configFixture string = `
+const configFixtureV1 string = `
 {
     "owner": "test",
     "app": "example-go",
     "values": {
       "TEST": "testing",
       "FOO": "bar"
+    },
+    "typed_values": {
+		"web": {
+		  "PORT": "9000"
+		}
+	},
+	"limits": {
+	  "web": "std1.xlarge.c1m1"
+	},
+    "tags": {
+	  "web": {
+        "test": "tests"
+	  }
+    },
+    "registry": {
+      "username": "bob"
+    },
+    "created": "2014-01-01T00:00:00UTC",
+    "updated": "2014-01-01T00:00:00UTC",
+    "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
+}
+`
+
+const configFixtureV2 string = `
+{
+    "owner": "test",
+    "app": "example-go",
+    "values": {
+      "TEST": "testing",
+      "FOO": "bar",
+	  "VERSION": "2"
     },
     "typed_values": {
 		"web": {
@@ -82,7 +113,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		}
 
 		res.WriteHeader(http.StatusCreated)
-		res.Write([]byte(configFixture))
+		res.Write([]byte(configFixtureV1))
 		return
 	}
 
@@ -108,7 +139,12 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 
 	if req.URL.Path == "/v2/apps/example-go/config/" && req.Method == "GET" {
-		res.Write([]byte(configFixture))
+
+		if req.URL.RawQuery == "version=v2" {
+			res.Write([]byte(configFixtureV2))
+		} else {
+			res.Write([]byte(configFixtureV1))
+		}
 		return
 	}
 
@@ -280,7 +316,7 @@ func TestConfigList(t *testing.T) {
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
-	actual, err := List(drycc, "example-go")
+	actual, err := List(drycc, "example-go", -1)
 
 	if err != nil {
 		t.Error(err)
@@ -288,5 +324,17 @@ func TestConfigList(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Expected %v, Got %v", expected, actual)
+	}
+
+	actual, err = List(drycc, "example-go", 2)
+	if err != nil {
+		t.Error(err)
+	}
+	if version, ok := actual.Values["VERSION"]; ok {
+		if !reflect.DeepEqual(version, "2") {
+			t.Errorf("Expected %v, Got %v", "2", version)
+		}
+	} else {
+		t.Errorf("version not found %v", actual)
 	}
 }

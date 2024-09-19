@@ -10,8 +10,11 @@ import (
 )
 
 // List lists an app's config.
-func List(c *drycc.Client, app string) (api.Config, error) {
+func List(c *drycc.Client, app string, version int) (api.Config, error) {
 	u := fmt.Sprintf("/v2/apps/%s/config/", app)
+	if version > 0 {
+		u = fmt.Sprintf("%s?version=v%d", u, version)
+	}
 
 	res, reqErr := c.Request("GET", u, nil)
 	if reqErr != nil {
