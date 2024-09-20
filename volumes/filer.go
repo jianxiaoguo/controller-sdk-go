@@ -49,7 +49,12 @@ func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, size in
 	}
 	r.ContentLength = size
 	r.Header.Add("Content-Type", "filer/octet-stream")
-	r.Header.Add("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"; filepath="%s"`, name, volumePath))
+	disposition := fmt.Sprintf(
+		`attachment;filename*=utf-8''%s;filepath*=utf-8''%s`,
+		url.QueryEscape(name),
+		url.QueryEscape(volumePath),
+	)
+	r.Header.Add("Content-Disposition", disposition)
 	return c.Do(r)
 }
 
