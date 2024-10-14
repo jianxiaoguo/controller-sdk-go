@@ -2,6 +2,7 @@ package api
 
 // Service is the structure of the service object.
 type Service struct {
+	Name   string `json:"name"`
 	Domain string `json:"domain"`
 	Ptype  string `json:"ptype"`
 	Ports  []Port `json:"ports"`

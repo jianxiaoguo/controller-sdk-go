@@ -16,6 +16,7 @@ const servicesFixture string = `
 {
     "services": [
         {
+			"name": "example-go",
             "domain": "example-go.example-go.svc.cluster.local",
             "ptype": "web",
             "ports": [
@@ -34,6 +35,7 @@ const servicesFixture string = `
             ]
         },
         {
+			"name": "example-go-worker",
             "domain": "example-go-worker.example-go.svc.cluster.local",
             "ptype": "worker",
             "ports": [
@@ -113,6 +115,7 @@ func TestServicesList(t *testing.T) {
 
 	expected := api.Services{
 		{
+			Name:   "example-go",
 			Domain: "example-go.example-go.svc.cluster.local",
 			Ptype:  "web",
 			Ports: []api.Port{
@@ -131,6 +134,7 @@ func TestServicesList(t *testing.T) {
 			},
 		},
 		{
+			Name:   "example-go-worker",
 			Domain: "example-go-worker.example-go.svc.cluster.local",
 			Ptype:  "worker",
 			Ports: []api.Port{

@@ -14,10 +14,9 @@ type Route struct {
 	// It changes every time the application settings is changed and cannot be updated.
 	UUID       string      `json:"uuid,omitempty"`
 	Name       string      `json:"name,omitempty"`
-	Ptype      string      `json:"ptype,omitempty"`
 	Kind       string      `json:"kind,omitempty"`
-	Port       int         `json:"port,omitempty"`
 	ParentRefs []ParentRef `json:"parent_refs,omitempty"`
+	Rules      []RouteRule `json:"rules,omitempty"`
 }
 
 type ParentRef struct {
@@ -25,33 +24,38 @@ type ParentRef struct {
 	Port int    `json:"port,omitempty"`
 }
 
-// // Routes defines a collection of Route objects.
+type RouteRule map[string]interface{}
+
+// Routes defines a collection of Route objects.
 type Routes []Route
 
-// RouteCreateRequest is the structure of POST /v2/app/<app id>/routes/.
+// RouteCreateRequest is the structure of POST /v2/app/<app_id>/routes/.
+
 type RouteCreateRequest struct {
-	Name  string `json:"name,omitempty"`
-	Ptype string `json:"ptype,omitempty"`
-	Port  int    `json:"port,omitempty"`
-	Kind  string `json:"kind,omitempty"`
+	Name  string             `json:"name,omitempty"`
+	Kind  string             `json:"kind,omitempty"`
+	Rules []RequestRouteRule `json:"rules,omitempty"`
 }
 
-// RouteAttackRequest is the structure of PATCH /v2/apps/(?P<id>{})/routes/(?P<name>{})/attach/?$.
-type RouteAttackRequest struct {
+type BackendRefRequest struct {
+	Kind   string `json:"kind,omitempty"`
+	Name   string `json:"name,omitempty"`
+	Port   int32  `json:"port,omitempty"`
+	Weight int32  `json:"weight,omitempty"`
+}
+
+type RequestRouteRule struct {
+	BackendRefs []BackendRefRequest `json:"backendRefs,omitempty"`
+}
+
+// RouteAttachRequest is the structure of PATCH /v2/apps/(?P<id>{})/routes/(?P<name>{})/attach/?$.
+type RouteAttachRequest struct {
 	Port    int    `json:"port,omitempty"`
 	Gateway string `json:"gateway,omitempty"`
 }
 
-// RouteDetackRequest is the structure of PATCH /v2/apps/(?P<id>{})/routes/(?P<name>{})/detach/?$.
-type RouteDetackRequest struct {
+// RouteDetachRequest is the structure of PATCH /v2/apps/(?P<id>{})/routes/(?P<name>{})/detach/?$.
+type RouteDetachRequest struct {
 	Port    int    `json:"port,omitempty"`
 	Gateway string `json:"gateway,omitempty"`
-}
-
-// RouteRule is the structure of GET RESPONSE /v2/apps/(?P<id>{})/routes/(?P<name>{})/rules/?$.
-type RouteRule struct {
-	Name  string      `json:"name,omitempty"`
-	Ptype string      `json:"ptype,omitempty"`
-	Kind  string      `json:"kind,omitempty"`
-	Rules interface{} `json:"rules,omitempty"`
 }

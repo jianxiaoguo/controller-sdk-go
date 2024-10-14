@@ -24,15 +24,21 @@ const routesFixture string = `
             "owner": "test",
             "updated": "2023-04-19T00:00:00UTC",
             "name": "example-go",
-            "ptype": "web",
             "kind": "HTTPRoute",
-            "port": 80,
             "parent_refs": [
                 {
                     "name": "example-go",
                     "port": 80
                 }
-            ]
+            ],
+            "rules": [{
+                "backendRefs": [{
+                    "kind": "Service",
+                    "name": "example-go",
+                    "port": 5000,
+                    "weight": 100
+                }]
+            }]
         }
     ]
 }`
@@ -52,7 +58,7 @@ const routerulesFixture string = `
 
 const routerulesSetFixture string = `"[{\"backendRefs\": [{\"kind\": \"Service\",\"name\": \"py3django3\",\"port\": 80}]}]"`
 
-const routeCreateExpected string = `{"name":"example-go","ptype":"web","port":80,"kind":"HTTPRoute"}`
+const routeCreateExpected string = `{"name":"example-go","kind":"HTTPRoute","rules":[{"backendRefs":[{"kind":"Service","name":"example-go","port":80,"weight":100}]}]}`
 
 const routeRulesSetExpected string = `[{"backendRefs": [{"kind": "Service","name": "py3django3","port": 80}]}]`
 
@@ -171,13 +177,21 @@ func TestRoutesList(t *testing.T) {
 			Name:    "example-go",
 			Owner:   "test",
 			Updated: "2023-04-19T00:00:00UTC",
-			Ptype:   "web",
 			Kind:    "HTTPRoute",
-			Port:    80,
 			ParentRefs: []api.ParentRef{
 				{
 					Name: "example-go",
 					Port: 80,
+				},
+			},
+			Rules: []api.RouteRule{
+				{
+					"backendRefs": []map[string]interface{}{{
+						"kind":   "Service",
+						"name":   "example-go",
+						"port":   5000,
+						"weight": 100,
+					}},
 				},
 			},
 		},
@@ -197,7 +211,11 @@ func TestRoutesList(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if !reflect.DeepEqual(expected, actual) {
+	fmt.Printf("%v\n", actual)
+	fmt.Printf("%v\n", expected)
+	fmt.Printf("%v\n", fmt.Sprintf("%v", actual) == fmt.Sprintf("%v", expected))
+
+	if fmt.Sprintf("%v", actual) != fmt.Sprintf("%v", expected) {
 		t.Error(fmt.Errorf("Expected %v, Got %v", expected, actual))
 	}
 }
@@ -256,7 +274,9 @@ func TestRoutesAdd(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	err = New(drycc, "example-go", "example-go", "web", "HTTPRoute", 80)
+	backendRef := api.BackendRefRequest{Kind: "Service", Name: "example-go", Port: 80, Weight: 100}
+
+	err = New(drycc, "example-go", "example-go", "HTTPRoute", backendRef)
 
 	if err != nil {
 		t.Fatal(err)

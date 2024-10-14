@@ -28,10 +28,14 @@ func List(c *drycc.Client, appID string, results int) (api.Routes, int, error) {
 }
 
 // New adds a route to an app.
-func New(c *drycc.Client, appID string, name string, Ptype string, kind string, port int) error {
+func New(c *drycc.Client, appID, name, kind string, backendRefs ...api.BackendRefRequest) error {
 	u := fmt.Sprintf("/v2/apps/%s/routes/", appID)
 
-	req := api.RouteCreateRequest{Name: name, Ptype: Ptype, Kind: kind, Port: port}
+	req := api.RouteCreateRequest{
+		Name:  name,
+		Kind:  kind,
+		Rules: []api.RequestRouteRule{{BackendRefs: backendRefs}},
+	}
 
 	body, err := json.Marshal(req)
 
@@ -51,7 +55,7 @@ func New(c *drycc.Client, appID string, name string, Ptype string, kind string, 
 func AttachGateway(c *drycc.Client, appID string, name string, port int, gateway string) error {
 	u := fmt.Sprintf("/v2/apps/%s/routes/%s/attach/", appID, name)
 
-	req := api.RouteAttackRequest{Port: port, Gateway: gateway}
+	req := api.RouteAttachRequest{Port: port, Gateway: gateway}
 
 	body, err := json.Marshal(req)
 
@@ -72,7 +76,7 @@ func AttachGateway(c *drycc.Client, appID string, name string, port int, gateway
 func DetachGateway(c *drycc.Client, appID string, name string, port int, gateway string) error {
 	u := fmt.Sprintf("/v2/apps/%s/routes/%s/detach/", appID, name)
 
-	req := api.RouteDetackRequest{Port: port, Gateway: gateway}
+	req := api.RouteDetachRequest{Port: port, Gateway: gateway}
 
 	body, err := json.Marshal(req)
 
