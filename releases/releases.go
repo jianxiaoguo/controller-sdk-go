@@ -10,8 +10,11 @@ import (
 )
 
 // List lists an app's releases.
-func List(c *drycc.Client, appID string, results int) ([]api.Release, int, error) {
+func List(c *drycc.Client, appID, ptypes string, results int) ([]api.Release, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/releases/", appID)
+	if ptypes != "" {
+		u += fmt.Sprintf("?ptypes=%s", ptypes)
+	}
 
 	body, count, reqErr := c.LimitedRequest(u, results)
 

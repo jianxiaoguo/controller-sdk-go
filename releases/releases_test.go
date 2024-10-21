@@ -192,7 +192,7 @@ func TestReleasesList(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	actual, _, err := List(drycc, "example-go", 100)
+	actual, _, err := List(drycc, "example-go", "", 100)
 
 	if err != nil {
 		t.Fatal(err)
