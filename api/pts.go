@@ -8,6 +8,7 @@ type Ptype struct {
 	UpToDate          int    `json:"up_to_date"`
 	AvailableReplicas int    `json:"available_replicas"`
 	Started           string `json:"started"`
+	Garbage           bool   `json:"garbage"`
 }
 
 // Ptypes defines a collection of app Ptypes.

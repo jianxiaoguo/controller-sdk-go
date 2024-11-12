@@ -22,10 +22,15 @@ const configFixture string = `
 {
 	"owner": "test",
 	"app": "example-go",
-	"values": {
-		"TEST": "testing",
-		"FOO": "bar"
-	},
+	"values":[{
+		"name":  "TEST",
+		"value": "testing"
+	  },
+	  {
+		"name":  "FOO",
+		"value": "bar"
+	  }
+	],
 	"Limits": {
 		"web": "std1.xlarge.c1m1"
 	},
@@ -35,7 +40,9 @@ const configFixture string = `
 		}
 	},
 	"registry": {
-		"username": "bob"
+		"web": {
+			"username": "bob"
+		}
 	},
 	"created": "2014-01-01T00:00:00UTC",
 	"updated": "2014-01-01T00:00:00UTC",
@@ -157,9 +164,15 @@ func TestConfigHook(t *testing.T) {
 	expected := api.Config{
 		Owner: "test",
 		App:   "example-go",
-		Values: map[string]interface{}{
-			"TEST": "testing",
-			"FOO":  "bar",
+		Values: []api.ConfigValue{
+			{
+				Name:  "TEST",
+				Value: "testing",
+			},
+			{
+				Name:  "FOO",
+				Value: "bar",
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -170,7 +183,9 @@ func TestConfigHook(t *testing.T) {
 			},
 		},
 		Registry: map[string]interface{}{
-			"username": "bob",
+			"web": map[string]interface{}{
+				"username": "bob",
+			},
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",

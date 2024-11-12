@@ -7,9 +7,9 @@ import (
 
 func TestPtypesSorted(t *testing.T) {
 	ptypes := Ptypes{
-		{"web", "v1", "1/1", 1, 1, ""},
-		{"cronjob", "v1", "1/1", 1, 1, ""},
-		{"sleep", "v1", "1/1", 1, 1, ""},
+		{"web", "v1", "1/1", 1, 1, "", false},
+		{"cronjob", "v1", "1/1", 1, 1, "", false},
+		{"sleep", "v1", "1/1", 1, 1, "", false},
 	}
 
 	sort.Sort(ptypes)
