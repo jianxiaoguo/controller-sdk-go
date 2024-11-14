@@ -28,8 +28,8 @@ type PtypeValue struct {
 }
 
 type ConfigInfo struct {
-	Ptype PtypeValue      `json:"ptype,omitempty"`
-	Group map[string][]KV `json:"group,omitempty"`
+	Ptype map[string]PtypeValue `json:"ptype,omitempty"`
+	Group map[string][]KV       `json:"group,omitempty"`
 }
 
 // ValuesRefs is the key, value for refs
