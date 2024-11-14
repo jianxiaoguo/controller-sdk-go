@@ -211,14 +211,18 @@ func TestConfigSet(t *testing.T) {
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{
-				Name:  "NEW_URL2",
-				Value: "http://localhost:8080/",
 				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
 			},
 			{
-				Name:  "NEW_URL",
-				Value: "http://localhost:8080",
 				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
 			},
 		},
 		Limits: map[string]interface{}{
@@ -229,8 +233,8 @@ func TestConfigSet(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"web": map[string]interface{}{
+		Registry: map[string]map[string]interface{}{
+			"web": {
 				"username": "bob",
 			},
 		},
@@ -242,14 +246,18 @@ func TestConfigSet(t *testing.T) {
 	configVars := api.Config{
 		Values: []api.ConfigValue{
 			{
-				Name:  "NEW_URL2",
-				Value: "http://localhost:8080/",
 				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
 			},
 			{
-				Name:  "NEW_URL",
-				Value: "http://localhost:8080",
 				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
 			},
 		},
 		Limits: map[string]interface{}{
@@ -260,8 +268,8 @@ func TestConfigSet(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"web": map[string]interface{}{
+		Registry: map[string]map[string]interface{}{
+			"web": {
 				"username": "bob",
 			},
 		},
@@ -296,7 +304,7 @@ func TestConfigUnset(t *testing.T) {
 		Values:   []api.ConfigValue{},
 		Limits:   map[string]interface{}{},
 		Tags:     map[string]api.ConfigTags{},
-		Registry: map[string]interface{}{},
+		Registry: map[string]map[string]interface{}{},
 		Created:  "2014-01-01T00:00:00UTC",
 		Updated:  "2014-01-01T00:00:00UTC",
 		UUID:     "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
@@ -305,9 +313,11 @@ func TestConfigUnset(t *testing.T) {
 	configVars := api.Config{
 		Values: []api.ConfigValue{
 			{
-				Name:  "TEST",
-				Value: "",
 				Group: "global",
+				KV: api.KV{
+					Name:  "TEST",
+					Value: "",
+				},
 			},
 		},
 		Limits: map[string]interface{}{
@@ -316,8 +326,8 @@ func TestConfigUnset(t *testing.T) {
 		Tags: map[string]api.ConfigTags{
 			"web": {"test": nil},
 		},
-		Registry: map[string]interface{}{
-			"web": map[string]interface{}{
+		Registry: map[string]map[string]interface{}{
+			"web": {
 				"username": nil,
 			},
 		},
@@ -351,14 +361,18 @@ func TestConfigList(t *testing.T) {
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{
-				Name:  "NEW_URL2",
-				Value: "http://localhost:8080/",
 				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
 			},
 			{
-				Name:  "NEW_URL",
-				Value: "http://localhost:8080",
 				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
 			},
 		},
 		Limits: map[string]interface{}{
@@ -367,8 +381,8 @@ func TestConfigList(t *testing.T) {
 		Tags: map[string]api.ConfigTags{
 			"web": {"test": "tests"},
 		},
-		Registry: map[string]interface{}{
-			"web": map[string]interface{}{
+		Registry: map[string]map[string]interface{}{
+			"web": {
 				"username": "bob",
 			},
 		},
@@ -424,7 +438,7 @@ func TestConfigRefs(t *testing.T) {
 		},
 		Limits:   map[string]interface{}{},
 		Tags:     map[string]api.ConfigTags{},
-		Registry: map[string]interface{}{},
+		Registry: map[string]map[string]interface{}{},
 		Created:  "2014-01-01T00:00:00UTC",
 		Updated:  "2014-01-01T00:00:00UTC",
 		UUID:     "de1bf5b5-4a72-4f94-a10c-d2a3741cdf76",

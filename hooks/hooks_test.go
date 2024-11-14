@@ -166,12 +166,16 @@ func TestConfigHook(t *testing.T) {
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{
-				Name:  "TEST",
-				Value: "testing",
+				KV: api.KV{
+					Name:  "TEST",
+					Value: "testing",
+				},
 			},
 			{
-				Name:  "FOO",
-				Value: "bar",
+				KV: api.KV{
+					Name:  "FOO",
+					Value: "bar",
+				},
 			},
 		},
 		Limits: map[string]interface{}{
@@ -182,8 +186,8 @@ func TestConfigHook(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"web": map[string]interface{}{
+		Registry: map[string]map[string]interface{}{
+			"web": {
 				"username": "bob",
 			},
 		},
