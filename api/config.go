@@ -11,12 +11,25 @@ type ConfigTags map[string]interface{}
 
 // ConfigValues is the key, value for env
 // type ConfigValues []map[string]interface{}
-
-type ConfigValue struct {
-	Ptype string      `json:"ptype,omitempty"`
-	Group string      `json:"group,omitempty"`
+type KV struct {
 	Name  string      `json:"name,omitempty"`
 	Value interface{} `json:"value,omitempty"`
+}
+
+type ConfigValue struct {
+	Ptype string `json:"ptype,omitempty"`
+	Group string `json:"group,omitempty"`
+	KV
+}
+
+type PtypeValue struct {
+	Env map[string][]KV `json:"env,omitempty"`
+	Ref []string        `json:"ref,omitempty"`
+}
+
+type ConfigInfo struct {
+	Ptype PtypeValue      `json:"ptype,omitempty"`
+	Group map[string][]KV `json:"group,omitempty"`
 }
 
 // ValuesRefs is the key, value for refs

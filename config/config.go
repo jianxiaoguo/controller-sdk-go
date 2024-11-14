@@ -63,3 +63,23 @@ func Set(c *drycc.Client, app string, config api.Config) (api.Config, error) {
 
 	return newConfig, reqErr
 }
+
+// Detach config groups from app ptype.
+func Detach(c *drycc.Client, app string, config api.Config) error {
+	fmt.Printf("%#v", config)
+	body, err := json.Marshal(config)
+
+	if err != nil {
+		return err
+	}
+
+	u := fmt.Sprintf("/v2/apps/%s/config/", app)
+
+	res, reqErr := c.Request("DELETE", u, body)
+	if reqErr != nil {
+		return reqErr
+	}
+	defer res.Body.Close()
+
+	return reqErr
+}
