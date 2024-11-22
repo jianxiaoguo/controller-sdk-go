@@ -16,25 +16,29 @@ const configFixtureV1 string = `
 {
     "owner": "test",
     "app": "example-go",
-    "values": {
-      "TEST": "testing",
-      "FOO": "bar"
+    "values": [{
+        "name": "NEW_URL2", 
+        "value": "http://localhost:8080/", 
+        "group": "global"
+      },
+      {
+        "name": "NEW_URL", 
+        "value": "http://localhost:8080", 
+        "ptype": "web"
+      }
+    ],
+    "limits": {
+      "web": "std1.xlarge.c1m1"
     },
-    "typed_values": {
-		"web": {
-		  "PORT": "9000"
-		}
-	},
-	"limits": {
-	  "web": "std1.xlarge.c1m1"
-	},
     "tags": {
-	  "web": {
+      "web": {
         "test": "tests"
-	  }
+      }
     },
     "registry": {
-      "username": "bob"
+      "web": {
+        "username": "bob"
+      }
     },
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
@@ -46,16 +50,16 @@ const configFixtureV2 string = `
 {
     "owner": "test",
     "app": "example-go",
-    "values": {
-      "TEST": "testing",
-      "FOO": "bar",
-	  "VERSION": "2"
-    },
-    "typed_values": {
-		"web": {
-		  "PORT": "9000"
-		}
+    "values": [{
+		"name":  "NEW_URL2",
+		"value": "http://localhost:8080/",
+		"group": "global"
 	},
+	{
+		"name":  "NEW_URL",
+		"value": "http://localhost:8080",
+		"ptype": "web"
+	}],
 	"limits": {
 	  "web": "std1.xlarge.c1m1"
 	},
@@ -65,7 +69,9 @@ const configFixtureV2 string = `
 	  }
     },
     "registry": {
-      "username": "bob"
+      "web": {
+        "username": "bob"
+      }
     },
     "created": "2014-01-01T00:00:00UTC",
     "updated": "2014-01-01T00:00:00UTC",
@@ -77,8 +83,7 @@ const configUnsetFixture string = `
 {
     "owner": "test",
     "app": "unset-test",
-    "values": {},
-	"typed_values": {"web":{"PORT":null}},
+    "values": [],
     "limits": {},
     "tags": {},
 	"registry": {},
@@ -87,9 +92,24 @@ const configUnsetFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
+const configSetRefsFixture string = `
+{
+    "owner": "test",
+    "app": "setrefs-test",
+    "values": [],
+	"values_refs":{"web":["myconfig1"]},
+    "limits": {},
+    "tags": {},
+	"registry": {},
+    "created": "2014-01-01T00:00:00UTC",
+    "updated": "2014-01-01T00:00:00UTC",
+    "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf76"
+}
+`
 
-const configSetExpected string = `{"values":{"FOO":"bar","TEST":"testing"},"typed_values":{"web":{"PORT":"9000"}},"limits":{"web":"std1.xlarge.c1m1"},"tags":{"web":{"test":"tests"}},"registry":{"username":"bob"}}`
-const configUnsetExpected string = `{"values":{"FOO":null,"TEST":null},"typed_values":{"web":{"PORT":null}},"limits":{"web":null},"tags":{"web":{"test":null}},"registry":{"username":null}}`
+const configSetExpected string = `{"values":[{"group":"global","name":"NEW_URL2","value":"http://localhost:8080/"},{"ptype":"web","name":"NEW_URL","value":"http://localhost:8080"}],"limits":{"web":"std1.xlarge.c1m1"},"tags":{"web":{"test":"tests"}},"registry":{"web":{"username":"bob"}}}`
+const configUnsetExpected string = `{"values":[{"group":"global","name":"TEST","value":""}],"limits":{"web":null},"tags":{"web":{"test":null}},"registry":{"web":{"username":null}}}`
+const configSetRefsExpected string = `{"values_refs":{"web":["myconfig1"]}}`
 
 type fakeHTTPServer struct{}
 
@@ -138,6 +158,27 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if req.URL.Path == "/v2/apps/setrefs-test/config/" && req.Method == "POST" {
+		body, err := io.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+
+		if string(body) != configSetRefsExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", configSetRefsExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+
+		res.WriteHeader(http.StatusCreated)
+		res.Write([]byte(configSetRefsFixture))
+		return
+	}
+
 	if req.URL.Path == "/v2/apps/example-go/config/" && req.Method == "GET" {
 
 		if req.URL.RawQuery == "version=v2" {
@@ -168,12 +209,21 @@ func TestConfigSet(t *testing.T) {
 	expected := api.Config{
 		Owner: "test",
 		App:   "example-go",
-		Values: api.ConfigValues{
-			"TEST": "testing",
-			"FOO":  "bar",
-		},
-		TypedValues: map[string]api.ConfigValues{
-			"web": {"PORT": "9000"},
+		Values: []api.ConfigValue{
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
+			},
+			{
+				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -183,8 +233,10 @@ func TestConfigSet(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"username": "bob",
+		Registry: map[string]map[string]interface{}{
+			"web": {
+				"username": "bob",
+			},
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",
@@ -192,12 +244,21 @@ func TestConfigSet(t *testing.T) {
 	}
 
 	configVars := api.Config{
-		Values: api.ConfigValues{
-			"TEST": "testing",
-			"FOO":  "bar",
-		},
-		TypedValues: map[string]api.ConfigValues{
-			"web": {"PORT": "9000"},
+		Values: []api.ConfigValue{
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
+			},
+			{
+				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -207,8 +268,10 @@ func TestConfigSet(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"username": "bob",
+		Registry: map[string]map[string]interface{}{
+			"web": {
+				"username": "bob",
+			},
 		},
 	}
 
@@ -236,27 +299,26 @@ func TestConfigUnset(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner:  "test",
-		App:    "unset-test",
-		Values: map[string]interface{}{},
-		TypedValues: map[string]api.ConfigValues{
-			"web": {"PORT": nil},
-		},
+		Owner:    "test",
+		App:      "unset-test",
+		Values:   []api.ConfigValue{},
 		Limits:   map[string]interface{}{},
 		Tags:     map[string]api.ConfigTags{},
-		Registry: map[string]interface{}{},
+		Registry: map[string]map[string]interface{}{},
 		Created:  "2014-01-01T00:00:00UTC",
 		Updated:  "2014-01-01T00:00:00UTC",
 		UUID:     "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
 
 	configVars := api.Config{
-		Values: map[string]interface{}{
-			"TEST": nil,
-			"FOO":  nil,
-		},
-		TypedValues: map[string]api.ConfigValues{
-			"web": {"PORT": nil},
+		Values: []api.ConfigValue{
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "TEST",
+					Value: "",
+				},
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": nil,
@@ -264,8 +326,10 @@ func TestConfigUnset(t *testing.T) {
 		Tags: map[string]api.ConfigTags{
 			"web": {"test": nil},
 		},
-		Registry: map[string]interface{}{
-			"username": nil,
+		Registry: map[string]map[string]interface{}{
+			"web": {
+				"username": nil,
+			},
 		},
 	}
 
@@ -295,12 +359,21 @@ func TestConfigList(t *testing.T) {
 	expected := api.Config{
 		Owner: "test",
 		App:   "example-go",
-		Values: map[string]interface{}{
-			"TEST": "testing",
-			"FOO":  "bar",
-		},
-		TypedValues: map[string]api.ConfigValues{
-			"web": {"PORT": "9000"},
+		Values: []api.ConfigValue{
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "NEW_URL2",
+					Value: "http://localhost:8080/",
+				},
+			},
+			{
+				Ptype: "web",
+				KV: api.KV{
+					Name:  "NEW_URL",
+					Value: "http://localhost:8080",
+				},
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -308,8 +381,10 @@ func TestConfigList(t *testing.T) {
 		Tags: map[string]api.ConfigTags{
 			"web": {"test": "tests"},
 		},
-		Registry: map[string]interface{}{
-			"username": "bob",
+		Registry: map[string]map[string]interface{}{
+			"web": {
+				"username": "bob",
+			},
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",
@@ -330,11 +405,60 @@ func TestConfigList(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	if version, ok := actual.Values["VERSION"]; ok {
-		if !reflect.DeepEqual(version, "2") {
-			t.Errorf("Expected %v, Got %v", "2", version)
+	url := actual.Values[0].Value
+	if url != "" {
+		if !reflect.DeepEqual(url, "http://localhost:8080/") {
+			t.Errorf("Expected %v, Got %v", "http://localhost:8080/", url)
 		}
 	} else {
 		t.Errorf("version not found %v", actual)
+	}
+}
+
+func TestConfigRefs(t *testing.T) {
+	t.Parallel()
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	expected := api.Config{
+		Owner:  "test",
+		App:    "setrefs-test",
+		Values: []api.ConfigValue{},
+		ValuesRefs: map[string][]string{
+			"web": {
+				"myconfig1",
+			},
+		},
+		Limits:   map[string]interface{}{},
+		Tags:     map[string]api.ConfigTags{},
+		Registry: map[string]map[string]interface{}{},
+		Created:  "2014-01-01T00:00:00UTC",
+		Updated:  "2014-01-01T00:00:00UTC",
+		UUID:     "de1bf5b5-4a72-4f94-a10c-d2a3741cdf76",
+	}
+
+	configVars := api.Config{
+		ValuesRefs: map[string][]string{
+			"web": {
+				"myconfig1",
+			},
+		},
+	}
+
+	actual, err := Set(drycc, "setrefs-test", configVars)
+
+	if err != nil {
+		t.Error(err)
+	}
+
+	if !reflect.DeepEqual(expected, actual) {
+		t.Errorf("Expected %v, Got %v", expected, actual)
 	}
 }

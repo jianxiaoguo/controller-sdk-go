@@ -22,10 +22,17 @@ const configFixture string = `
 {
 	"owner": "test",
 	"app": "example-go",
-	"values": {
-		"TEST": "testing",
-		"FOO": "bar"
-	},
+	"values":[{
+		"group": "global",
+		"name":  "TEST",
+		"value": "testing"
+	  },
+	  {
+		"group": "global",
+		"name":  "FOO",
+		"value": "bar"
+	  }
+	],
 	"Limits": {
 		"web": "std1.xlarge.c1m1"
 	},
@@ -35,7 +42,9 @@ const configFixture string = `
 		}
 	},
 	"registry": {
-		"username": "bob"
+		"web": {
+			"username": "bob"
+		}
 	},
 	"created": "2014-01-01T00:00:00UTC",
 	"updated": "2014-01-01T00:00:00UTC",
@@ -157,9 +166,21 @@ func TestConfigHook(t *testing.T) {
 	expected := api.Config{
 		Owner: "test",
 		App:   "example-go",
-		Values: map[string]interface{}{
-			"TEST": "testing",
-			"FOO":  "bar",
+		Values: []api.ConfigValue{
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "TEST",
+					Value: "testing",
+				},
+			},
+			{
+				Group: "global",
+				KV: api.KV{
+					Name:  "FOO",
+					Value: "bar",
+				},
+			},
 		},
 		Limits: map[string]interface{}{
 			"web": "std1.xlarge.c1m1",
@@ -169,8 +190,10 @@ func TestConfigHook(t *testing.T) {
 				"test": "tests",
 			},
 		},
-		Registry: map[string]interface{}{
-			"username": "bob",
+		Registry: map[string]map[string]interface{}{
+			"web": {
+				"username": "bob",
+			},
 		},
 		Created: "2014-01-01T00:00:00UTC",
 		Updated: "2014-01-01T00:00:00UTC",

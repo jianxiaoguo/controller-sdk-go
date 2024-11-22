@@ -78,6 +78,21 @@ func Restart(c *drycc.Client, appID string, targets map[string]string) error {
 	return err
 }
 
+// Clean clean an app's processes.
+func Clean(c *drycc.Client, appID string, targets map[string]string) error {
+	u := fmt.Sprintf("/v2/apps/%s/ptypes/clean/", appID)
+	body, err := json.Marshal(targets)
+	if err != nil {
+		return err
+	}
+	res, err := c.Request("POST", u, body)
+	if err != nil && !drycc.IsErrAPIMismatch(err) {
+		return err
+	}
+	defer res.Body.Close()
+	return err
+}
+
 // ByType organizes process types of an app by process type.
 func ByType(ptypes api.Ptypes) api.Ptypes {
 	// Sort ProcessTypes alphabetically by process types name

@@ -67,6 +67,8 @@ const scaleExpected string = `{"web":2}`
 
 const restartExpected string = `{"types":"web,worker"}`
 
+const cleanExpected string = `{"types":"task,worker"}`
+
 type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
@@ -119,6 +121,25 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		res.Write(nil)
 		return
 	}
+
+	if req.URL.Path == "/v2/apps/example-go/ptypes/clean/" && req.Method == "POST" {
+		body, err := io.ReadAll(req.Body)
+
+		if err != nil {
+			fmt.Println(err)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+		}
+		if string(body) != cleanExpected {
+			fmt.Printf("Expected '%s', Got '%s'\n", cleanExpected, body)
+			res.WriteHeader(http.StatusInternalServerError)
+			res.Write(nil)
+			return
+		}
+		res.WriteHeader(http.StatusNoContent)
+		return
+	}
+
 	fmt.Printf("Unrecognized URL %s\n", req.URL)
 	res.WriteHeader(http.StatusNotFound)
 	res.Write(nil)
@@ -245,5 +266,28 @@ func TestScale(t *testing.T) {
 
 	if err = Scale(drycc, "example-go", map[string]int{"web": 2}); err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestAppsClean(t *testing.T) {
+	t.Parallel()
+
+	types := map[string]string{
+		"types": "task,worker",
+	}
+
+	handler := fakeHTTPServer{}
+	server := httptest.NewServer(&handler)
+	defer server.Close()
+
+	drycc, err := drycc.New(false, server.URL, "abc")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = Clean(drycc, "example-go", types)
+
+	if err != nil {
+		t.Error(err)
 	}
 }

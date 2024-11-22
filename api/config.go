@@ -9,19 +9,39 @@ import (
 // ConfigTags is the key, value for tag
 type ConfigTags map[string]interface{}
 
-// ConfigValues is the key, value for env
-type ConfigValues map[string]interface{}
+// ConfigValues value for env
+type KV struct {
+	Name  string      `json:"name,omitempty"`
+	Value interface{} `json:"value,omitempty"`
+}
+
+type ConfigValue struct {
+	Ptype string `json:"ptype,omitempty"`
+	Group string `json:"group,omitempty"`
+	KV
+}
+
+type PtypeValue struct {
+	Env []KV     `json:"env,omitempty"`
+	Ref []string `json:"ref,omitempty"`
+}
+
+type ConfigInfo struct {
+	Ptype map[string]PtypeValue `json:"ptype,omitempty"`
+	Group map[string][]KV       `json:"group,omitempty"`
+}
+
+// ValuesRefs is the key, value for refs
+type ValuesRefs map[string][]string
 
 // ConfigSet is the definition of POST /v2/apps/<app id>/config/.
 type ConfigSet struct {
-	Values      ConfigValues            `json:"values"`
-	TypedValues map[string]ConfigValues `json:"typed_values"`
+	Values []ConfigValue `json:"values"`
 }
 
 // ConfigUnset is the definition of POST /v2/apps/<app id>/config/.
 type ConfigUnset struct {
-	Values      ConfigValues            `json:"values"`
-	TypedValues map[string]ConfigValues `json:"typed_values"`
+	Values []ConfigValue `json:"values"`
 }
 
 // Config is the structure of an app's config.
@@ -31,9 +51,9 @@ type Config struct {
 	// App is the app name. It cannot be updated at all right now.
 	App string `json:"app,omitempty"`
 	// Values are exposed as environment variables to the app.
-	Values ConfigValues `json:"values,omitempty"`
+	Values []ConfigValue `json:"values,omitempty"`
 	// Typed values are exposed as environment variables to the app.
-	TypedValues map[string]ConfigValues `json:"typed_values,omitempty"`
+	ValuesRefs ValuesRefs `json:"values_refs,omitempty"`
 	// Limits is used to set process resources limits. The key is the process name
 	// and the value is a limit plan. Ex: std1.xlarge.c1m1
 	Limits map[string]interface{} `json:"limits,omitempty"`
@@ -46,7 +66,7 @@ type Config struct {
 	Tags map[string]ConfigTags `json:"tags,omitempty"`
 	// Registry is a key-value pair to provide authentication for container registries.
 	// The key is the username and the value is the password.
-	Registry map[string]interface{} `json:"registry,omitempty"`
+	Registry map[string]map[string]interface{} `json:"registry,omitempty"`
 	// Created is the time that the application was created and cannot be updated.
 	Created string `json:"created,omitempty"`
 	// Updated is the last time the configuration was changed and cannot be updated.
