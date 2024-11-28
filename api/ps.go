@@ -45,6 +45,7 @@ type PodLogsRequest struct {
 	Lines     int    `json:"lines"`
 	Follow    bool   `json:"follow"`
 	Container string `json:"container"`
+	Previous  bool   `json:"previous"`
 }
 
 // Start is the definition of POST /v2/apps/<app_id>/stop or POST /v2/apps/<app_id>/start.
