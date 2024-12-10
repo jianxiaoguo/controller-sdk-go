@@ -212,14 +212,14 @@ func TestConfigSet(t *testing.T) {
 		Values: []api.ConfigValue{
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL2",
 					Value: "http://localhost:8080/",
 				},
 			},
 			{
 				Ptype: "web",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL",
 					Value: "http://localhost:8080",
 				},
@@ -247,14 +247,14 @@ func TestConfigSet(t *testing.T) {
 		Values: []api.ConfigValue{
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL2",
 					Value: "http://localhost:8080/",
 				},
 			},
 			{
 				Ptype: "web",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL",
 					Value: "http://localhost:8080",
 				},
@@ -314,7 +314,7 @@ func TestConfigUnset(t *testing.T) {
 		Values: []api.ConfigValue{
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "TEST",
 					Value: "",
 				},
@@ -362,14 +362,14 @@ func TestConfigList(t *testing.T) {
 		Values: []api.ConfigValue{
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL2",
 					Value: "http://localhost:8080/",
 				},
 			},
 			{
 				Ptype: "web",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "NEW_URL",
 					Value: "http://localhost:8080",
 				},

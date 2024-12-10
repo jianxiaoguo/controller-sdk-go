@@ -169,14 +169,14 @@ func TestConfigHook(t *testing.T) {
 		Values: []api.ConfigValue{
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "TEST",
 					Value: "testing",
 				},
 			},
 			{
 				Group: "global",
-				KV: api.KV{
+				ConfigVar: api.ConfigVar{
 					Name:  "FOO",
 					Value: "bar",
 				},

@@ -10,25 +10,25 @@ import (
 type ConfigTags map[string]interface{}
 
 // ConfigValues value for env
-type KV struct {
-	Name  string      `json:"name,omitempty"`
-	Value interface{} `json:"value,omitempty"`
+type ConfigVar struct {
+	Name  string      `json:"name"`
+	Value interface{} `json:"value"`
 }
 
 type ConfigValue struct {
 	Ptype string `json:"ptype,omitempty"`
 	Group string `json:"group,omitempty"`
-	KV
+	ConfigVar
 }
 
 type PtypeValue struct {
-	Env []KV     `json:"env,omitempty"`
-	Ref []string `json:"ref,omitempty"`
+	Env []ConfigVar `json:"env,omitempty"`
+	Ref []string    `json:"ref,omitempty"`
 }
 
 type ConfigInfo struct {
-	Ptype map[string]PtypeValue `json:"ptype,omitempty"`
-	Group map[string][]KV       `json:"group,omitempty"`
+	Ptype map[string]PtypeValue  `json:"ptype,omitempty"`
+	Group map[string][]ConfigVar `json:"group,omitempty"`
 }
 
 // ValuesRefs is the key, value for refs
