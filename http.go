@@ -55,7 +55,7 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	setControllerVersion(c, res.Header)
 
 	// Return results along with api compatibility error
-	return res, checkAPICompatibility(apiVersion, APIVersion)
+	return res, CheckAPICompatibility(apiVersion, APIVersion)
 }
 
 // NewRequest wraps [NewRequestWithContext] using [context.Background].
@@ -143,7 +143,7 @@ your drycc version is correct.`
 	c.ControllerAPIVersion = apiVersion
 	setControllerVersion(c, res.Header)
 
-	return checkAPICompatibility(apiVersion, APIVersion)
+	return CheckAPICompatibility(apiVersion, APIVersion)
 }
 
 // Healthcheck can be called to see if the controller is healthy
@@ -177,7 +177,7 @@ func (c *Client) Healthcheck() error {
 	c.ControllerAPIVersion = apiVersion
 	setControllerVersion(c, res.Header)
 
-	return checkAPICompatibility(apiVersion, APIVersion)
+	return CheckAPICompatibility(apiVersion, APIVersion)
 }
 
 func addUserAgent(headers *http.Header, userAgent string) {
