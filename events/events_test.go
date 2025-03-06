@@ -43,11 +43,11 @@ type fakeHTTPServer struct{}
 
 func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
-	if req.URL.Path == "/v2/apps/example-go/events/" && req.Method == "GET" && req.URL.RawQuery == "ptype=example-go-web" {
+	if req.URL.Path == "/v2/apps/example-go/events/" && req.Method == "GET" && req.URL.RawQuery == "ptype=example-go-web&limit=100" {
 		res.Write([]byte(ptypeEventsFixture))
 		return
 	}
-	if req.URL.Path == "/v2/apps/example-go/events/" && req.Method == "GET" && req.URL.RawQuery == "pod_name=example-go-web-6b44dbd6c8-h89cg" {
+	if req.URL.Path == "/v2/apps/example-go/events/" && req.Method == "GET" && req.URL.RawQuery == "pod_name=example-go-web-6b44dbd6c8-h89cg&limit=100" {
 		res.Write([]byte(podEventsFixture))
 		return
 	}

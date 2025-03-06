@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"strconv"
 	"strings"
 )
@@ -85,7 +86,19 @@ func (c *Client) Request(method string, path string, body []byte) (*http.Respons
 
 // LimitedRequest allows limiting the number of responses in a request.
 func (c *Client) LimitedRequest(path string, results int) (string, int, error) {
-	res, reqErr := c.Request("GET", path+"?limit="+strconv.Itoa(results), nil)
+	var query string
+	u, err := url.Parse(path)
+	if err != nil {
+		return "", -1, err
+	}
+
+	if len(u.Query()) > 0 {
+		query = "&limit=" + strconv.Itoa(results)
+	} else {
+		query = "?limit=" + strconv.Itoa(results)
+	}
+
+	res, reqErr := c.Request("GET", path+query, nil)
 
 	if reqErr != nil && !IsErrAPIMismatch(reqErr) {
 		return "", -1, reqErr
