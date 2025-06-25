@@ -3,23 +3,11 @@ package apps
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"net/http"
-	"net/url"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"golang.org/x/net/websocket"
 )
-
-// ErrNoLogs is returned when logs are missing from an app.
-var ErrNoLogs = errors.New(
-	`There are currently no log messages. Please check the following things:
-1) Logger and fluentd pods are running: kubectl --namespace=drycc get pods.
-2) The application is writing logs to the logger component by checking that an entry in the ring buffer was created: kubectl --namespace=drycc logs <logger pod>
-3) Making sure that the container logs were mounted properly into the fluentd pod: kubectl --namespace=drycc exec <fluentd pod> ls /var/log/containers
-3a) If the above command returns saying /var/log/containers cannot be found then please see the following github issue for a workaround: https://github.com/drycc/logger/issues/50`)
 
 // List lists apps on a Drycc controller.
 func List(c *drycc.Client, results int) (api.Apps, int, error) {
@@ -85,36 +73,6 @@ func Get(c *drycc.Client, appID string) (api.App, error) {
 	}
 
 	return app, reqErr
-}
-
-// Logs retrieves logs from an app. The number of log lines fetched can be set by the lines
-// argument. Setting lines = -1 will retrieve all app logs.
-func Logs(c *drycc.Client, appID string, request api.AppLogsRequest) (*websocket.Conn, error) {
-	scheme := "ws"
-	if c.ControllerURL.Scheme == "https" {
-		scheme = "wss"
-	}
-	path := fmt.Sprintf("v2/apps/%s/logs", appID)
-	endpoint := url.URL{Scheme: scheme, Host: c.ControllerURL.Host, Path: path}
-
-	config, err := websocket.NewConfig(endpoint.String(), c.ControllerURL.String())
-	if err != nil {
-		return nil, err
-	}
-	config.Header = http.Header{
-		"User-Agent":          {c.UserAgent},
-		"Authorization":       {"token " + c.Token},
-		"X-Drycc-Service-Key": {c.ServiceKey},
-	}
-	conn, err := websocket.DialConfig(config)
-	if err != nil {
-		return nil, err
-	}
-	err = websocket.JSON.Send(conn, request)
-	if err != nil {
-		return nil, err
-	}
-	return conn, nil
 }
 
 // Run a one-time command in your app. This will start a kubernetes job with the

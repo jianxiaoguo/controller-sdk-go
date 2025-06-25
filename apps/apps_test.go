@@ -3,16 +3,13 @@ package apps
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"net/http/httptest"
 	"reflect"
-	"sync"
 	"testing"
 
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
-	"golang.org/x/net/websocket"
 )
 
 const appFixture string = `
@@ -271,44 +268,6 @@ func TestAppsList(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, actual) {
 		t.Errorf("Expected %v, Got %v", expected, actual)
-	}
-}
-
-func TestAppsLogs(t *testing.T) {
-	t.Parallel()
-	var once sync.Once
-	var addr string
-	once.Do(func() {
-		http.Handle(
-			"/v2/apps/example-go/logs",
-			websocket.Handler(func(conn *websocket.Conn) {
-				io.Copy(conn, conn)
-			}),
-		)
-		server := httptest.NewServer(nil)
-		addr = server.Listener.Addr().String()
-		log.Print("Test WebSocket server listening on ", addr)
-	})
-	drycc, err := drycc.New(false, addr, "abc")
-	if err != nil {
-		t.Fatal(err)
-	}
-	expected := api.AppLogsRequest{
-		Lines:   1,
-		Follow:  false,
-		Timeout: 300,
-	}
-	conn, err := Logs(drycc, "example-go", expected)
-	if err != nil {
-		t.Fatal(err)
-	}
-	var actual api.AppLogsRequest
-	err = websocket.JSON.Receive(conn, &actual)
-	if err != nil {
-		t.Fatal(err)
-	}
-	if !reflect.DeepEqual(actual, expected) {
-		t.Errorf("Expected: %v, Got %v", expected, actual)
 	}
 }
 
