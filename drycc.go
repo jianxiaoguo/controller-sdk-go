@@ -82,10 +82,10 @@ type Client struct {
 	// Token is used to authenticate the request against the API.
 	Token string
 
-	// HooksToken is the controller token used with the hooks resource.
+	// ServiceKey is the controller token used with the hooks resource.
 	// The hooks resource isn't intended to be used by users, so it requires
 	// a service token rather than a user token.
-	HooksToken string
+	ServiceKey string
 }
 
 // APIVersion is the api version compatible with the SDK.

@@ -102,9 +102,9 @@ func Logs(c *drycc.Client, appID string, request api.AppLogsRequest) (*websocket
 		return nil, err
 	}
 	config.Header = http.Header{
-		"User-Agent":           {c.UserAgent},
-		"Authorization":        {"token " + c.Token},
-		"X-Drycc-Builder-Auth": {c.HooksToken},
+		"User-Agent":          {c.UserAgent},
+		"Authorization":       {"token " + c.Token},
+		"X-Drycc-Service-Key": {c.ServiceKey},
 	}
 	conn, err := websocket.DialConfig(config)
 	if err != nil {

@@ -30,8 +30,8 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 		req.Header.Add("Authorization", "token "+c.Token)
 	}
 
-	if c.HooksToken != "" {
-		req.Header.Add("X-Drycc-Builder-Auth", c.HooksToken)
+	if c.ServiceKey != "" {
+		req.Header.Add("X-Drycc-Service-Key", c.ServiceKey)
 	}
 	if req.Header.Get("Content-Type") == "" {
 		req.Header.Add("Content-Type", "application/json")

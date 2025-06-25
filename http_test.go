@@ -69,8 +69,8 @@ func (f fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		}
 
 		bT := "testing"
-		if req.Header.Get("X-Drycc-Builder-Auth") != bT {
-			fmt.Printf("Hook Token Wrong: Expected %s, Got %s\n", bT, req.Header.Get("X-Drycc-Builder-Auth"))
+		if req.Header.Get("X-Drycc-Service-Key") != bT {
+			fmt.Printf("Hook Token Wrong: Expected %s, Got %s\n", bT, req.Header.Get("X-Drycc-Service-Key"))
 			res.WriteHeader(http.StatusInternalServerError)
 			res.Write(nil)
 			return
@@ -161,7 +161,7 @@ func TestBasicRequest(t *testing.T) {
 		t.Fatal(err)
 	}
 	drycc.UserAgent = "test"
-	drycc.HooksToken = "testing"
+	drycc.ServiceKey = "testing"
 
 	res, err := drycc.Request("POST", "/request/", []byte("test"))
 	if err != nil {
