@@ -117,8 +117,10 @@ const volumeUnmountFixture string = `
 }
 `
 
-const volumeMountExpected string = `{"path":{"cmd":"/data/cmd1","web":"/data/web1"}}`
-const volumeUnmountExpected string = `{"path":{"cmd":null,"web":null}}`
+const (
+	volumeMountExpected   string = `{"path":{"cmd":"/data/cmd1","web":"/data/web1"}}`
+	volumeUnmountExpected string = `{"path":{"cmd":null,"web":null}}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -128,7 +130,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Create
 	if req.URL.Path == "/v2/apps/example-go/volumes/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -153,17 +154,19 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 	// Client
 	if strings.Contains(req.URL.Path, "/v2/apps/example-go/volumes/myvolume/files/") {
-		if req.Method == "GET" {
-			if req.URL.Query().Get("action") == "get" {
+		switch req.Method {
+		case "GET":
+			switch req.URL.Query().Get("action") {
+			case "get":
 				res.Header().Add("Content-Type", "application/octet-stream")
 				res.Write([]byte(volumeFileContentExpected))
 				return
-			} else if req.URL.Query().Get("action") == "list" {
+			case "list":
 				res.Header().Add("Content-Type", "application/json")
 				res.Write([]byte("[]"))
 				return
 			}
-		} else if req.Method == "POST" {
+		case "POST":
 			if err := req.ParseMultipartForm(1024 * 1024); err != nil {
 				return
 			}
@@ -186,7 +189,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 				}
 			}
 			return
-		} else if req.Method == "DELETE" {
+		case "DELETE":
 			res.WriteHeader(http.StatusNoContent)
 			res.Write(nil)
 			return
@@ -196,7 +199,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Expand
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -218,7 +220,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Delete
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/" && req.Method == "DELETE" {
 		res.WriteHeader(http.StatusNoContent)
-		//res.Write([]byte(volumeMountFixture))
+		// res.Write([]byte(volumeMountFixture))
 		return
 	}
 
@@ -231,7 +233,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	//　Mount
 	if req.URL.Path == "/v2/apps/example-go/volumes/myvolume/path/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -302,7 +303,6 @@ func TestVolumesCreate(t *testing.T) {
 		Size: "500G",
 	}
 	actual, err := Create(drycc, "example-go", volume)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -341,7 +341,6 @@ func TestVolumesExpand(t *testing.T) {
 		Size: "500G",
 	}
 	actual, err := Expand(drycc, "example-go", volume)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -396,7 +395,6 @@ func TestVolumesList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -429,7 +427,6 @@ func TestVolumeGet(t *testing.T) {
 	}
 
 	actual, err := Get(drycc, "example-go", "myvolume")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -474,7 +471,6 @@ func TestVolumeMount(t *testing.T) {
 		},
 	}
 	actual, err := Mount(drycc, "example-go", "myvolume", volumeVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -516,7 +512,6 @@ func TestVolumeUnmount(t *testing.T) {
 		},
 	}
 	actual, err := Mount(drycc, "unmount-test", "myvolume", volumeVars)
-
 	if err != nil {
 		t.Error(err)
 	}

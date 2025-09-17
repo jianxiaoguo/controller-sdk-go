@@ -48,8 +48,10 @@ const gatewaysFixture string = `
     ]
 }`
 
-const gatewayCreateExpected string = `{"name":"example-go","port":443,"protocol":"HTTPS"}`
-const gatewayRemoveExpected string = `{"name":"example-go","port":443,"protocol":"HTTPS"}`
+const (
+	gatewayCreateExpected string = `{"name":"example-go","port":443,"protocol":"HTTPS"}`
+	gatewayRemoveExpected string = `{"name":"example-go","port":443,"protocol":"HTTPS"}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -63,7 +65,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/gateways/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -82,7 +83,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/gateways/" && req.Method == "DELETE" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -145,7 +145,6 @@ func TestGatewaysList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -168,7 +167,6 @@ func TestGatewaysAdd(t *testing.T) {
 	}
 
 	err = New(drycc, "example-go", "example-go", 443, "HTTPS")
-
 	if err != nil {
 		t.Fatal(err)
 	}

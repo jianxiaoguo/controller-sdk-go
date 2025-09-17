@@ -4,6 +4,7 @@ import (
 	"fmt"
 )
 
+// Event represents a TLS event as a map of string key-value pairs.
 type Event = map[string]string
 
 // TLS is the structure of an app's TLS settings.
@@ -19,9 +20,9 @@ type TLS struct {
 	// UUID is a unique string reflecting the TLS settings in its current state.
 	// It changes every time the TLS settings is changed and cannot be updated.
 	UUID string `json:"uuid,omitempty"`
-	//HTTPSEnforced determines if the router should enable or disable https-only requests.
+	// HTTPSEnforced determines if the router should enable or disable https-only requests.
 	HTTPSEnforced *bool `json:"https_enforced,omitempty"`
-	//Use ACME to automatically generate certificates if CertsAuto enable
+	// Use ACME to automatically generate certificates if CertsAuto enable
 	CertsAutoEnabled *bool   `json:"certs_auto_enabled,omitempty"`
 	Issuer           *Issuer `json:"issuer,omitempty"`
 	Events           []Event `json:"events,omitempty"`

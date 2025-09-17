@@ -92,6 +92,7 @@ const configUnsetFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
+
 const configSetRefsFixture string = `
 {
     "owner": "test",
@@ -107,9 +108,11 @@ const configSetRefsFixture string = `
 }
 `
 
-const configSetExpected string = `{"values":[{"group":"global","name":"NEW_URL2","value":"http://localhost:8080/"},{"ptype":"web","name":"NEW_URL","value":"http://localhost:8080"}],"limits":{"web":"std1.xlarge.c1m1"},"tags":{"web":{"test":"tests"}},"registry":{"web":{"username":"bob"}}}`
-const configUnsetExpected string = `{"values":[{"group":"global","name":"TEST","value":""}],"limits":{"web":null},"tags":{"web":{"test":null}},"registry":{"web":{"username":null}}}`
-const configSetRefsExpected string = `{"values_refs":{"web":["myconfig1"]}}`
+const (
+	configSetExpected     string = `{"values":[{"group":"global","name":"NEW_URL2","value":"http://localhost:8080/"},{"ptype":"web","name":"NEW_URL","value":"http://localhost:8080"}],"limits":{"web":"std1.xlarge.c1m1"},"tags":{"web":{"test":"tests"}},"registry":{"web":{"username":"bob"}}}`
+	configUnsetExpected   string = `{"values":[{"group":"global","name":"TEST","value":""}],"limits":{"web":null},"tags":{"web":{"test":null}},"registry":{"web":{"username":null}}}`
+	configSetRefsExpected string = `{"values_refs":{"web":["myconfig1"]}}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -118,7 +121,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/config/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -139,7 +141,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/unset-test/config/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -160,7 +161,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/setrefs-test/config/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -276,7 +276,6 @@ func TestConfigSet(t *testing.T) {
 	}
 
 	actual, err := Set(drycc, "example-go", configVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -334,7 +333,6 @@ func TestConfigUnset(t *testing.T) {
 	}
 
 	actual, err := Set(drycc, "unset-test", configVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -392,7 +390,6 @@ func TestConfigList(t *testing.T) {
 	}
 
 	actual, err := List(drycc, "example-go", -1)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -453,7 +450,6 @@ func TestConfigRefs(t *testing.T) {
 	}
 
 	actual, err := Set(drycc, "setrefs-test", configVars)
-
 	if err != nil {
 		t.Error(err)
 	}

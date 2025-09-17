@@ -1,3 +1,4 @@
+// Package tokens provides methods for managing tokens.
 package tokens
 
 import (

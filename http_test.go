@@ -85,7 +85,6 @@ func (f fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		}
 
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -206,7 +205,6 @@ func TestLimitedRequest(t *testing.T) {
 	expectedC := 4
 
 	actual, count, err := drycc.LimitedRequest("/limited/", 2)
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,4 +1,4 @@
-// Package ps provides methods for managing app processes.
+// Package events provides methods for managing app events.
 package events
 
 import (
@@ -9,7 +9,7 @@ import (
 	"github.com/drycc/controller-sdk-go/api"
 )
 
-// List events of an app process.
+// ListPodEvents lists events of an app process.
 func ListPodEvents(c *drycc.Client, appID string, podName string, results int) (api.AppEvents, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/events/?pod_name=%s", appID, podName)
 	body, count, reqErr := c.LimitedRequest(u, results)
@@ -25,7 +25,7 @@ func ListPodEvents(c *drycc.Client, appID string, podName string, results int) (
 	return events, count, reqErr
 }
 
-// List events of an app ptype.
+// ListPtypeEvents lists events of an app ptype.
 func ListPtypeEvents(c *drycc.Client, appID string, ptype string, results int) (api.AppEvents, int, error) {
 	u := fmt.Sprintf("/v2/apps/%s/events/?ptype=%s-%s", appID, appID, ptype)
 	body, count, reqErr := c.LimitedRequest(u, results)

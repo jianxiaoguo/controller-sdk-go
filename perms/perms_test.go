@@ -21,8 +21,10 @@ const listUserPermFixture string = `
 	"count": 2
 }`
 
-const createUserPermExpected = `{"username":"foo","permissions":"view,change,delete"}`
-const updateUserPermExpected = `{"username":"foo","permissions":"view"}`
+const (
+	createUserPermExpected = `{"username":"foo","permissions":"view,change,delete"}`
+	updateUserPermExpected = `{"username":"foo","permissions":"view"}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -36,7 +38,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/perms/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -57,7 +58,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/perms/foo/" && req.Method == "PUT" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -105,7 +105,6 @@ func TestList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 300)
-
 	if err != nil {
 		t.Fatal(err)
 	}

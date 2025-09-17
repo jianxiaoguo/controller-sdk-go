@@ -1,5 +1,6 @@
 package api
 
+// FilerDirEntry represents a directory entry in the file system.
 type FilerDirEntry struct {
 	Name      string `json:"name,omitempty"`
 	Path      string `json:"path,omitempty"`
@@ -8,4 +9,5 @@ type FilerDirEntry struct {
 	Timestamp string `json:"timestamp,omitempty"`
 }
 
+// FilerDirEntries is a collection of FilerDirEntry.
 type FilerDirEntries []FilerDirEntry

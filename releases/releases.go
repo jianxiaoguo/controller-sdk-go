@@ -76,7 +76,6 @@ func Rollback(c *drycc.Client, appID string, ptypes string, version int) (int, e
 	var reqBody []byte
 	if version != -1 {
 		reqBody, err = json.Marshal(req)
-
 		if err != nil {
 			return -1, err
 		}

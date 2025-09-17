@@ -40,7 +40,7 @@ type PodType struct {
 // PodTypes holds groups of pods organized by type.
 type PodTypes []PodType
 
-// AppLogsRequest is the definition of websocket /v2/apps/<app id>/logs
+// PodLogsRequest is the definition of websocket /v2/apps/<app id>/logs
 type PodLogsRequest struct {
 	Lines     int    `json:"lines"`
 	Follow    bool   `json:"follow"`
@@ -48,7 +48,7 @@ type PodLogsRequest struct {
 	Previous  bool   `json:"previous"`
 }
 
-// Start is the definition of POST /v2/apps/<app_id>/stop or POST /v2/apps/<app_id>/start.
+// Types is the definition of POST /v2/apps/<app_id>/stop or POST /v2/apps/<app_id>/start.
 type Types struct {
 	Types []string `json:"types,omitempty"`
 }
@@ -75,6 +75,7 @@ type ContainerState struct {
 // PodState defines a collection of container state.
 type PodState []ContainerState
 
+// PodIDs represents a list of pod IDs.
 type PodIDs struct {
 	PodIDs string `json:"pod_ids"`
 }

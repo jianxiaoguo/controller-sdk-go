@@ -25,7 +25,7 @@ type Volume struct {
 	UUID string `json:"uuid,omitempty"`
 	// Volume's name
 	Name string `json:"name,omitempty"`
-	//Volume's size
+	// Volume's size
 	Size string `json:"size,omitempty"`
 	// Volume's mount path
 	Path map[string]interface{} `json:"path,omitempty"`
@@ -35,4 +35,5 @@ type Volume struct {
 	Parameters map[string]interface{} `json:"parameters,omitempty"`
 }
 
+// Volumes is a collection of Volume.
 type Volumes []Volume

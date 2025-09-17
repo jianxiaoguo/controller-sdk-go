@@ -8,6 +8,7 @@ type Service struct {
 	Ports  []Port `json:"ports"`
 }
 
+// Port represents a port configuration in a service.
 type Port struct {
 	Name       string `json:"name"`
 	Port       int    `json:"port"`

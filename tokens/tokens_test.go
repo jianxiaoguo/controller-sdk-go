@@ -87,7 +87,6 @@ func TestTokensList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -110,7 +109,6 @@ func TestTokensRemove(t *testing.T) {
 	}
 
 	err = Delete(drycc, "f71e3b18-e702-499e-bd7f-8fb0a66d7b12")
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -19,11 +19,13 @@ type Route struct {
 	Rules      []RouteRule `json:"rules,omitempty"`
 }
 
+// ParentRef represents a reference to a parent gateway.
 type ParentRef struct {
 	Name string `json:"name,omitempty"`
 	Port int    `json:"port,omitempty"`
 }
 
+// RouteRule represents a rule in a route configuration.
 type RouteRule map[string]interface{}
 
 // Routes defines a collection of Route objects.
@@ -31,12 +33,14 @@ type Routes []Route
 
 // RouteCreateRequest is the structure of POST /v2/app/<app_id>/routes/.
 
+// RouteCreateRequest is the structure of POST /v2/app/<app_id>/routes/.
 type RouteCreateRequest struct {
 	Name  string             `json:"name,omitempty"`
 	Kind  string             `json:"kind,omitempty"`
 	Rules []RequestRouteRule `json:"rules,omitempty"`
 }
 
+// BackendRefRequest represents a backend reference in a route request.
 type BackendRefRequest struct {
 	Kind   string `json:"kind,omitempty"`
 	Name   string `json:"name,omitempty"`
@@ -44,6 +48,7 @@ type BackendRefRequest struct {
 	Weight int32  `json:"weight,omitempty"`
 }
 
+// RequestRouteRule represents a route rule in a request.
 type RequestRouteRule struct {
 	BackendRefs []BackendRefRequest `json:"backendRefs,omitempty"`
 }

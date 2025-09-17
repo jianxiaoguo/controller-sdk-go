@@ -52,6 +52,7 @@ const specsFixture string = `
 	"count": 1
   }
 `
+
 const plansFixture string = `
 {
 	"results": [{
@@ -261,7 +262,6 @@ func TestSpecs(t *testing.T) {
 	}
 
 	actual, _, err := Specs(drycc, "", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -340,7 +340,6 @@ func TestPlans(t *testing.T) {
 	}
 
 	actual, _, err := Plans(drycc, "", 0, 0, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -405,7 +404,6 @@ func TestGetPlan(t *testing.T) {
 	}
 
 	actual, err := GetPlan(drycc, "std1.large.c1m1")
-
 	if err != nil {
 		t.Fatal(err)
 	}

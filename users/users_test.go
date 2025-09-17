@@ -85,7 +85,6 @@ func TestUsersList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}

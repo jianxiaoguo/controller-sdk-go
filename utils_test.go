@@ -43,7 +43,7 @@ func TestParseEnv(t *testing.T) {
 	}
 	defer os.RemoveAll(f.Name())
 	for key, value := range expects {
-		f.WriteString(fmt.Sprintf("%s=%s\n", key, value))
+		fmt.Fprintf(f, "%s=%s\n", key, value)
 	}
 	f.Seek(0, 0)
 
@@ -116,11 +116,11 @@ deploy:
 	defer os.RemoveAll(tmp)
 
 	configDir := filepath.Join(tmp, "config")
-	os.MkdirAll(configDir, 0777)
-	os.WriteFile(filepath.Join(tmp, "web.yml"), []byte(webPipeline), 0777)
-	os.WriteFile(filepath.Join(tmp, "task.yaml"), []byte(taskPipeline), 0777)
-	os.WriteFile(filepath.Join(configDir, "global"), []byte("DEBUG=true\n"), 0777)
-	os.WriteFile(filepath.Join(configDir, "web"), []byte("PORT=8000\nJVM_OPTIONS=-Xms16G\n"), 0777)
+	os.MkdirAll(configDir, 0o777)
+	os.WriteFile(filepath.Join(tmp, "web.yml"), []byte(webPipeline), 0o777)
+	os.WriteFile(filepath.Join(tmp, "task.yaml"), []byte(taskPipeline), 0o777)
+	os.WriteFile(filepath.Join(configDir, "global"), []byte("DEBUG=true\n"), 0o777)
+	os.WriteFile(filepath.Join(configDir, "web"), []byte("PORT=8000\nJVM_OPTIONS=-Xms16G\n"), 0o777)
 
 	dryccfile, err := ParseDryccfile(tmp)
 	if err != nil {

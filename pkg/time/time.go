@@ -1,3 +1,4 @@
+// Package time provides time formatting utilities for the Drycc Platform.
 package time
 
 import "time"

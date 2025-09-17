@@ -43,7 +43,6 @@ func List(c *drycc.Client, app string, version int) (api.Config, error) {
 // Trying to set a tag that is not a label in the kubernetes cluster will return a drycc.ErrTagNotFound.
 func Set(c *drycc.Client, app string, config api.Config) (api.Config, error) {
 	body, err := json.Marshal(config)
-
 	if err != nil {
 		return api.Config{}, err
 	}
@@ -67,7 +66,6 @@ func Set(c *drycc.Client, app string, config api.Config) (api.Config, error) {
 // Detach config groups from app ptype.
 func Detach(c *drycc.Client, app string, config api.Config) error {
 	body, err := json.Marshal(config)
-
 	if err != nil {
 		return err
 	}

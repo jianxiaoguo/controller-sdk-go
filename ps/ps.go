@@ -99,7 +99,7 @@ func Describe(c *drycc.Client, appID string, podID string, results int) (api.Pod
 	return podState, count, reqErr
 }
 
-// delete a pod
+// Delete deletes a pod from an app.
 func Delete(c *drycc.Client, appID string, podIDs string) error {
 	u := fmt.Sprintf("/v2/apps/%s/pods/", appID)
 

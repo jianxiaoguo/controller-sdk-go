@@ -38,7 +38,6 @@ func List(c *drycc.Client, app string) (api.AppSettings, error) {
 // Calling Set() with an empty api.AppSettings will return a drycc.ErrConflict.
 func Set(c *drycc.Client, app string, appSettings api.AppSettings) (api.AppSettings, error) {
 	body, err := json.Marshal(appSettings)
-
 	if err != nil {
 		return api.AppSettings{}, err
 	}

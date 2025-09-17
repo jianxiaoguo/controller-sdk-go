@@ -55,7 +55,6 @@ func New(c *drycc.Client, appID string, Ptype string, port int, protocol string,
 	req := api.ServiceCreateUpdateRequest{Ptype: Ptype, Port: port, Protocol: protocol, TargetPort: targetPort}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -76,7 +75,6 @@ func Delete(c *drycc.Client, appID string, Ptype string, protocol string, port i
 	req := api.ServiceDeleteRequest{Ptype: Ptype, Protocol: protocol, Port: port}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}

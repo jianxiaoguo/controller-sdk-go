@@ -32,10 +32,11 @@ type PtypeState struct {
 	NodeSelector   map[string]string `json:"node_selector,omitempty"`
 }
 
+// VolumeMount represents a volume mount in a container.
 type VolumeMount struct {
 	Name      string `json:"name"`
 	MountPath string `json:"mountPath"`
 }
 
-// PtypesState defines a collection of container state.
+// PtypeStates defines a collection of container state.
 type PtypeStates []PtypeState

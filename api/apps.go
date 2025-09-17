@@ -1,3 +1,4 @@
+// Package api provides data structures for the Drycc Controller API.
 package api
 
 // App is the definition of the app object.

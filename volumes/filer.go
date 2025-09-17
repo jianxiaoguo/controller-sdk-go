@@ -1,4 +1,4 @@
-// Package config provides methods for managing configuration of apps.
+// Package volumes provides methods for managing file operations on app volumes.
 package volumes
 
 import (
@@ -30,7 +30,7 @@ func ListDir(c *drycc.Client, appID, volumeID, path string, results int) (api.Fi
 	return filerDirEntries, count, reqErr
 }
 
-// Getfile to an app's volume.
+// GetFile gets a file from an app's volume.
 func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, error) {
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/client/%s", appID, volumeID, path)
 	req, err := c.NewRequest("GET", u, nil)
@@ -40,7 +40,7 @@ func GetFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, err
 	return c.Do(req)
 }
 
-// Put file to an app's volume.
+// PostFile puts a file to an app's volume.
 func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, size int64, reader io.Reader) (*http.Response, error) {
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/client/", appID, volumeID)
 	r, err := c.NewRequest("POST", u, reader)
@@ -58,7 +58,7 @@ func PostFile(c *drycc.Client, appID, volumeID, volumePath, name string, size in
 	return c.Do(r)
 }
 
-// Get file to an app's volume.
+// DeleteFile deletes a file from an app's volume.
 func DeleteFile(c *drycc.Client, appID, volumeID, path string) (*http.Response, error) {
 	u := fmt.Sprintf("/v2/apps/%s/volumes/%s/client/%s", appID, volumeID, path)
 	return c.Request("DELETE", u, nil)

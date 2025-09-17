@@ -8,10 +8,9 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/drycc/controller-sdk-go/pkg/time"
-
 	drycc "github.com/drycc/controller-sdk-go"
 	"github.com/drycc/controller-sdk-go/api"
+	"github.com/drycc/controller-sdk-go/pkg/time"
 )
 
 const certsFixture string = `
@@ -62,7 +61,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/certs/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +130,6 @@ func TestCertsList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -173,7 +170,6 @@ func TestCert(t *testing.T) {
 	}
 
 	actual, err := New(drycc, "example-go", "test", "foo", "test-example-com")
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -67,12 +67,15 @@ const deployExpected string = `{"types":"web,task"}`
 const rollbackFixture string = `
 {"ptypes":"web,task", "version": 5}
 `
+
 const rollbackerFixture string = `
 {"ptypes":"web,task", "version": 7}
 `
 
-const rollbackExpected string = `{"version":2,"ptypes":"web,task"}`
-const rollbackerExpected string = ``
+const (
+	rollbackExpected   string = `{"version":2,"ptypes":"web,task"}`
+	rollbackerExpected string = ``
+)
 
 type fakeHTTPServer struct{}
 
@@ -91,7 +94,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/releases/deploy/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -111,7 +113,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/releases/rollback/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -132,7 +133,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/rollbacker/releases/rollback/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -193,7 +193,6 @@ func TestReleasesList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", "", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -238,7 +237,6 @@ func TestReleasesGet(t *testing.T) {
 	}
 
 	actual, err := Get(drycc, "example-go", 1)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -262,7 +260,6 @@ func TestDeploy(t *testing.T) {
 	targets := map[string]interface{}{"types": "web,task"}
 
 	err = Deploy(drycc, "example-go", targets)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -283,7 +280,6 @@ func TestRollback(t *testing.T) {
 	}
 
 	actual, err := Rollback(drycc, "example-go", "web,task", 2)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -308,7 +304,6 @@ func TestRollbacker(t *testing.T) {
 	}
 
 	actual, err := Rollback(drycc, "rollbacker", "web,task", -1)
-
 	if err != nil {
 		t.Fatal(err)
 	}

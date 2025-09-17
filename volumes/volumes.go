@@ -1,4 +1,4 @@
-// Package config provides methods for managing configuration of apps.
+// Package volumes provides methods for managing volumes of apps.
 package volumes
 
 import (

@@ -22,6 +22,7 @@ type ReleaseRollback struct {
 	Ptypes  string `json:"ptypes"`
 }
 
+// Condition represents a condition in a release.
 type Condition struct {
 	State     string   `json:"state"`
 	Action    string   `json:"action"`

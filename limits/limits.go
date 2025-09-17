@@ -1,3 +1,4 @@
+// Package limits provides methods for managing resource limits of apps.
 package limits
 
 import (

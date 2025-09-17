@@ -9,23 +9,26 @@ import (
 // ConfigTags is the key, value for tag
 type ConfigTags map[string]interface{}
 
-// ConfigValues value for env
+// ConfigVar represents a configuration variable for an app.
 type ConfigVar struct {
 	Name  string      `json:"name"`
 	Value interface{} `json:"value"`
 }
 
+// ConfigValue represents a configuration value with its type and group.
 type ConfigValue struct {
 	Ptype string `json:"ptype,omitempty"`
 	Group string `json:"group,omitempty"`
 	ConfigVar
 }
 
+// PtypeValue represents values for a specific process type.
 type PtypeValue struct {
 	Env []ConfigVar `json:"env,omitempty"`
 	Ref []string    `json:"ref,omitempty"`
 }
 
+// ConfigInfo represents the complete configuration information for an app.
 type ConfigInfo struct {
 	Ptype map[string]PtypeValue  `json:"ptype,omitempty"`
 	Group map[string][]ConfigVar `json:"group,omitempty"`

@@ -53,7 +53,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/keys/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -107,7 +106,6 @@ func TestKeysList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +137,6 @@ func TestKeyCreate(t *testing.T) {
 	}
 
 	actual, err := New(drycc, "test@example.com", "ssh-rsa abc test@example.com")
-
 	if err != nil {
 		t.Fatal(err)
 	}

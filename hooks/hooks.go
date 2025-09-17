@@ -54,7 +54,8 @@ func GetAppConfig(c *drycc.Client, username, app string) (api.Config, error) {
 // gitSha should be the first 8 characters of the git commit sha. Image is either the container image
 // location for the dockerfile app the absolute url to the tar file for a buldpack app.
 func CreateBuild(c *drycc.Client, username, app, image, stack, gitSha string,
-	procfile api.ProcessType, dryccfile map[string]interface{}, dockerfile string) (int, error) {
+	procfile api.ProcessType, dryccfile map[string]interface{}, dockerfile string,
+) (int, error) {
 	req := api.BuildHookRequest{
 		Sha:        gitSha,
 		User:       username,

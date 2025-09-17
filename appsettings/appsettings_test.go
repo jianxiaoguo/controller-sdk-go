@@ -43,8 +43,11 @@ const appSettingsUnsetFixture string = `
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
 }
 `
-const appSettingsSetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autodeploy":true,"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
-const appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autodeploy":true,"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+
+const (
+	appSettingsSetExpected   string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autodeploy":true,"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+	appSettingsUnsetExpected string = `{"routable":true,"allowlist":["1.2.3.4","0.0.0.0/0"],"autodeploy":true,"autorollback":true,"autoscale":{"cmd":{"min":3,"max":8,"cpu_percent":40}},"label":{"git_repo":"https://github.com/drycc/controller-sdk-go","team":"drycc"}}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -53,7 +56,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/settings/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -74,7 +76,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/unset-test/settings/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -157,7 +158,6 @@ func TestAppSettingsSet(t *testing.T) {
 	}
 
 	actual, err := Set(drycc, "example-go", appSettingsVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -221,7 +221,6 @@ func TestAppSettingsUnset(t *testing.T) {
 	}
 
 	actual, err := Set(drycc, "unset-test", appSettingsVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -267,7 +266,6 @@ func TestAppSettingsList(t *testing.T) {
 	}
 
 	actual, err := List(drycc, "example-go")
-
 	if err != nil {
 		t.Error(err)
 	}

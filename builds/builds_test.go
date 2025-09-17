@@ -60,7 +60,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/build/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -111,7 +110,6 @@ func TestBuildsGet(t *testing.T) {
 	}
 
 	actual, err := Get(drycc, "example-go", -1)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -150,7 +148,6 @@ func TestBuildCreate(t *testing.T) {
 	}
 
 	actual, err := New(drycc, "example-go", "drycc/example-go", "heroku-18", procfile, map[string]interface{}{})
-
 	if err != nil {
 		t.Fatal(err)
 	}

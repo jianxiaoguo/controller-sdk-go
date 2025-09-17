@@ -31,7 +31,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/allowlist/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -89,7 +88,6 @@ func TestAllowlistList(t *testing.T) {
 	}
 
 	actual, err := List(drycc, "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +114,6 @@ func TestAllowlistAdd(t *testing.T) {
 	}
 
 	actual, err := Add(drycc, "example-go", []string{"1.2.3.4", "0.0.0.0/0"})
-
 	if err != nil {
 		t.Fatal(err)
 	}

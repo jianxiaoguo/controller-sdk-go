@@ -30,7 +30,6 @@ func List(c *drycc.Client, appID string, results int) ([]api.UserPermResponse, i
 func Create(c *drycc.Client, appID, username, permissions string) error {
 	req := api.UserPermRequest{Username: username, Permissions: permissions}
 	reqBody, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -47,7 +46,6 @@ func Create(c *drycc.Client, appID, username, permissions string) error {
 func Update(c *drycc.Client, appID, username, permissions string) error {
 	req := api.UserPermRequest{Username: username, Permissions: permissions}
 	reqBody, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}

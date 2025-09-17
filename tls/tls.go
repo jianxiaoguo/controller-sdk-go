@@ -34,7 +34,6 @@ func changeTLS(c *drycc.Client, app string, httpsEnforced, certsAutoEnabled *boo
 	t.CertsAutoEnabled = certsAutoEnabled
 	t.Issuer = issuer
 	body, err := json.Marshal(t)
-
 	if err != nil {
 		return api.TLS{}, err
 	}

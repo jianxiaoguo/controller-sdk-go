@@ -10,6 +10,7 @@ type ResourcePlan struct {
 	Description string `json:"description,omitempty"`
 }
 
+// ResourcePlans is a collection of ResourcePlan.
 type ResourcePlans []ResourcePlan
 
 // ResourceService is the structure of an app's resource service.
@@ -22,6 +23,7 @@ type ResourceService struct {
 	Updateable bool `json:"updateable,omitempty"`
 }
 
+// ResourceServices is a collection of ResourceService.
 type ResourceServices []ResourceService
 
 // Resource is the structure of an app's resource.
@@ -53,9 +55,10 @@ type Resource struct {
 	Message string `json:"message,omitempty"`
 }
 
+// Resources is a collection of Resource.
 type Resources []Resource
 
-// Binding is the definition of PATCH /v2/apps/<app_id>/resources/<name>/binding/.
+// ResourceBinding is the definition of PATCH /v2/apps/<app_id>/resources/<name>/binding/.
 type ResourceBinding struct {
 	BindAction string `json:"bind_action,omitempty"`
 }

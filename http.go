@@ -25,7 +25,6 @@ func createHTTPClient(sslVerify bool) *http.Client {
 // Do sends an HTTP request and returns an HTTP response,
 // following policy (such as redirects, cookies, auth) as configured on the client.
 func (c *Client) Do(req *http.Request) (*http.Response, error) {
-
 	if c.Token != "" {
 		req.Header.Add("Authorization", "token "+c.Token)
 	}
@@ -40,7 +39,6 @@ func (c *Client) Do(req *http.Request) (*http.Response, error) {
 	addUserAgent(&req.Header, c.UserAgent)
 
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return res, err
 	}
@@ -107,7 +105,6 @@ func (c *Client) LimitedRequest(path string, results int) (string, int, error) {
 	defer res.Body.Close()
 
 	body, err := io.ReadAll(res.Body)
-
 	if err != nil {
 		return "", -1, err
 	}
@@ -118,7 +115,6 @@ func (c *Client) LimitedRequest(path string, results int) (string, int, error) {
 	}
 
 	out, err := json.Marshal(r["results"].([]interface{}))
-
 	if err != nil {
 		return "", -1, err
 	}
@@ -141,7 +137,6 @@ your drycc version is correct.`
 	}
 
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}
@@ -175,7 +170,6 @@ func (c *Client) Healthcheck() error {
 	}
 
 	res, err := c.HTTPClient.Do(req)
-
 	if err != nil {
 		return err
 	}

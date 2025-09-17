@@ -1,10 +1,12 @@
 package api
 
+// AuthLoginRequest represents the request structure for authentication login.
 type AuthLoginRequest struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
 }
 
+// AuthLoginResponse represents the response structure for authentication login.
 type AuthLoginResponse struct {
 	Key string `json:"key,omitempty"`
 }

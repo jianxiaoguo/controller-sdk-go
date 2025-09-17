@@ -1,4 +1,4 @@
-// Package ps provides methods for managing app processes.
+// Package pts provides methods for managing app ptypes.
 package pts
 
 import (
@@ -48,7 +48,6 @@ func Scale(c *drycc.Client, appID string, targets map[string]int) error {
 	u := fmt.Sprintf("/v2/apps/%s/ptypes/scale/", appID)
 
 	body, err := json.Marshal(targets)
-
 	if err != nil {
 		return err
 	}

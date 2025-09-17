@@ -53,7 +53,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/domains/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -107,7 +106,6 @@ func TestDomainsList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -139,7 +137,6 @@ func TestDomainsAdd(t *testing.T) {
 	}
 
 	actual, err := New(drycc, "example-go", "example.example.com", "web")
-
 	if err != nil {
 		t.Fatal(err)
 	}

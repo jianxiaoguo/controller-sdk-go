@@ -35,7 +35,6 @@ func New(c *drycc.Client, appID string) (api.App, error) {
 	if appID != "" {
 		req := api.AppCreateRequest{ID: appID}
 		b, err := json.Marshal(req)
-
 		if err != nil {
 			return api.App{}, err
 		}
@@ -85,7 +84,6 @@ func Run(c *drycc.Client, appID string, command string, volumes map[string]inter
 		Expires: expires,
 	}
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -118,7 +116,6 @@ func Transfer(c *drycc.Client, appID string, username string) error {
 
 	req := api.AppUpdateRequest{Owner: username}
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}

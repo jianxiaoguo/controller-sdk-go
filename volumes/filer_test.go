@@ -21,11 +21,12 @@ func (f *fakeFilerServer) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 	// get/delete file
 	if strings.Contains(req.URL.Path, "/v2/apps/example-go/volumes/myvolume/client/tmp/helloword.txt") {
-		if req.Method == "GET" {
+		switch req.Method {
+		case "GET":
 			res.Header().Add("Content-Type", "application/octet-stream")
 			res.Write([]byte(volumeFileContentExpected))
 			return
-		} else if req.Method == "DELETE" {
+		case "DELETE":
 			res.WriteHeader(http.StatusNoContent)
 			res.Write(nil)
 			return
@@ -33,11 +34,12 @@ func (f *fakeFilerServer) ServeHTTP(res http.ResponseWriter, req *http.Request) 
 	}
 	// post file or list dir
 	if strings.Contains(req.URL.Path, "/v2/apps/example-go/volumes/myvolume/client/") {
-		if req.Method == "GET" {
+		switch req.Method {
+		case "GET":
 			res.Header().Add("Content-Type", "application/json")
 			res.Write([]byte(`{"results":[], "count": 0}`))
 			return
-		} else if req.Method == "POST" {
+		case "POST":
 			body, err := io.ReadAll(req.Body)
 			if err != nil {
 				fmt.Println(err)
@@ -116,7 +118,7 @@ func TestVolumesPostFile(t *testing.T) {
 
 	testFile := "helloword.txt"
 
-	err := os.WriteFile(testFile, []byte(volumeFileContentExpected), 0644)
+	err := os.WriteFile(testFile, []byte(volumeFileContentExpected), 0o644)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -145,7 +147,6 @@ func TestVolumesPostFile(t *testing.T) {
 	if _, err := PostFile(drycc, "example-go", "myvolume", "tmp/", file.Name(), fileinfo.Size(), file); err != nil {
 		t.Fatal(err)
 	}
-
 }
 
 func TestVolumesDeleteFile(t *testing.T) {

@@ -1,4 +1,4 @@
-// Package config provides methods for managing configuration of apps.
+// Package resources provides methods for managing resources of apps.
 package resources
 
 import (

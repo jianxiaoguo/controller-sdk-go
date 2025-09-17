@@ -33,7 +33,6 @@ func New(c *drycc.Client, appID, domain, Ptype string) (api.Domain, error) {
 	req := api.DomainCreateRequest{Domain: domain, Ptype: Ptype}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return api.Domain{}, err
 	}

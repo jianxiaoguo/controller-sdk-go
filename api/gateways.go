@@ -18,6 +18,7 @@ type Gateway struct {
 	Addresses []Address  `json:"addresses,omitempty"`
 }
 
+// Listener represents a gateway listener configuration.
 type Listener struct {
 	Name          string      `json:"name,omitempty"`
 	Port          int         `json:"port,omitempty"`
@@ -25,6 +26,7 @@ type Listener struct {
 	AllowedRoutes interface{} `json:"allowedRoutes,omitempty"`
 }
 
+// Address represents a gateway address configuration.
 type Address struct {
 	Type  string `json:"type,omitempty"`
 	Value string `json:"value,omitempty"`
@@ -40,7 +42,7 @@ type GatewayCreateRequest struct {
 	Protocol string `json:"protocol,omitempty"`
 }
 
-// GatewayRemoteRequest is the structure of Delete /v2/app/<app id>/gateways/.
+// GatewayRemoveRequest is the structure of Delete /v2/app/<app id>/gateways/.
 type GatewayRemoveRequest struct {
 	Name     string `json:"name,omitempty"`
 	Port     int    `json:"port,omitempty"`

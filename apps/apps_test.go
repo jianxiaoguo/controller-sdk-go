@@ -39,9 +39,11 @@ const appsFixture string = `
     ]
 }`
 
-const appCreateExpected string = `{"id":"example-go"}`
-const appRunExpected string = `{"command":"echo hi","timeout":3600,"expires":3600}`
-const appTransferExpected string = `{"owner":"test"}`
+const (
+	appCreateExpected   string = `{"id":"example-go"}`
+	appRunExpected      string = `{"command":"echo hi","timeout":3600,"expires":3600}`
+	appTransferExpected string = `{"owner":"test"}`
+)
 
 type fakeHTTPServer struct {
 	createID        bool
@@ -53,7 +55,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -96,7 +97,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/run" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -116,7 +116,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -162,7 +161,6 @@ func TestAppsCreate(t *testing.T) {
 
 	for _, id := range []string{"example-go", ""} {
 		actual, err := New(drycc, id)
-
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -194,7 +192,6 @@ func TestAppsGet(t *testing.T) {
 	}
 
 	actual, err := Get(drycc, "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -261,7 +258,6 @@ func TestAppsList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}

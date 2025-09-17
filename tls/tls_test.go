@@ -84,7 +84,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -135,7 +134,6 @@ func (badJSONFakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Reques
 
 	if req.URL.Path == "/v2/apps/foo/tls/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -193,7 +191,6 @@ func TestTLSInfo(t *testing.T) {
 	}
 
 	actual, err := Info(dClient, "foo")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -240,7 +237,6 @@ func TestTLSEnable(t *testing.T) {
 	}
 
 	actual, err := EnableHTTPSEnforced(dClient, "foo")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -287,7 +283,6 @@ func TestTLSDisable(t *testing.T) {
 	}
 
 	actual, err := DisableHTTPSEnforced(dClient, "foo")
-
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -50,8 +50,10 @@ const servicesFixture string = `
     ]
 }`
 
-const serviceCreateExpected string = `{"ptype":"web","port":5000,"protocol":"UDP","target_port":5000}`
-const serviceDeleteExpected string = `{"ptype":"web","port":5000,"protocol":"UDP"}`
+const (
+	serviceCreateExpected string = `{"ptype":"web","port":5000,"protocol":"UDP","target_port":5000}`
+	serviceDeleteExpected string = `{"ptype":"web","port":5000,"protocol":"UDP"}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -65,7 +67,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/services/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -86,7 +87,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	if req.URL.Path == "/v2/apps/example-go/services/" && req.Method == "DELETE" {
 
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -158,7 +158,6 @@ func TestServicesList(t *testing.T) {
 	}
 
 	actual, err := List(drycc, "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -181,7 +180,6 @@ func TestServicesAdd(t *testing.T) {
 	}
 
 	err = New(drycc, "example-go", "web", 5000, "UDP", 5000)
-
 	if err != nil {
 		t.Fatal(err)
 	}

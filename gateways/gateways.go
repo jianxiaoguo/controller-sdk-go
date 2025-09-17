@@ -33,7 +33,6 @@ func New(c *drycc.Client, appID string, name string, port int, protocol string) 
 	req := api.GatewayCreateRequest{Name: name, Port: port, Protocol: protocol}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -54,7 +53,6 @@ func Delete(c *drycc.Client, appID string, name string, port int, protocol strin
 	req := api.GatewayRemoveRequest{Name: name, Port: port, Protocol: protocol}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}

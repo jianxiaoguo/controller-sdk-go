@@ -10,6 +10,7 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+// ParseEnv parses environment variables from a file.
 func ParseEnv(fileame string) (map[string]interface{}, error) {
 	contents, err := os.ReadFile(fileame)
 	if err != nil {
@@ -34,6 +35,7 @@ func ParseEnv(fileame string) (map[string]interface{}, error) {
 	return configMap, nil
 }
 
+// ParseDryccfile parses a Drycc configuration file.
 func ParseDryccfile(dryccpath string) (map[string]interface{}, error) {
 	config := make(map[string]interface{})
 	if entries, err := os.ReadDir(path.Join(dryccpath, "config")); err == nil {
@@ -75,6 +77,7 @@ func ParseDryccfile(dryccpath string) (map[string]interface{}, error) {
 	return dryccfile, nil
 }
 
+// CheckAPICompatibility checks if the server and client API versions are compatible.
 func CheckAPICompatibility(serverAPIVersion, clientAPIVersion string) error {
 	sVersion := strings.Split(serverAPIVersion, ".")
 	aVersion := strings.Split(clientAPIVersion, ".")

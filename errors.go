@@ -11,7 +11,7 @@ import (
 
 const (
 	// formatErrUnknown is used to create an dynamic error if no error matches
-	formatErrUnknown = "Unknown Error (%d): %s"
+	formatErrUnknown = "unknown error (%d): %s"
 	jsonParsingError = "error decoding json response (%s): %s"
 
 	// fieldReqMsg is API error stating a field is required.
@@ -36,22 +36,22 @@ const (
 
 var (
 	// ErrServerError is returned when the server returns a 500.
-	ErrServerError = errors.New("Internal Server Error")
+	ErrServerError = errors.New("internal server error")
 	// ErrMethodNotAllowed is thrown when using a unsupposrted method.
 	// This should not come up unless there in an bug in the SDK.
-	ErrMethodNotAllowed = errors.New("Method Not Allowed")
+	ErrMethodNotAllowed = errors.New("method not allowed")
 	// ErrInvalidUsername is returned when the user specifies an invalid or missing username.
-	ErrInvalidUsername = errors.New(invalidUserMsg)
+	ErrInvalidUsername = errors.New("enter a valid username. this value may contain only letters, numbers and @/./+/-/_ characters")
 	// ErrDuplicateUsername is returned when trying to register a user that already exists.
-	ErrDuplicateUsername = errors.New(duplicateUserMsg)
+	ErrDuplicateUsername = errors.New("a user with that username already exists")
 	// ErrMissingPassword is returned when a password is not sent with the request.
-	ErrMissingPassword = errors.New("A Password is required")
+	ErrMissingPassword = errors.New("a password is required")
 	// ErrLogin is returned when the api cannot login fails with provided username and password
-	ErrLogin = errors.New(failedLoginMsg)
+	ErrLogin = errors.New("unable to log in with provided credentials")
 	// ErrUnauthorized is given when the API returns a 401.
-	ErrUnauthorized = errors.New("Unauthorized: Missing or Invalid Token")
+	ErrUnauthorized = errors.New("unauthorized: missing or invalid token")
 	// ErrInvalidAppName is returned when the user specifies an invalid app name.
-	ErrInvalidAppName = errors.New(invalidAppNameMsg)
+	ErrInvalidAppName = errors.New("app name can only contain a-z (lowercase), 0-9 and hyphens")
 	// ErrConflict is returned when the API returns a 409.
 	ErrConflict = errors.New("this action could not be completed due to a conflict")
 	// ErrForbidden is returned when the API returns a 403.
@@ -59,29 +59,29 @@ var (
 	// ErrMissingKey is returned when a key is not sent with the request.
 	ErrMissingKey = errors.New("a key is required")
 	// ErrDuplicateKey is returned when adding a key that already exists.
-	ErrDuplicateKey = errors.New(duplicateKeyMsg)
+	ErrDuplicateKey = errors.New("public key is already in use")
 	// ErrInvalidName is returned when a name is invalid or missing.
 	ErrInvalidName = fmt.Errorf("name %s", strings.ToLower(invalidNameMsg))
 	// ErrInvalidCertificate is returned when a certififate is missing or invalid
-	ErrInvalidCertificate = errors.New(invalidCertMsg)
+	ErrInvalidCertificate = errors.New("could not load certificate")
 	// ErrPodNotFound is returned when a pod type is not Found
-	ErrPodNotFound = errors.New("Pod not found in application")
+	ErrPodNotFound = errors.New("pod not found in application")
 	// ErrInvalidDomain is returned when a domain is missing or invalid
-	ErrInvalidDomain = errors.New(invalidDomainMsg)
+	ErrInvalidDomain = errors.New("hostname does not look valid")
 	// ErrDuplicateDomain is returned adding domain that is already in use
-	ErrDuplicateDomain = errors.New(duplicateDomainMsg)
+	ErrDuplicateDomain = errors.New("domain is already in use by another application")
 	// ErrInvalidImage is returned when a image is missing or invalid
-	ErrInvalidImage = errors.New("The given image is invalid")
+	ErrInvalidImage = errors.New("the given image is invalid")
 	// ErrInvalidVersion is returned when a version is invalid
-	ErrInvalidVersion = errors.New("The given version is invalid")
+	ErrInvalidVersion = errors.New("the given version is invalid")
 	// ErrMissingID is returned when a ID is missing
-	ErrMissingID = errors.New("An id is required")
+	ErrMissingID = errors.New("an id is required")
 	// ErrInvalidEmail is returned when a user gives an invalid email.
-	ErrInvalidEmail = errors.New(invalidEmailMsg)
+	ErrInvalidEmail = errors.New("enter a valid email address")
 	// ErrTagNotFound is returned when no node can be found that matches the tag
-	ErrTagNotFound = errors.New(invalidTagMsg)
+	ErrTagNotFound = errors.New("no nodes matched the provided labels")
 	// ErrDuplicateApp is returned when create an app with an ID that already exists
-	ErrDuplicateApp = errors.New(duplicateIDMsg)
+	ErrDuplicateApp = errors.New("application with this id already exists")
 	// ErrCancellationFailed is returned when cancelling a user fails.
 	ErrCancellationFailed = errors.New("failed to delete user because the user still has applications assigned. Delete or transfer ownership")
 )
@@ -97,7 +97,7 @@ type ErrNotFound struct {
 }
 
 func (e ErrUnprocessable) Error() string {
-	return fmt.Sprintf("Unable to process your request: %s", e.errorMsg)
+	return fmt.Sprintf("unable to process your request: %s", e.errorMsg)
 }
 
 func (e ErrNotFound) Error() string {
@@ -272,12 +272,13 @@ func arrayContains(search string, completeMatch bool, array []string) bool {
 
 func unknownServerError(statusCode int, message string) error {
 	// newlines set from controller aren't evaluated as controller characters, so they need to be replaced
-	message = strings.Replace(message, `\n`, "\n", -1)
+	message = strings.ReplaceAll(message, `\n`, "\n")
 	return fmt.Errorf(formatErrUnknown, statusCode, message)
 }
 
 func scanResponse(
-	body map[string]interface{}, field string, errMsgs []string, completeMatch bool) bool {
+	body map[string]interface{}, field string, errMsgs []string, completeMatch bool,
+) bool {
 	for _, msg := range errMsgs {
 		if arrayContains(msg, completeMatch, arrayContents(body, field)) {
 			return true

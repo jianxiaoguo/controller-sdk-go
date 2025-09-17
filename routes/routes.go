@@ -38,7 +38,6 @@ func New(c *drycc.Client, appID, name, kind string, backendRefs ...api.BackendRe
 	}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -58,7 +57,6 @@ func AttachGateway(c *drycc.Client, appID string, name string, port int, gateway
 	req := api.RouteAttachRequest{Port: port, Gateway: gateway}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -79,7 +77,6 @@ func DetachGateway(c *drycc.Client, appID string, name string, port int, gateway
 	req := api.RouteDetachRequest{Port: port, Gateway: gateway}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return err
 	}
@@ -93,7 +90,7 @@ func DetachGateway(c *drycc.Client, appID string, name string, port int, gateway
 	return reqErr
 }
 
-// GetRoute get info rule of a route from an app.
+// GetRule gets info rule of a route from an app.
 func GetRule(c *drycc.Client, appID string, name string) (string, error) {
 	u := fmt.Sprintf("/v2/apps/%s/routes/%s/rules/", appID, name)
 	res, err := c.Request("GET", u, nil)

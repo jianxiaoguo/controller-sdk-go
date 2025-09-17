@@ -85,7 +85,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	}
 	if req.URL.Path == "/v2/apps/example-go/ptypes/restart/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -103,7 +102,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/ptypes/scale/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -124,7 +122,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/ptypes/clean/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -170,7 +167,6 @@ func TestPtype(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -246,7 +242,6 @@ func TestAppsRestart(t *testing.T) {
 	}
 
 	err = Restart(drycc, "example-go", types)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -286,7 +281,6 @@ func TestAppsClean(t *testing.T) {
 	}
 
 	err = Clean(drycc, "example-go", types)
-
 	if err != nil {
 		t.Error(err)
 	}

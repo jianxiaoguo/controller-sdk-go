@@ -151,8 +151,10 @@ const resourceUnbindFixture string = `
 }
 `
 
-const resourceBindExpected string = `{"bind_action":"bind"}`
-const resourceUnbindExpected string = `{"bind_action":"unbind"}`
+const (
+	resourceBindExpected   string = `{"bind_action":"bind"}`
+	resourceUnbindExpected string = `{"bind_action":"unbind"}`
+)
 
 type fakeHTTPServer struct{}
 
@@ -173,7 +175,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Create
 	if req.URL.Path == "/v2/apps/example-go/resources/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -229,7 +230,6 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	// Patch bind
 	if req.URL.Path == "/v2/apps/example-bind/resources/mysql/binding/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -301,7 +301,6 @@ func TestResourcesCreate(t *testing.T) {
 		Plan: "mysql:5.6",
 	}
 	actual, err := Create(drycc, "example-go", resource)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -332,7 +331,6 @@ func TestServices(t *testing.T) {
 	}
 
 	actual, _, err := Services(drycc, 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -363,7 +361,6 @@ func TestServicePlans(t *testing.T) {
 	}
 
 	actual, _, err := Plans(drycc, "mysql", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -403,7 +400,6 @@ func TestResourcesList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -458,7 +454,6 @@ func TestResourceGet(t *testing.T) {
 	}
 
 	actual, err := Get(drycc, "example-go", "mysql")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -498,7 +493,6 @@ func TestResourcePut(t *testing.T) {
 		Plan: "mysql:5.7",
 	}
 	actual, err := Put(drycc, "example-go", "mysql", resource)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -539,7 +533,6 @@ func TestResourceBind(t *testing.T) {
 		BindAction: "bind",
 	}
 	actual, err := Binding(drycc, "example-bind", "mysql", resourceVars)
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -580,7 +573,6 @@ func TestResourceUnbind(t *testing.T) {
 		BindAction: "unbind",
 	}
 	actual, err := Binding(drycc, "example-unbind", "mysql", resourceVars)
-
 	if err != nil {
 		t.Error(err)
 	}

@@ -86,7 +86,6 @@ func TestEvents(t *testing.T) {
 	}
 
 	actual, _, err := ListPodEvents(drycc, "example-go", "example-go-web-6b44dbd6c8-h89cg", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -96,7 +95,6 @@ func TestEvents(t *testing.T) {
 	}
 
 	actual, _, err = ListPtypeEvents(drycc, "example-go", "web", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}

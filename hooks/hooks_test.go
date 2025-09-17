@@ -78,7 +78,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/hooks/config/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -99,7 +98,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/hooks/build/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -141,7 +139,6 @@ func TestUserFromKey(t *testing.T) {
 	}
 
 	actual, err := UserFromKey(drycc, testingClientFingerprint)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -201,7 +198,6 @@ func TestConfigHook(t *testing.T) {
 	}
 
 	actual, err := GetAppConfig(drycc, "test", "example-go")
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -228,7 +224,6 @@ func TestBuildHook(t *testing.T) {
 	actual, err := CreateBuild(
 		drycc, "test", "example-go", "test:abc123", "heroku-18", "abc123",
 		map[string]string{"web": "./run"}, map[string]interface{}{}, "")
-
 	if err != nil {
 		t.Error(err)
 	}

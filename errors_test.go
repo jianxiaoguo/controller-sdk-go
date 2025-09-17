@@ -284,7 +284,7 @@ func TestErrors(t *testing.T) {
 				StatusCode: 400,
 				Body:       readCloser(`{"detail":"unknown error\nnewline"}`),
 			},
-			expected: errors.New(`Unknown Error (400): {"detail":"unknown error
+			expected: errors.New(`unknown error (400): {"detail":"unknown error
 newline"}`),
 		},
 	}

@@ -31,8 +31,8 @@ func Get(c *drycc.Client, appID string, version int) (api.Build, error) {
 
 // New a build of an app.
 func New(c *drycc.Client, appID string, image string, stack string,
-	procfile map[string]string, dryccfile map[string]interface{}) (api.Build, error) {
-
+	procfile map[string]string, dryccfile map[string]interface{},
+) (api.Build, error) {
 	u := fmt.Sprintf("/v2/apps/%s/build/", appID)
 
 	req := api.CreateBuildRequest{
@@ -43,7 +43,6 @@ func New(c *drycc.Client, appID string, image string, stack string,
 	}
 
 	body, err := json.Marshal(req)
-
 	if err != nil {
 		return api.Build{}, err
 	}

@@ -7,22 +7,19 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/drycc/controller-sdk-go/api"
-
 	drycc "github.com/drycc/controller-sdk-go"
+	"github.com/drycc/controller-sdk-go/api"
 )
 
 const keyFixture = "61a7907bf5b34659a14f96371fed2ebc"
 
-type fakeHTTPServer struct {
-}
+type fakeHTTPServer struct{}
 
 func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Add("DRYCC_API_VERSION", drycc.APIVersion)
 
 	if req.URL.Path == "/v2/auth/login/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -34,7 +31,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.Write(nil)
 		} else {
 			res.WriteHeader(http.StatusFound)
-			res.Write([]byte(fmt.Sprintf(`{"key": "%s"}`, keyFixture)))
+			fmt.Fprintf(res, `{"key": "%s"}`, keyFixture)
 		}
 	}
 
@@ -61,7 +58,6 @@ func TestLogin(t *testing.T) {
 	}
 
 	actual, err := Login(drycc, "", "")
-
 	if err != nil {
 		t.Error(err)
 	}
@@ -78,7 +74,6 @@ func TestLogin(t *testing.T) {
 	if actual != keyFixture {
 		t.Errorf("Expected %s, Got %s", expected, actual)
 	}
-
 }
 
 func TestToken(t *testing.T) {
@@ -98,7 +93,6 @@ func TestToken(t *testing.T) {
 	}
 
 	token, err := Token(drycc, keyFixture, "test")
-
 	if err != nil {
 		t.Error(err)
 	}

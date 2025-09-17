@@ -83,7 +83,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/routes/example-go/rules/" && req.Method == "PUT" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -102,7 +101,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/routes/" && req.Method == "POST" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -121,7 +119,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/routes/example-go/attach/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -140,7 +137,6 @@ func (fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 
 	if req.URL.Path == "/v2/apps/example-go/routes/example-go/detach/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
-
 		if err != nil {
 			fmt.Println(err)
 			res.WriteHeader(http.StatusInternalServerError)
@@ -206,7 +202,6 @@ func TestRoutesList(t *testing.T) {
 	}
 
 	actual, _, err := List(drycc, "example-go", 100)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -233,7 +228,6 @@ func TestRouteGet(t *testing.T) {
 	}
 
 	actual, err := GetRule(drycc, "example-go", "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -256,7 +250,6 @@ func TestRouteSet(t *testing.T) {
 	}
 
 	err = SetRule(drycc, "example-go", "example-go", routeRulesSetExpected)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -277,7 +270,6 @@ func TestRoutesAdd(t *testing.T) {
 	backendRef := api.BackendRefRequest{Kind: "Service", Name: "example-go", Port: 80, Weight: 100}
 
 	err = New(drycc, "example-go", "example-go", "HTTPRoute", backendRef)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -296,7 +288,6 @@ func TestRoutesAttachGateway(t *testing.T) {
 	}
 
 	err = AttachGateway(drycc, "example-go", "example-go", 80, "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -315,7 +306,6 @@ func TestRoutesDetachGateway(t *testing.T) {
 	}
 
 	err = DetachGateway(drycc, "example-go", "example-go", 80, "example-go")
-
 	if err != nil {
 		t.Fatal(err)
 	}
