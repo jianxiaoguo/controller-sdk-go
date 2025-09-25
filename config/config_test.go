@@ -275,7 +275,7 @@ func TestConfigSet(t *testing.T) {
 		},
 	}
 
-	actual, err := Set(drycc, "example-go", configVars)
+	actual, err := Set(drycc, "example-go", configVars, true)
 	if err != nil {
 		t.Error(err)
 	}
@@ -332,7 +332,7 @@ func TestConfigUnset(t *testing.T) {
 		},
 	}
 
-	actual, err := Set(drycc, "unset-test", configVars)
+	actual, err := Set(drycc, "unset-test", configVars, true)
 	if err != nil {
 		t.Error(err)
 	}
@@ -449,7 +449,7 @@ func TestConfigRefs(t *testing.T) {
 		},
 	}
 
-	actual, err := Set(drycc, "setrefs-test", configVars)
+	actual, err := Set(drycc, "setrefs-test", configVars, true)
 	if err != nil {
 		t.Error(err)
 	}

@@ -41,13 +41,16 @@ func List(c *drycc.Client, app string, version int) (api.Config, error) {
 // Calling Set() with an empty api.Config will return a drycc.ErrConflict.
 // Trying to unset a key that does not exist returns a drycc.ErrUnprocessable.
 // Trying to set a tag that is not a label in the kubernetes cluster will return a drycc.ErrTagNotFound.
-func Set(c *drycc.Client, app string, config api.Config) (api.Config, error) {
+func Set(c *drycc.Client, app string, config api.Config, merge bool) (api.Config, error) {
 	body, err := json.Marshal(config)
 	if err != nil {
 		return api.Config{}, err
 	}
 
 	u := fmt.Sprintf("/v2/apps/%s/config/", app)
+	if merge {
+		u += "?merge=true"
+	}
 
 	res, reqErr := c.Request("POST", u, body)
 	if reqErr != nil {
