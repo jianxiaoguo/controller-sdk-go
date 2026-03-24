@@ -18,7 +18,6 @@ const (
 	tlsDisabledFixture string = `{
 	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 	"app": "foo",
-	"owner": "test",
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
 	"https_enforced": false,
@@ -28,7 +27,6 @@ const (
 	tlsEnabledFixture string = `{
 	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 	"app": "foo",
-	"owner": "test",
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
 	"https_enforced": true,
@@ -37,7 +35,6 @@ const (
 	issuerFixture string = `{
     "uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
     "app": "foo",
-    "owner": "test",
     "created": "2016-08-22T17:40:16Z",
     "updated": "2016-08-22T17:40:16Z",
     "https_enforced": null,
@@ -56,7 +53,6 @@ const (
 	tlsCertsAutoFixture string = `{
 	"uuid": "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 	"app": "foo",
-	"owner": "test",
 	"created": "2016-08-22T17:40:16Z",
 	"updated": "2016-08-22T17:40:16Z",
 	"https_enforced": null,
@@ -174,7 +170,6 @@ func TestTLSInfo(t *testing.T) {
 		Created:          "2016-08-22T17:40:16Z",
 		Updated:          "2016-08-22T17:40:16Z",
 		App:              "foo",
-		Owner:            "test",
 		UUID:             "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 		HTTPSEnforced:    new(bool),
 		CertsAutoEnabled: new(bool),
@@ -222,7 +217,6 @@ func TestTLSEnable(t *testing.T) {
 		Created:       "2016-08-22T17:40:16Z",
 		Updated:       "2016-08-22T17:40:16Z",
 		App:           "foo",
-		Owner:         "test",
 		UUID:          "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 		HTTPSEnforced: &b,
 	}
@@ -268,7 +262,6 @@ func TestTLSDisable(t *testing.T) {
 		Created:       "2016-08-22T17:40:16Z",
 		Updated:       "2016-08-22T17:40:16Z",
 		App:           "foo",
-		Owner:         "test",
 		UUID:          "c4aed81c-d1ca-4ff1-ab89-d2151264e1a3",
 		HTTPSEnforced: &b,
 	}

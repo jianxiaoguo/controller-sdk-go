@@ -29,7 +29,6 @@ const (
 	invalidEmailMsg       = "Enter a valid email address."
 	invalidTagMsg         = "No nodes matched the provided labels"
 	duplicateIDMsg        = "Application with this id already exists."
-	cancellationFailedMsg = "still has applications assigned. Delete or transfer ownership"
 	duplicateDomainMsg    = "Domain is already in use by another application"
 	duplicateKeyMsg       = "Public Key is already in use"
 )
@@ -82,8 +81,6 @@ var (
 	ErrTagNotFound = errors.New("no nodes matched the provided labels")
 	// ErrDuplicateApp is returned when create an app with an ID that already exists
 	ErrDuplicateApp = errors.New("application with this id already exists")
-	// ErrCancellationFailed is returned when cancelling a user fails.
-	ErrCancellationFailed = errors.New("failed to delete user because the user still has applications assigned. Delete or transfer ownership")
 )
 
 // ErrUnprocessable is returned when the controller throws a 422.
@@ -211,16 +208,7 @@ func checkForErrors(res *http.Response) error {
 	case 405:
 		return ErrMethodNotAllowed
 	case 409:
-		bodyMap := make(map[string]any)
-		if err := json.Unmarshal(out, &bodyMap); err != nil {
-			return unknownServerError(res.StatusCode, fmt.Sprintf(jsonParsingError, err, string(out)))
-		}
-		if v, ok := bodyMap["detail"].(string); ok {
-			if strings.Contains(v, cancellationFailedMsg) {
-				return ErrCancellationFailed
-			}
-		}
-		return unknownServerError(res.StatusCode, string(out))
+		return ErrConflict
 	case 422:
 		bodyMap := make(map[string]any)
 		if err := json.Unmarshal(out, &bodyMap); err != nil {

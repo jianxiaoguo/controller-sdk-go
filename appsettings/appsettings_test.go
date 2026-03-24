@@ -14,7 +14,6 @@ import (
 
 const appSettingsFixture string = `
 {
-    "owner": "test",
     "app": "example-go",
     "routable": true,
     "autodeploy": true,
@@ -30,7 +29,6 @@ const appSettingsFixture string = `
 
 const appSettingsUnsetFixture string = `
 {
-    "owner": "test",
     "app": "unset-test",
     "routable": true,
     "autodeploy": true,
@@ -117,7 +115,6 @@ func TestAppSettingsSet(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:        "test",
 		App:          "example-go",
 		Routable:     api.NewRoutable(),
 		Autodeploy:   api.NewAutodeploy(),
@@ -180,7 +177,6 @@ func TestAppSettingsUnset(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:        "test",
 		App:          "unset-test",
 		Routable:     api.NewRoutable(),
 		Autodeploy:   api.NewAutodeploy(),
@@ -243,7 +239,6 @@ func TestAppSettingsList(t *testing.T) {
 	}
 
 	expected := api.AppSettings{
-		Owner:        "test",
 		App:          "example-go",
 		Routable:     api.NewRoutable(),
 		Autodeploy:   api.NewAutodeploy(),

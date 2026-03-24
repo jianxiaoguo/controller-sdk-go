@@ -2,8 +2,6 @@ package api
 
 // Route is the structure of an app's route.
 type Route struct {
-	// Owner is the app owner. It cannot be updated with AppSettings.Set(). See app.Transfer().
-	Owner string `json:"owner,omitempty"`
 	// App is the app name. It cannot be updated at all right now.
 	App string `json:"app,omitempty"`
 	// Created is the time that the application settings was created and cannot be updated.

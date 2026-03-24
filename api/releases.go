@@ -7,7 +7,6 @@ type Release struct {
 	Build      string      `json:"build,omitempty"`
 	Config     string      `json:"config"`
 	Created    string      `json:"created"`
-	Owner      string      `json:"owner"`
 	Summary    string      `json:"summary"`
 	Exception  string      `json:"exception"`
 	Conditions []Condition `json:"conditions"`

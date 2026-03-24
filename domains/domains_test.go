@@ -23,7 +23,6 @@ const domainsFixture string = `
             "created": "2014-01-01T00:00:00UTC",
             "domain": "example.example.com",
             "ptype": "web",
-            "owner": "test",
             "updated": "2014-01-01T00:00:00UTC"
         }
     ]
@@ -35,7 +34,6 @@ const domainFixture string = `
     "created": "2014-01-01T00:00:00UTC",
     "domain": "example.example.com",
     "ptype": "web",
-    "owner": "test",
     "updated": "2014-01-01T00:00:00UTC"
 }`
 
@@ -91,7 +89,6 @@ func TestDomainsList(t *testing.T) {
 			Created: "2014-01-01T00:00:00UTC",
 			Domain:  "example.example.com",
 			Ptype:   "web",
-			Owner:   "test",
 			Updated: "2014-01-01T00:00:00UTC",
 		},
 	}
@@ -123,7 +120,6 @@ func TestDomainsAdd(t *testing.T) {
 		Created: "2014-01-01T00:00:00UTC",
 		Domain:  "example.example.com",
 		Ptype:   "web",
-		Owner:   "test",
 		Updated: "2014-01-01T00:00:00UTC",
 	}
 

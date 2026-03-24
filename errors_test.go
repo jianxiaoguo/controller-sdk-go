@@ -262,7 +262,7 @@ func TestErrors(t *testing.T) {
 				StatusCode: 409,
 				Body:       readCloser(`{"detail":"foo still has applications assigned. Delete or transfer ownership"}`),
 			},
-			expected: ErrCancellationFailed,
+			expected: ErrConflict,
 		},
 		{
 			res: &http.Response{

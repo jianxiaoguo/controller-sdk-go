@@ -21,7 +21,6 @@ const routesFixture string = `
         {
             "app": "example-go",
             "created": "2023-04-19T00:00:00UTC",
-            "owner": "test",
             "updated": "2023-04-19T00:00:00UTC",
             "name": "example-go",
             "kind": "HTTPRoute",
@@ -171,7 +170,6 @@ func TestRoutesList(t *testing.T) {
 			App:     "example-go",
 			Created: "2023-04-19T00:00:00UTC",
 			Name:    "example-go",
-			Owner:   "test",
 			Updated: "2023-04-19T00:00:00UTC",
 			Kind:    "HTTPRoute",
 			ParentRefs: []api.ParentRef{

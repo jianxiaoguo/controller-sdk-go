@@ -16,7 +16,7 @@ const appFixture string = `
 {
     "created": "2014-01-01T00:00:00UTC",
     "id": "example-go",
-    "owner": "test",
+	"workspace": "test",
     "structure": {},
     "updated": "2014-01-01T00:00:00UTC",
     "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
@@ -31,7 +31,7 @@ const appsFixture string = `
         {
             "created": "2014-01-01T00:00:00UTC",
             "id": "example-go",
-            "owner": "test",
+			"workspace": "test",
             "structure": {},
             "updated": "2014-01-01T00:00:00UTC",
             "uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75"
@@ -40,9 +40,10 @@ const appsFixture string = `
 }`
 
 const (
-	appCreateExpected   string = `{"id":"example-go"}`
+	appCreateExpected   string = `{"id":"example-go","workspace":"test"}`
+	appCreateEmptyExpected string = `{"workspace":"test"}`
 	appRunExpected      string = `{"command":"echo hi","timeout":3600,"expires":3600}`
-	appTransferExpected string = `{"owner":"test"}`
+	appTransferExpected string = `{"workspace":"test"}`
 )
 
 type fakeHTTPServer struct {
@@ -66,7 +67,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(appFixture))
 			return
-		} else if string(body) == "" && !f.createWithoutID {
+		} else if string(body) == appCreateEmptyExpected && !f.createWithoutID {
 			f.createWithoutID = true
 			res.WriteHeader(http.StatusCreated)
 			res.Write([]byte(appFixture))
@@ -114,7 +115,7 @@ func (f *fakeHTTPServer) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if req.URL.Path == "/v2/apps/example-go/" && req.Method == "POST" {
+	if req.URL.Path == "/v2/apps/example-go/" && req.Method == "PATCH" {
 		body, err := io.ReadAll(req.Body)
 		if err != nil {
 			fmt.Println(err)
@@ -149,7 +150,7 @@ func TestAppsCreate(t *testing.T) {
 	expected := api.App{
 		ID:      "example-go",
 		Created: "2014-01-01T00:00:00UTC",
-		Owner:   "test",
+		Workspace: "test",
 		Updated: "2014-01-01T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
@@ -160,7 +161,7 @@ func TestAppsCreate(t *testing.T) {
 	}
 
 	for _, id := range []string{"example-go", ""} {
-		actual, err := New(drycc, id)
+		actual, err := New(drycc, id, "test")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -181,7 +182,7 @@ func TestAppsGet(t *testing.T) {
 	expected := api.App{
 		ID:      "example-go",
 		Created: "2014-01-01T00:00:00UTC",
-		Owner:   "test",
+		Workspace: "test",
 		Updated: "2014-01-01T00:00:00UTC",
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 	}
@@ -246,7 +247,7 @@ func TestAppsList(t *testing.T) {
 		{
 			ID:      "example-go",
 			Created: "2014-01-01T00:00:00UTC",
-			Owner:   "test",
+			Workspace: "test",
 			Updated: "2014-01-01T00:00:00UTC",
 			UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 		},

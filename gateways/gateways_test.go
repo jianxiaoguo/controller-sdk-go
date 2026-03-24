@@ -22,7 +22,6 @@ const gatewaysFixture string = `
             "app": "example-go",
             "name": "example-go",
             "created": "2023-04-19T00:00:00UTC",
-            "owner": "test",
             "updated": "2023-04-19T00:00:00UTC",
             "listeners": [
                 {
@@ -111,7 +110,6 @@ func TestGatewaysList(t *testing.T) {
 			App:     "example-go",
 			Created: "2023-04-19T00:00:00UTC",
 			Name:    "example-go",
-			Owner:   "test",
 			Updated: "2023-04-19T00:00:00UTC",
 			Listeners: []api.Listener{
 				{

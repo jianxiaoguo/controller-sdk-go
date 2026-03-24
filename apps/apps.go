@@ -25,21 +25,19 @@ func List(c *drycc.Client, results int) (api.Apps, int, error) {
 	return apps, count, reqErr
 }
 
-// New creates a new app with the given appID. Passing an empty string will result in
-// a randomized app name.
+// New creates a new app with the given appID and workspace.
+// Passing an empty appID will result in a randomized app name.
 //
 // If the app name already exists, the error drycc.ErrDuplicateApp will be returned.
-func New(c *drycc.Client, appID string) (api.App, error) {
+func New(c *drycc.Client, appID string, workspace string) (api.App, error) {
 	body := []byte{}
 
-	if appID != "" {
-		req := api.AppCreateRequest{ID: appID}
-		b, err := json.Marshal(req)
-		if err != nil {
-			return api.App{}, err
-		}
-		body = b
+	req := api.AppCreateRequest{ID: appID, Workspace: workspace}
+	b, err := json.Marshal(req)
+	if err != nil {
+		return api.App{}, err
 	}
+	body = b
 
 	res, reqErr := c.Request("POST", "/v2/apps/", body)
 	if reqErr != nil && !drycc.IsErrAPIMismatch(reqErr) {
@@ -110,17 +108,17 @@ func Delete(c *drycc.Client, appID string) error {
 	return err
 }
 
-// Transfer an app to another user.
-func Transfer(c *drycc.Client, appID string, username string) error {
+// Transfer moves an app to another workspace.
+func Transfer(c *drycc.Client, appID string, workspace string) error {
 	u := fmt.Sprintf("/v2/apps/%s/", appID)
 
-	req := api.AppUpdateRequest{Owner: username}
+	req := api.AppUpdateRequest{Workspace: workspace}
 	body, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
 
-	res, err := c.Request("POST", u, body)
+	res, err := c.Request("PATCH", u, body)
 	if err == nil {
 		res.Body.Close()
 	}

@@ -18,7 +18,6 @@ const volumeCreateExpected string = `{"name":"myvolume","size":"500G"}`
 const volumeCreateFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
 	"size": "500G",
@@ -35,7 +34,6 @@ const volumeExpandExpected string = `{"name":"myvolume","size":"500G"}`
 const volumeExpandFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
 	"size": "500G",
@@ -55,7 +53,6 @@ const volumesFixture string = `
     "results": [
 		{
 			"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-			"owner": "test",
 			"app": "example-go",
 			"name": "myvolume",
 			"size": "500G",
@@ -72,7 +69,6 @@ const volumesFixture string = `
 const volumeGetFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
 	"size": "500G",
@@ -87,7 +83,6 @@ const volumeGetFixture string = `
 const volumeMountFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "myvolume",
 	"size": "500G",
@@ -105,7 +100,6 @@ const volumeMountFixture string = `
 const volumeUnmountFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "unmount-test",
 	"name": "myvolume",
 	"size": "500G",
@@ -249,7 +243,6 @@ func TestVolumesCreate(t *testing.T) {
 
 	expected := api.Volume{
 		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:      "test",
 		App:        "example-go",
 		Name:       "myvolume",
 		Size:       "500G",
@@ -287,7 +280,6 @@ func TestVolumesExpand(t *testing.T) {
 
 	expected := api.Volume{
 		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:      "test",
 		App:        "example-go",
 		Name:       "myvolume",
 		Size:       "500G",
@@ -344,7 +336,6 @@ func TestVolumesList(t *testing.T) {
 		{
 			UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 			App:        "example-go",
-			Owner:      "test",
 			Name:       "myvolume",
 			Path:       map[string]any{},
 			Size:       "500G",
@@ -378,7 +369,6 @@ func TestVolumeGet(t *testing.T) {
 	expected := api.Volume{
 		UUID:       "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
 		App:        "example-go",
-		Owner:      "test",
 		Name:       "myvolume",
 		Path:       map[string]any{},
 		Size:       "500G",
@@ -420,7 +410,6 @@ func TestVolumeMount(t *testing.T) {
 
 	expected := api.Volume{
 		Name:  "myvolume",
-		Owner: "test",
 		App:   "example-go",
 		Path: map[string]any{
 			"cmd": "/data/cmd1",
@@ -464,7 +453,6 @@ func TestVolumeUnmount(t *testing.T) {
 
 	expected := api.Volume{
 		Name:       "myvolume",
-		Owner:      "test",
 		App:        "unmount-test",
 		Path:       map[string]any{},
 		Size:       "500G",

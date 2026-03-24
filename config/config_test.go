@@ -14,7 +14,6 @@ import (
 
 const configFixtureV1 string = `
 {
-    "owner": "test",
     "app": "example-go",
     "values": [{
         "name": "NEW_URL2", 
@@ -58,7 +57,6 @@ const configFixtureV1 string = `
 
 const configFixtureV2 string = `
 {
-    "owner": "test",
     "app": "example-go",
     "values": [{
 		"name":  "NEW_URL2",
@@ -101,7 +99,6 @@ const configFixtureV2 string = `
 
 const configUnsetFixture string = `
 {
-    "owner": "test",
     "app": "unset-test",
     "values": [],
     "limits": {},
@@ -115,7 +112,6 @@ const configUnsetFixture string = `
 
 const configSetRefsFixture string = `
 {
-    "owner": "test",
     "app": "setrefs-test",
     "values": [],
 	"values_refs":{"web":["myconfig1"]},
@@ -227,7 +223,6 @@ func TestConfigSet(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner: "test",
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{
@@ -344,7 +339,6 @@ func TestConfigUnset(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner:    "test",
 		App:      "unset-test",
 		Values:   []api.ConfigValue{},
 		Limits:   map[string]any{},
@@ -401,7 +395,6 @@ func TestConfigList(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner: "test",
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{
@@ -484,7 +477,6 @@ func TestConfigRefs(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner:  "test",
 		App:    "setrefs-test",
 		Values: []api.ConfigValue{},
 		ValuesRefs: map[string][]string{

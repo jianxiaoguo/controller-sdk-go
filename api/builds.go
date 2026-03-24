@@ -7,7 +7,6 @@ type Build struct {
 	Dockerfile string            `json:"dockerfile,omitempty"`
 	Image      string            `json:"image,omitempty"`
 	Stack      string            `json:"stack,omitempty"`
-	Owner      string            `json:"owner"`
 	Procfile   map[string]string `json:"procfile"`
 	Dryccfile  map[string]any    `json:"dryccfile"`
 	Sha        string            `json:"sha,omitempty"`

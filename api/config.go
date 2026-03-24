@@ -49,8 +49,6 @@ type ConfigUnset struct {
 
 // Config is the structure of an app's config.
 type Config struct {
-	// Owner is the app owner. It cannot be updated with config.Set(). See app.Transfer().
-	Owner string `json:"owner,omitempty"`
 	// App is the app name. It cannot be updated at all right now.
 	App string `json:"app,omitempty"`
 	// Values are exposed as environment variables to the app.

@@ -24,7 +24,6 @@ const releasesFixture string = `
             "build": null,
             "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
             "created": "2014-01-01T00:00:00UTC",
-            "owner": "test",
             "summary": "test created initial release",
             "exception": null,
             "conditions": [{
@@ -47,7 +46,6 @@ const releaseFixture string = `
     "state": "succeed",
     "config": "95bd6dea-1685-4f78-a03d-fd7270b058d1",
     "created": "2014-01-01T00:00:00UTC",
-    "owner": "test",
     "summary": "test created initial release",
     "exception": null,
     "conditions": [{
@@ -166,7 +164,6 @@ func TestReleasesList(t *testing.T) {
 			State:     "succeed",
 			Config:    "95bd6dea-1685-4f78-a03d-fd7270b058d1",
 			Created:   "2014-01-01T00:00:00UTC",
-			Owner:     "test",
 			Summary:   "test created initial release",
 			Exception: "",
 			Conditions: []api.Condition{
@@ -211,7 +208,6 @@ func TestReleasesGet(t *testing.T) {
 		Build:     "",
 		Config:    "95bd6dea-1685-4f78-a03d-fd7270b058d1",
 		Created:   "2014-01-01T00:00:00UTC",
-		Owner:     "test",
 		Summary:   "test created initial release",
 		Exception: "",
 		Conditions: []api.Condition{

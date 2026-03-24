@@ -161,7 +161,6 @@ func TestConfigHook(t *testing.T) {
 	}
 
 	expected := api.Config{
-		Owner: "test",
 		App:   "example-go",
 		Values: []api.ConfigValue{
 			{

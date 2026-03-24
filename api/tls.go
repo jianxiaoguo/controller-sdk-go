@@ -9,8 +9,6 @@ type Event = map[string]string
 
 // TLS is the structure of an app's TLS settings.
 type TLS struct {
-	// Owner is the app owner. It cannot be updated with TLS.Set(). See app.Transfer().
-	Owner string `json:"owner,omitempty"`
 	// App is the app the tls settings apply to and cannot be updated.
 	App string `json:"app,omitempty"`
 	// Created is the time that the TLS settings was created and cannot be updated.

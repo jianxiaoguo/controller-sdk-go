@@ -5,7 +5,7 @@ package api
 type App struct {
 	Created string `json:"created"`
 	ID      string `json:"id"`
-	Owner   string `json:"owner"`
+	Workspace string `json:"workspace"`
 	Updated string `json:"updated"`
 	UUID    string `json:"uuid"`
 }
@@ -19,12 +19,13 @@ func (a Apps) Less(i, j int) bool { return a[i].ID < a[j].ID }
 
 // AppCreateRequest is the definition of POST /v2/apps/.
 type AppCreateRequest struct {
-	ID string `json:"id,omitempty"`
+	ID        string `json:"id,omitempty"`
+	Workspace string `json:"workspace,omitempty"`
 }
 
-// AppUpdateRequest is the definition of POST /v2/apps/<app id>/.
+// AppUpdateRequest is the definition of PATCH /v2/apps/<app id>/.
 type AppUpdateRequest struct {
-	Owner string `json:"owner,omitempty"`
+	Workspace string `json:"workspace,omitempty"`
 }
 
 // AppRunRequest is the definition of POST /v2/apps/<app id>/run.

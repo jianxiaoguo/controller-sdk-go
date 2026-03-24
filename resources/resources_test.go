@@ -45,7 +45,6 @@ const resourcePutExpected string = `{"plan":"mysql:5.7"}`
 const resourceCreateFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "mysql",
 	"plan": "mysql:5.6",
@@ -62,7 +61,6 @@ const resourceCreateFixture string = `
 const resourcePutFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "mysql",
 	"plan": "mysql:5.7",
@@ -84,7 +82,6 @@ const resourcesFixture string = `
    "results": [
 		{
 			"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-			"owner": "test",
 			"app": "example-go",
 			"name": "mysql",
 			"plan": "mysql:5.6",
@@ -103,7 +100,6 @@ const resourcesFixture string = `
 const resourceFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-go",
 	"name": "mysql",
 	"plan": "mysql:5.6",
@@ -120,7 +116,6 @@ const resourceFixture string = `
 const resourceBindingFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-bind",
 	"name": "mysql",
 	"plan": "mysql:5.6",
@@ -137,7 +132,6 @@ const resourceBindingFixture string = `
 const resourceUnbindFixture string = `
 {
 	"uuid": "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-	"owner": "test",
 	"app": "example-unbind",
 	"name": "mysql",
 	"plan": "mysql:5.6",
@@ -275,7 +269,6 @@ func TestResourcesCreate(t *testing.T) {
 
 	expected := api.Resource{
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
 		App:     "example-go",
 		Name:    "mysql",
 		Plan:    "mysql:5.6",
@@ -376,7 +369,6 @@ func TestResourcesList(t *testing.T) {
 	expected := api.Resources{
 		{
 			UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-			Owner:   "test",
 			App:     "example-go",
 			Name:    "mysql",
 			Plan:    "mysql:5.6",
@@ -431,7 +423,6 @@ func TestResourceGet(t *testing.T) {
 
 	expected := api.Resource{
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
 		App:     "example-go",
 		Name:    "mysql",
 		Plan:    "mysql:5.6",
@@ -468,7 +459,6 @@ func TestResourcePut(t *testing.T) {
 
 	expected := api.Resource{
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
 		App:     "example-go",
 		Name:    "mysql",
 		Plan:    "mysql:5.7",
@@ -516,7 +506,6 @@ func TestResourceBind(t *testing.T) {
 
 	expected := api.Resource{
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
 		App:     "example-bind",
 		Name:    "mysql",
 		Plan:    "mysql:5.6",
@@ -556,7 +545,6 @@ func TestResourceUnbind(t *testing.T) {
 
 	expected := api.Resource{
 		UUID:    "de1bf5b5-4a72-4f94-a10c-d2a3741cdf75",
-		Owner:   "test",
 		App:     "example-unbind",
 		Name:    "mysql",
 		Plan:    "mysql:5.6",

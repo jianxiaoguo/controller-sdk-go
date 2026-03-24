@@ -28,8 +28,6 @@ type ResourceServices []ResourceService
 
 // Resource is the structure of an app's resource.
 type Resource struct {
-	// Owner is the app owner.
-	Owner string `json:"owner,omitempty"`
 	// App is the app the tls settings apply to and cannot be updated.
 	App string `json:"app,omitempty"`
 	// Created is the time that the resource was created and cannot be updated.

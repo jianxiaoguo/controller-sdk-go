@@ -18,7 +18,6 @@ type Cert struct {
 	Subject        string    `json:"subject"`
 	SubjectAltName []string  `json:"san,omitempty"`
 	Domains        []string  `json:"domains,omitempty"`
-	Owner          string    `json:"owner,omitempty"`
 	ID             int       `json:"id,omitempty"`
 }
 

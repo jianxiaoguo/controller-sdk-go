@@ -38,7 +38,6 @@ const certFixture string = `
     "fingerprint": "12:34:56:78:90",
     "name": "test-example-com",
     "app": "example-go",
-    "owner": "test",
     "id": 1
 }`
 
@@ -156,7 +155,6 @@ func TestCert(t *testing.T) {
 		Fingerprint: "12:34:56:78:90",
 		App:         "example-go",
 		Name:        "test-example-com",
-		Owner:       "test",
 		ID:          1,
 	}
 
@@ -196,7 +194,6 @@ func TestCertInfo(t *testing.T) {
 		Fingerprint: "12:34:56:78:90",
 		App:         "example-go",
 		Name:        "test-example-com",
-		Owner:       "test",
 		ID:          1,
 	}
 

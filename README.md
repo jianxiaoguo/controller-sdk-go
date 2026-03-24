@@ -26,6 +26,45 @@ apps, _, err := apps.List(client, 100)
 if err != nil {
     log.Fatal(err)
 }
+
+// Create app in a workspace (workspace is required in the new API)
+app, err := apps.New(client, "example-go", "team-a")
+if err != nil {
+    log.Fatal(err)
+}
+
+_ = app
+```
+
+### Workspaces
+
+```go
+import drycc "github.com/drycc/controller-sdk-go"
+import "github.com/drycc/controller-sdk-go/workspaces"
+import members "github.com/drycc/controller-sdk-go/workspaces/members"
+import invitations "github.com/drycc/controller-sdk-go/workspaces/invitations"
+```
+
+```go
+client, err := drycc.New(true, "drycc.test.io", "abc123")
+if err != nil {
+    log.Fatal(err)
+}
+
+ws, err := workspaces.Create(client, "team-a", "team-a@example.com")
+if err != nil {
+    log.Fatal(err)
+}
+
+_, _, err = members.List(client, ws.Name, 100)
+if err != nil {
+    log.Fatal(err)
+}
+
+_, err = invitations.Create(client, ws.Name, "new-user@example.com")
+if err != nil {
+    log.Fatal(err)
+}
 ```
 
 ### Authentication

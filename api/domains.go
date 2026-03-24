@@ -5,7 +5,6 @@ type Domain struct {
 	App     string `json:"app"`
 	Created string `json:"created"`
 	Domain  string `json:"domain"`
-	Owner   string `json:"owner"`
 	Ptype   string `json:"ptype"`
 	Updated string `json:"updated"`
 }
